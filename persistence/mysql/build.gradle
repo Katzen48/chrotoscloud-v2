@@ -1,0 +1,21 @@
+plugins {
+    id 'java'
+}
+
+group 'net.chrotos:chrotoscloud-persistence-mysql'
+version '3.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    implementation project(':api')
+    implementation project(':persistence:models')
+}
+
+test {
+    //seJUnitPlatform()
+}

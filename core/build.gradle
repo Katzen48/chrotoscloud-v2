@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+}
+
+group 'net.chrotos:chrotoscloud-core'
+version '3.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    implementation 'com.google.inject:guice:5.0.1'
+
+    implementation project(':api')
+    implementation project(':persistence:models')
+
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    testCompileOnly 'org.projectlombok:lombok:1.18.22'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+}
+
+test {
+    //useJUnitPlatform()
+}
