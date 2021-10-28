@@ -12,7 +12,7 @@ public interface Account {
     float getBalance();
     float getLimit();
     float getCreditLimit();
-    float isSharedAccount();
+    boolean isSharedAccount();
     Collection<UUID> getSharedWith();
     LocalDateTime getCreatedAt();
 }
