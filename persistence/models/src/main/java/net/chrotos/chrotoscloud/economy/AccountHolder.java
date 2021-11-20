@@ -1,10 +1,10 @@
 package net.chrotos.chrotoscloud.economy;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 public interface AccountHolder {
-    Collection<Account> getAccounts();
-    Collection<Account> getAccounts(AccountType type);
-    Collection<Account> getAccounts(String accountCode);
-    Account getAccount(AccountType type, String accountCode);
+    List<Account> getAccounts();
+    List<Account> getAccounts(AccountType type);
+    Account getAccount(UUID uniqueId);
 }

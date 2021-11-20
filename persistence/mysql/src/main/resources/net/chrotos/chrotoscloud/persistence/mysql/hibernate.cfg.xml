@@ -1,0 +1,16 @@
+<hibernate-configuration>
+    <session-factory>
+
+        <property name = "hibernate.dialect">
+            org.hibernate.dialect.MySQLDialect
+        </property>
+
+        <property name = "hibernate.connection.driver_class">
+            com.mysql.jdbc.Driver
+        </property>
+
+        <property name="hbm2ddl.auto">create</property>
+        <mapping class="net.chrotos.chrotoscloud.economy.CloudAccount" />
+        <mapping class="net.chrotos.chrotoscloud.player.CloudPlayer" />
+    </session-factory>
+</hibernate-configuration>

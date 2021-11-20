@@ -19,5 +19,17 @@ jobs:
           gradle-version: 7.2
       - uses: actions/upload-artifact@v2
         with:
-          name: Package
-          path: build/libs
+          name: api
+          path: api/build/libs
+      - uses: actions/upload-artifact@v2
+        with:
+          name: core
+          path: core/build/libs
+      - uses: actions/upload-artifact@v2
+        with:
+          name: persistence-models
+          path: persistence/models/build/libs
+      - uses: actions/upload-artifact@v2
+        with:
+          name: persistence-mysql
+          path: persistence/mysql/build/libs
