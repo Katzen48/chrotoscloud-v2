@@ -2,15 +2,22 @@
     <session-factory>
 
         <property name = "hibernate.dialect">
-            org.hibernate.dialect.MySQLDialect
+            org.hibernate.dialect.MariaDB103Dialect
         </property>
 
         <property name = "hibernate.connection.driver_class">
-            com.mysql.jdbc.Driver
+            org.mariadb.jdbc.Driver
         </property>
 
-        <property name="hbm2ddl.auto">create</property>
-        <mapping class="net.chrotos.chrotoscloud.economy.CloudAccount" />
+        <property name="hibernate.physical_naming_strategy">
+            com.vladmihalcea.hibernate.naming.CamelCaseToSnakeCaseNamingStrategy
+        </property>
+
+        <!--
+        <property name="hbm2ddl.auto">validate</property>
+        -->
+
         <mapping class="net.chrotos.chrotoscloud.player.CloudPlayer" />
+        <mapping class="net.chrotos.chrotoscloud.economy.CloudAccount" />
     </session-factory>
 </hibernate-configuration>

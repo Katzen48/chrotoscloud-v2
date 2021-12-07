@@ -7,12 +7,11 @@ import java.util.UUID;
 
 public interface Account {
     UUID getUniqueId();
-    UUID getOwnerId();
     Player getOwner();
     AccountType getAccountType();
     Collection<Transaction> getTransactions();
     float getBalance();
-    float getLimit();
+    float getBalanceLimit();
     float getCreditLimit();
     boolean isSharedAccount();
     Collection<UUID> getSharedWith();

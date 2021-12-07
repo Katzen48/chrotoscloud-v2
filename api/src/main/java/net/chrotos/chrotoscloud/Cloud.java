@@ -4,21 +4,49 @@ import lombok.Getter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 import net.chrotos.chrotoscloud.player.Player;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.ServiceLoader;
 
 @Getter
 public abstract class Cloud {
     private static Cloud instance;
-    private PersistenceAdapter persistence;
-    private CloudConfig cloudConfig;
+    protected PersistenceAdapter persistence;
+    protected CloudConfig cloudConfig;
 
-    public static void initializeFromInstance(Cloud instance) {
-        if (Cloud.instance != null) {
-            throw new IllegalStateException("Cloud is already initialized");
+    public static Cloud getInstance() {
+        if (Cloud.instance == null) {
+            ServiceLoader<Cloud> serviceLoader = ServiceLoader.load(Cloud.class);
+
+            Iterator<Cloud> iterator = serviceLoader.iterator();
+
+            if (!iterator.hasNext()) {
+                throw new IllegalArgumentException("No Implementation found!");
+            }
+
+            instance = iterator.next();
         }
 
-        Cloud.instance = instance;
+        return instance;
     }
 
     public abstract List<Player> getOnlinePlayers();
+
+    // Management stuff (loading, initialization
+
+    /**
+     * Load the module with it's services, before it can be initialized
+     * @throws IllegalStateException if the a service is missing it's implementing module
+     */
+    public abstract void load();
+
+    /**
+     * Initialize the module, after it has been loaded
+     * @throws IllegalStateException if the module has not been loaded
+     */
+    public abstract void initialize();
+
+    public abstract boolean isInitialized();
+
+    public abstract boolean isLoaded();
 }

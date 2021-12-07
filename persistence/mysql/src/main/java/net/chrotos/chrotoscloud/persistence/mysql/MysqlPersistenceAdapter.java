@@ -3,10 +3,14 @@ package net.chrotos.chrotoscloud.persistence.mysql;
 import net.chrotos.chrotoscloud.CloudConfig;
 import net.chrotos.chrotoscloud.persistence.DataSelectFilter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
+import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
+import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
+import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
 import org.hibernate.cfg.Configuration;
 
 import javax.persistence.EntityManager;
+import javax.persistence.FlushModeType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -26,11 +30,23 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     @Override
     public boolean configure(CloudConfig config) {
         try {
+            if (config.shouldRunMigrations()) {
+                Flyway flyway = Flyway.configure().dataSource(  config.getPersistenceConnectionString(),
+                                                                config.getPersistenceUser(),
+                                                                config.getPersistencePassword())
+                                                    .load();
+
+                // TODO add logging
+                flyway.migrate();
+            }
+
             Configuration dbConfig = new Configuration()
-                    .configure("classpath:net/chrotos/chrotoscloud/persistence/mysql/hibernate.cfg.xml")
+                    .configure("/net/chrotos/chrotoscloud/persistence/mysql/hibernate.cfg.xml")
                     .setProperty("hibernate.connection.url", config.getPersistenceConnectionString())
                     .setProperty("hibernate.connection.username", config.getPersistenceUser())
                     .setProperty("hibernate.connection.password", config.getPersistencePassword());
+
+            dbConfig.setPhysicalNamingStrategy(new CamelCaseToUnderscoresNamingStrategy());
 
 
             sessionFactory = dbConfig.buildSessionFactory();
@@ -68,5 +84,27 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
         }
 
         return entityManager.find(clazz, filter.getPrimaryKeyValue());
+    }
+
+    @Override
+    public <E> void save(E entity) {
+        if (entityManager.contains(entity)) {
+            return;
+        }
+
+        RuntimeException exception = null;
+        entityManager.getTransaction().begin();
+        try {
+            entityManager.persist(entity);
+            entityManager.flush();
+        } catch (RuntimeException e) {
+            exception = e;
+        }
+
+        entityManager.getTransaction().commit();
+
+        if (exception != null) {
+            throw exception;
+        }
     }
 }
