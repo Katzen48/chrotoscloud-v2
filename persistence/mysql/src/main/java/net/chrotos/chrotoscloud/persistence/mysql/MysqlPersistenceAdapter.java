@@ -34,6 +34,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
                 Flyway flyway = Flyway.configure().dataSource(  config.getPersistenceConnectionString(),
                                                                 config.getPersistenceUser(),
                                                                 config.getPersistencePassword())
+                                                    .table("migrations")
                                                     .load();
 
                 // TODO add logging

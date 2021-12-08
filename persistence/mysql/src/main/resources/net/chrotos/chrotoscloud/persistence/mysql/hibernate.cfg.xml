@@ -9,13 +9,7 @@
             org.mariadb.jdbc.Driver
         </property>
 
-        <property name="hibernate.physical_naming_strategy">
-            com.vladmihalcea.hibernate.naming.CamelCaseToSnakeCaseNamingStrategy
-        </property>
-
-        <!--
         <property name="hbm2ddl.auto">validate</property>
-        -->
 
         <mapping class="net.chrotos.chrotoscloud.player.CloudPlayer" />
         <mapping class="net.chrotos.chrotoscloud.economy.CloudAccount" />
