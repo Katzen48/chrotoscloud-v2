@@ -17,6 +17,10 @@ jobs:
         with:
           arguments: build
           gradle-version: 7.2
+        env:
+          CHROTOSCLOUD_TEST_DB_STRING: ${{ secrets.CHROTOSCLOUD_TEST_DB_STRING }}
+          CHROTOSCLOUD_TEST_DB_USER: ${{ secrets.CHROTOSCLOUD_TEST_DB_USER }}
+          CHROTOSCLOUD_TEST_DB_PASSWORD: ${{ secrets.CHROTOSCLOUD_TEST_DB_PASSWORD }}
       - uses: actions/upload-artifact@v2
         with:
           name: api
