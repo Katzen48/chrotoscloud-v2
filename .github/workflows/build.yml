@@ -4,7 +4,13 @@
 # documentation.
 
 name: Java CI
-on: [push]
+on: 
+  push:
+    branches:
+    - master
+    paths:
+    - plugin/**
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,6 +23,7 @@ jobs:
         with:
           arguments: build
           gradle-version: 7.2
+          build-root-directory: plugin
         env:
           CHROTOSCLOUD_TEST_DB_STRING: ${{ secrets.CHROTOSCLOUD_TEST_DB_STRING }}
           CHROTOSCLOUD_TEST_DB_USER: ${{ secrets.CHROTOSCLOUD_TEST_DB_USER }}
@@ -24,16 +31,16 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: api
-          path: api/build/libs
+          path: plugin/api/build/libs
       - uses: actions/upload-artifact@v2
         with:
           name: core
-          path: core/build/libs
+          path: plugin/core/build/libs
       - uses: actions/upload-artifact@v2
         with:
           name: persistence-models
-          path: persistence/models/build/libs
+          path: plugin/persistence/models/build/libs
       - uses: actions/upload-artifact@v2
         with:
           name: persistence-mysql
-          path: persistence/mysql/build/libs
+          path: plugin/persistence/mysql/build/libs
