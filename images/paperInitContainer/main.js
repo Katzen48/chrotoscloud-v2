@@ -1,7 +1,7 @@
 // Fetch newest paper version
 
 const BASE_URL = 'https://papermc.io/api/v2/projects/paper/versions';
-const path = '/workdir/server.jar'
+const path = '/workdir'
 const fs = require('fs');
 const https = require('https');
 
@@ -13,7 +13,7 @@ const https = require('https');
 
     await new Promise((resolve, reject) => {
         https.get(`${BASE_URL}/${version}/builds/${newestBuild}/downloads/paper-${version}-${newestBuild}.jar`, (res) => {
-            const stream = fs.createWriteStream(path);
+            const stream = fs.createWriteStream(path + '/server.jar');
             res.pipe(stream);
 
             stream.on('finish', () => {
@@ -21,5 +21,7 @@ const https = require('https');
                 resolve();
             });
         })
-    })
+    });
+    
+    fs.writeFileSync(path + '/eula.txt', 'eula=true');
 })();
