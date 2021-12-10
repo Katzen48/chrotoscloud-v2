@@ -1,8 +1,8 @@
 // Fetch newest paper version
-import fetch from "node-fetch";
 
 const BASE_URL = 'https://papermc.io/api/v2/projects/paper/versions';
 const path = '/workdir'
+const fetch = require('cross-fetch')
 const fs = require('fs');
 const https = require('https');
 
