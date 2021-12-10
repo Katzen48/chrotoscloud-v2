@@ -14,6 +14,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  BASE_IMAGE = ghcr.io/${{ github.repository }}
 
 jobs:
   build-and-push-image:
@@ -38,4 +39,4 @@ jobs:
         with:
           context: images/paperInitContainer
           push: true
-          tags: paper-init-container
+          tags: ${{ env.BASE_IMAGE }}:paper-init-container
