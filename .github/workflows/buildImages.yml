@@ -10,6 +10,7 @@ on:
     - master
     paths:
     - images/**
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
