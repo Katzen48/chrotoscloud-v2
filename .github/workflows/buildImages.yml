@@ -37,4 +37,4 @@ jobs:
         with:
           context: images/paperInitContainer
           push: true
-          tags: paperInitContainer
+          tags: paper-init-container
