@@ -10,7 +10,7 @@ const https = require('https');
     let version = process.env.PAPER_VERSION || '1.17.1';
 
     let versionResponse = await fetch(`${BASE_URL}/${version}`)
-    let json = await version.json();
+    let json = await versionResponse.json();
     let newestBuild = json.builds.sort().reverse()[0];
 
     await new Promise((resolve, reject) => {
