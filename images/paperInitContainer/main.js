@@ -11,7 +11,7 @@ const https = require('https');
 
     let versionResponse = await fetch(`${BASE_URL}/${version}`)
     let json = await versionResponse.json();
-    let newestBuild = json.builds.sort().reverse()[0];
+    let newestBuild = json.builds[json.builds.length - 1];
 
     await new Promise((resolve, reject) => {
         https.get(`${BASE_URL}/${version}/builds/${newestBuild}/downloads/paper-${version}-${newestBuild}.jar`, (res) => {
