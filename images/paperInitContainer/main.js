@@ -2,6 +2,7 @@
 
 const BASE_URL = 'https://papermc.io/api/v2/projects/paper/versions';
 const path = '/workdir'
+const fetch = require('node-fetch');
 const fs = require('fs');
 const https = require('https');
 
@@ -9,7 +10,8 @@ const https = require('https');
     let version = process.env.PAPER_VERSION || '1.17.1';
 
     let versionResponse = await fetch(`${BASE_URL}/${version}`)
-    let newestBuild = JSON.parse(versionResponse).builds.sort().reverse()[0];
+    let json = await version.json();
+    let newestBuild = json.builds.sort().reverse()[0];
 
     await new Promise((resolve, reject) => {
         https.get(`${BASE_URL}/${version}/builds/${newestBuild}/downloads/paper-${version}-${newestBuild}.jar`, (res) => {

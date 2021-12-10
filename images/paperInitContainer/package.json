@@ -2,6 +2,7 @@
   "name": "paperInitContainer",
   "version": "1.0.0",
   "dependencies": {
+    "node-fetch": "^3.1.0"
   },
   "main": "main.js"
 }
