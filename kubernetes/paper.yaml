@@ -27,6 +27,7 @@ spec:
       labels:
         app: paper-template
     spec:
+      volumes:
         - name: workdir
           emptyDir: {}
       initContainers:

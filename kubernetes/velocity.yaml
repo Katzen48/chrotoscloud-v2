@@ -27,6 +27,7 @@ spec:
       labels:
         app: velocity-proxy
     spec:
+      volumes:
         - name: workdir
           emptyDir: {}
       initContainers:
