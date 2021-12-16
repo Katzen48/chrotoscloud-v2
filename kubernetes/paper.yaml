@@ -1,0 +1,82 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: paper-template
+  namespace: servers
+spec:
+  ports:
+    - name: minecraft
+      protocol: TCP
+      port: 25565
+      targetPort: 25565
+  selector:
+    app: paper-template
+---
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: paper-template
+  namespace: servers
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paper-template
+  template:
+    metadata:
+      labels:
+        app: paper-template
+    spec:
+        - name: workdir
+          emptyDir: {}
+      initContainers:
+        - name: paper-download
+          image: ghcr.io/katzen48/chrotoscloud-v2:paper-init-container
+          volumeMounts:
+            - name: workdir
+              mountPath: /workdir
+          imagePullPolicy: IfNotPresent
+      containers:
+        - name: paper
+          image: openjdk:16-jdk-alpine
+          command:
+            - java
+          args:
+            - '-Xms3000M'
+            - '-Xmx4G'
+            - '-jar'
+            - server.jar
+          workingDir: /opt/paper
+          ports:
+            - name: minecraft
+              containerPort: 25565
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 2
+              memory: 4G
+            requests:
+              cpu: 1
+              memory: 3000M
+          volumeMounts:
+            - name: workdir
+              mountPath: /opt/paper
+          livenessProbe:
+            tcpSocket:
+              port: 25565
+            initialDelaySeconds: 60
+            timeoutSeconds: 1
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: 25565
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 2
+            successThreshold: 1
+            failureThreshold: 10
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+  serviceName: paper-template

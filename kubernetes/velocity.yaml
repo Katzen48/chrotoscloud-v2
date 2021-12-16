@@ -1,0 +1,83 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: velocity-proxy
+  namespace: servers
+spec:
+  ports:
+    - name: minecraft
+      protocol: TCP
+      port: 25565
+      targetPort: 25565
+  selector:
+    app: velocity-proxy
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: velocity-proxy
+  namespace: servers
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: velocity-proxy
+  template:
+    metadata:
+      labels:
+        app: velocity-proxy
+    spec:
+        - name: workdir
+          emptyDir: {}
+      initContainers:
+        - name: velocity-download
+          image: ghcr.io/katzen48/chrotoscloud-v2:velocity-init-container
+          volumeMounts:
+            - name: workdir
+              mountPath: /workdir
+          imagePullPolicy: IfNotPresent
+      containers:
+        - name: lobby-test
+          image: openjdk:16-jdk-alpine
+          command:
+            - java
+          args:
+            - '-Xms3000M'
+            - '-Xmx4G'
+            - '-jar'
+            - server.jar
+          workingDir: /opt/proxy
+          ports:
+            - name: minecraft
+              hostPort: 25565
+              containerPort: 25565
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 2
+              memory: 4G
+            requests:
+              cpu: 1
+              memory: 3000M
+          volumeMounts:
+            - name: workdir
+              mountPath: /opt/proxy
+          livenessProbe:
+            tcpSocket:
+              port: 25565
+            initialDelaySeconds: 60
+            timeoutSeconds: 1
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: 25565
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 2
+            successThreshold: 1
+            failureThreshold: 10
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+  serviceName: velocity-proxy
