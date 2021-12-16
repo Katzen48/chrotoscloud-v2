@@ -34,9 +34,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: paperInitContainer
         uses: docker/build-push-action@v2.7.0
         with:
           context: images/paperInitContainer
           push: true
           tags: ${{ env.BASE_IMAGE }}:paper-init-container
+          
+      - name: velocityInitContainer
+        uses: docker/build-push-action@v2.7.0
+        with:
+          context: images/velocityInitContainer
+          push: true
+          tags: ${{ env.BASE_IMAGE }}:velocity-init-container
