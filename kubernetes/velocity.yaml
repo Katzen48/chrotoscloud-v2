@@ -39,7 +39,7 @@ spec:
           imagePullPolicy: IfNotPresent
       containers:
         - name: lobby-test
-          image: ghcr.io/katzen48/chrotoscloud-v2:velocity
+          image: openjdk:16-jdk-alpine
           command:
             - java
           args:
