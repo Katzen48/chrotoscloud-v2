@@ -1,12 +1,12 @@
 FROM node:17
 
 COPY velocity-all.jar .
-COPY entrypoint.sh .
+COPY entrypoint.sh /usr/local/bin/
 
-RUN chmod u+x entrypoint.sh
+RUN chmod u+x /usr/local/bin/entrypoint.sh
 
 COPY package*.json ./
 RUN npm instal
 COPY main.js .
 
-ENTRYPOINT entrypoint.sh
+ENTRYPOINT ["entrypoint.sh"]
