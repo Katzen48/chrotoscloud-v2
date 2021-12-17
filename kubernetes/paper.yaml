@@ -3,6 +3,7 @@ apiVersion: v1
 metadata:
   name: paper-template
   namespace: servers
+  net.chrotos.ingress.minecraft/discover=true
 spec:
   ports:
     - name: minecraft
