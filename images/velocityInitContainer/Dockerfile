@@ -1,6 +1,6 @@
 FROM node:17
 
-COPY velocity-all .
+COPY velocity-all.jar .
 COPY entrypoint.sh .
 
 RUN chmod u+x entrypoint.sh
