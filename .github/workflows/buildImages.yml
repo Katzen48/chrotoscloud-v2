@@ -64,6 +64,6 @@ jobs:
       - name: waterfallInitContainer
         uses: docker/build-push-action@v2.7.0
         with:
-          context: images/bungeecordInitContainer
+          context: images/waterfallInitContainer
           push: true
           tags: ${{ env.BASE_IMAGE }}:waterfall-init-container
