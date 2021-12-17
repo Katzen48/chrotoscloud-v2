@@ -1,7 +1,7 @@
 FROM node:17
 
 COPY velocity-all .
-COPY entrypoint.sh
+COPY entrypoint.sh .
 
 RUN chmod u+x entrypoint.sh
 
