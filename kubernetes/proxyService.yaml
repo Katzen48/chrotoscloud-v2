@@ -1,0 +1,188 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxy-service
+  namespace: core
+spec:
+  type: ClusterIP
+  selector:
+    app: proxy-service
+  ports:
+  - port: 80
+    targetPort: 80
+    name: proxy-service
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: proxy-service
+  namespace: core
+data:
+  nginx.conf: |+
+    worker_processes  auto;
+    error_log         "/opt/bitnami/nginx/logs/error.log";
+    pid               "/opt/bitnami/nginx/tmp/nginx.pid";
+
+    events {
+        worker_connections  1024;
+    }
+
+    http {
+        proxy_cache_path                              /home levels=1:2 keys_zone=STATIC:10m inactive=24h;
+        proxy_cache_key                               "$scheme$request_method$host$request_uri";
+
+        server {
+          listen                                      8080;
+          
+          location /gradle-release/ {
+            proxy_pass                                http://artifactory.core:8081/artifactory/gradle-release/;
+            proxy_buffering                           off;
+            proxy_set_header                          Authorization $http_authorization;
+            proxy_pass_header                         Authorization;
+            proxy_set_header                          Host $host; 
+            proxy_set_header                          X-Real-IP $remote_addr; 
+            proxy_set_header                          X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header                          X-Forwarded-Proto $scheme;
+            proxy_set_header                          X-Original-URI $request_uri;
+            client_max_body_size                      500M;
+          }
+          
+          location /gradle-dev/ {
+            proxy_pass                                http://artifactory.core:8081/artifactory/gradle-dev/;
+            proxy_buffering                           off;
+            proxy_set_header                          Authorization $http_authorization;
+            proxy_pass_header                         Authorization;
+            proxy_set_header                          Host $host; 
+            proxy_set_header                          X-Real-IP $remote_addr; 
+            proxy_set_header                          X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header                          X-Forwarded-Proto $scheme;
+            proxy_set_header                          X-Original-URI $request_uri;
+            client_max_body_size                      500M;
+          }
+          
+          location /cdn/release/static/ {
+            proxy_pass                                http://artifactory.core:8081/artifactory/cdn/release/static/;
+            proxy_buffering                           off;
+            proxy_set_header                          Authorization $http_authorization;
+            proxy_pass_header                         Authorization;
+            proxy_set_header                          Host $host; 
+            proxy_set_header                          X-Real-IP $remote_addr; 
+            proxy_set_header                          X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header                          X-Forwarded-Proto $scheme;
+            proxy_set_header                          X-Original-URI $request_uri;
+            proxy_cache	                              STATIC;
+            proxy_cache_valid                         200  1d;
+            proxy_cache_valid                         404 1m;
+            proxy_cache_use_stale                     error timeout invalid_header updating http_500 http_502 http_503 http_504;
+            client_max_body_size                      500M;
+          }
+          
+          location /cdn/release/config/ {
+            proxy_pass                                http://artifactory.core:8081/artifactory/cdn/release/config/;
+            proxy_buffering                           off;
+            proxy_set_header                          Authorization $http_authorization;
+            proxy_pass_header                         Authorization;
+            proxy_set_header                          Host $host; 
+            proxy_set_header                          X-Real-IP $remote_addr; 
+            proxy_set_header                          X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header                          X-Forwarded-Proto $scheme;
+            proxy_set_header                          X-Original-URI $request_uri;
+            client_max_body_size                      500M;
+          }
+          
+          location /cdn/release/world/ {
+            proxy_pass                                http://artifactory.core:8081/artifactory/cdn/release/world/;
+            proxy_buffering                           off;
+            proxy_set_header                          Authorization $http_authorization;
+            proxy_pass_header                         Authorization;
+            proxy_set_header                          Host $host; 
+            proxy_set_header                          X-Real-IP $remote_addr; 
+            proxy_set_header                          X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header                          X-Forwarded-Proto $scheme;
+            proxy_set_header                          X-Original-URI $request_uri;
+            client_max_body_size                      500M;
+          }
+          
+          location /cdn/dev/world/ {
+            proxy_pass                                http://artifactory.core:8081/artifactory/cdn/dev/world/;
+            proxy_buffering                           off;
+            proxy_set_header                          Authorization $http_authorization;
+            proxy_pass_header                         Authorization;
+            proxy_set_header                          Host $host; 
+            proxy_set_header                          X-Real-IP $remote_addr; 
+            proxy_set_header                          X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header                          X-Forwarded-Proto $scheme;
+            proxy_set_header                          X-Original-URI $request_uri;
+            client_max_body_size                      500M;
+          }
+          
+          location /cdn/dev/static/ {
+            proxy_pass                                http://artifactory.core:8081/artifactory/cdn/dev/static/;
+            proxy_buffering                           off;
+            proxy_set_header                          Authorization $http_authorization;
+            proxy_pass_header                         Authorization;
+            proxy_set_header                          Host $host; 
+            proxy_set_header                          X-Real-IP $remote_addr; 
+            proxy_set_header                          X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header                          X-Forwarded-Proto $scheme;
+            proxy_set_header                          X-Original-URI $request_uri;
+            proxy_cache	                              STATIC;
+            proxy_cache_valid                         200  1d;
+            proxy_cache_valid                         404 1m;
+            proxy_cache_use_stale                     error timeout invalid_header updating http_500 http_502 http_503 http_504;
+            client_max_body_size                      500M;
+          }
+          
+          location /cdn/dev/config/ {
+            proxy_pass                                http://artifactory.core:8081/artifactory/cdn/dev/config/;
+            proxy_buffering                           off;
+            proxy_set_header                          Authorization $http_authorization;
+            proxy_pass_header                         Authorization;
+            proxy_set_header                          Host $host; 
+            proxy_set_header                          X-Real-IP $remote_addr; 
+            proxy_set_header                          X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header                          X-Forwarded-Proto $scheme;
+            proxy_set_header                          X-Original-URI $request_uri;
+            client_max_body_size                      500M;
+          }
+      }
+    }
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: proxy-service
+  namespace: core
+spec:
+  selector:
+    matchLabels:
+      app: proxy-service
+  serviceName: proxy-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: proxy-service
+    spec:
+      containers:
+      - name: proxy-service
+        image: bitnami/nginx:latest
+        resources:
+          requests:
+            memory: 500M
+            cpu: 250m
+          limits:
+            memory: 1G
+            cpu: 500m
+        ports:
+        - containerPort: 80
+          name: proxy-service
+        volumeMounts:
+          - name:  nginx-conf
+            mountPath: /opt/bitnami/nginx/conf/nginx.conf
+            subPath: "nginx.conf"
+            readOnly: true
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: proxy-service

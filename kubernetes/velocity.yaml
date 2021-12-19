@@ -27,9 +27,16 @@ spec:
       labels:
         app: velocity-proxy
     spec:
+      serviceAccountName: minecraft-ingress
       volumes:
         - name: workdir
           emptyDir: {}
+        - name: k8s-token
+          projected:
+            sources:
+            - serviceAccountToken:
+                path: k8s-token
+                expirationSeconds: 7200
       initContainers:
         - name: velocity-download
           image: ghcr.io/katzen48/chrotoscloud-v2:velocity-init-container
@@ -38,7 +45,7 @@ spec:
               mountPath: /workdir
           imagePullPolicy: IfNotPresent
       containers:
-        - name: lobby-test
+        - name: velocity-proxy
           image: openjdk:16-jdk-alpine
           command:
             - java

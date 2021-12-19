@@ -1,7 +1,6 @@
-FROM node:17
+FROM ghcr.io/katzen48/chrotoscloud-v2:simple-init-container
 
-COPY package*.json ./
-RUN npm instal
-COPY main.js .
+ENV SERVER_SOFTWARE paper
+ENV SERVER_SOFTWARE_VERSION 1.17.1
 
 CMD [ "node", "main.js" ]

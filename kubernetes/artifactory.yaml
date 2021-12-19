@@ -1,0 +1,130 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: artifactory
+  namespace: core
+spec:
+  type: ClusterIP
+  selector:
+    app: artifactory
+  ports:
+  - port: 80
+    targetPort: 8082
+    name: http
+  - name: artifactory
+    protocol: TCP
+    port: 8081
+    targetPort: 8081
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: artifactory-claim
+  namespace: core
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: artifactory
+  namespace: core
+spec:
+  selector:
+    matchLabels:
+      app: artifactory
+  serviceName: artifactory
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: artifactory
+    spec:
+      initContainers:
+      - name: initcontainer
+        image: alpine:latest
+        command: ["/bin/sh", "-c"]
+        args:
+          - chown 1030:1030 /var/opt/jfrog/artifactory;
+        volumeMounts:
+        - name: artifactory-volume
+          mountPath: /var/opt/jfrog/artifactory
+      - name: "remove-lost-found"
+        image: "alpine:latest"
+        command:
+        - 'sh'
+        - '-c'
+        - 'rm -rfv /var/opt/jfrog/artifactory/lost+found'
+        volumeMounts:
+        - name: artifactory-volume
+          mountPath: /var/opt/jfrog/artifactory
+      containers:
+      - name: artifactory
+        image: releases-docker.jfrog.io/jfrog/artifactory-oss:latest
+        ports:
+        - containerPort: 8082
+          name: ui
+        - containerPort: 8081
+          name: artifactory
+        volumeMounts:
+        - name: artifactory-volume
+          mountPath: /var/opt/jfrog/artifactory
+        env:
+        - name: JF_SHARED_EXTRAJAVAOPTS
+          value: -Xms4G -Xmx8G
+        resources:
+          requests:
+            memory: 4Gi
+            cpu: 2
+          limits:
+            memory: 8Gi
+            cpu: 4
+        readinessProbe:
+          httpGet:
+            path: /artifactory/api/v1/system/readiness
+            port: 8081
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          failureThreshold: 10
+        livenessProbe:
+          httpGet:
+            path: /artifactory/api/v1/system/liveness
+            port: 8081
+          initialDelaySeconds: 180
+          periodSeconds: 10
+      volumes:
+      - name: artifactory-volume
+        persistentVolumeClaim:
+          claimName: artifactory-claim
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: artifactory
+  namespace: core
+  labels:
+    name: artifactory
+spec:
+  rules:
+  - host: artifactory.example.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: artifactory
+            port:
+              name: http
+      - pathType: Prefix
+        path: "/artifactory/"
+        backend:
+          service:
+            name: artifactory
+            port:
+              name: artifactory
