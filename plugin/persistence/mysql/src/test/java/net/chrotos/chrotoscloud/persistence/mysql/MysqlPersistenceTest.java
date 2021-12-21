@@ -61,7 +61,7 @@ public class MysqlPersistenceTest {
         cloud.getPersistence().save(player);
 
         cloud.getPersistence().runInTransaction(() -> {
-            Account account = new CloudAccount(AccountType.BANK);
+            Account account = new CloudAccount(player, AccountType.BANK);
             Player finalPlayer = player;
             finalPlayer.getAccounts().add(account);
 

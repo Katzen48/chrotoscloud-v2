@@ -30,6 +30,7 @@ public class CloudAccount implements Account, SoftDeletable {
 
     @ManyToOne(targetEntity = CloudPlayer.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id", updatable = false)
+    @NonNull
     private Player owner;
 
     @Enumerated(EnumType.STRING)
