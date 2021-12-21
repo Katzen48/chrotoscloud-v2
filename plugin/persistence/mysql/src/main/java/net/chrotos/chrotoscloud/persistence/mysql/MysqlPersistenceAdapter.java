@@ -6,17 +6,16 @@ import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
-import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
 import org.hibernate.cfg.Configuration;
 
 import javax.persistence.EntityManager;
-import javax.persistence.FlushModeType;
+import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public class MysqlPersistenceAdapter implements PersistenceAdapter {
     private SessionFactory sessionFactory;
@@ -61,7 +60,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     }
 
     @Override
-    public <E> Collection<E> getAll(Class<E> clazz) {
+    public <E> List<E> getAll(Class<E> clazz) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<E> cq = cb.createQuery(clazz);
         Root<E> rootEntry = cq.from(clazz);
@@ -74,7 +73,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     }
 
     @Override
-    public <E> Collection<E> getAll(Class<E> clazz, DataSelectFilter filter) {
+    public <E> List<E> getAll(Class<E> clazz, DataSelectFilter filter) {
         return Collections.emptyList(); // TODO
     }
 
@@ -93,19 +92,21 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
             return;
         }
 
-        RuntimeException exception = null;
-        entityManager.getTransaction().begin();
+        runInTransaction(() -> entityManager.persist(entity));
+    }
+
+    @Override
+    public void runInTransaction(Runnable runnable) {
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
+
         try {
-            entityManager.persist(entity);
-            entityManager.flush();
-        } catch (RuntimeException e) {
-            exception = e;
-        }
+            runnable.run();
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
 
-        entityManager.getTransaction().commit();
-
-        if (exception != null) {
-            throw exception;
+            throw e;
         }
     }
 }

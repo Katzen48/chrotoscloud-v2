@@ -7,8 +7,12 @@ import lombok.RequiredArgsConstructor;
 import net.chrotos.chrotoscloud.economy.Account;
 import net.chrotos.chrotoscloud.economy.AccountType;
 import net.chrotos.chrotoscloud.economy.CloudAccount;
+import net.chrotos.chrotoscloud.permissions.CloudPermissible;
+import net.chrotos.chrotoscloud.permissions.CloudPermission;
+import net.chrotos.chrotoscloud.permissions.Permission;
 import net.chrotos.chrotoscloud.persistence.SoftDeletable;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.*;
@@ -18,7 +22,7 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class CloudPlayer implements Player, SoftDeletable {
+public class CloudPlayer extends CloudPermissible implements Player, SoftDeletable {
     @Id
     @Column(updatable = false, nullable = false)
     @NonNull
@@ -30,8 +34,13 @@ public class CloudPlayer implements Player, SoftDeletable {
 
     private transient SidedPlayer sidedPlayer;
 
-    @OneToMany(mappedBy = "owner", targetEntity = CloudAccount.class, fetch = FetchType.LAZY)
-    private Collection<Account> accounts = new ArrayList<>();
+    @OneToMany(mappedBy = "owner", targetEntity = CloudAccount.class, cascade = CascadeType.ALL)
+    private List<Account> accounts = new ArrayList<>();
+
+    @OneToMany(targetEntity = CloudPermission.class, cascade = CascadeType.ALL)
+    @JoinColumn(name = "permissible")
+    @Where(clause = "permissible_type='player'")
+    private List<Permission> permissions = new ArrayList<>();
 
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar createdAt = Calendar.getInstance();

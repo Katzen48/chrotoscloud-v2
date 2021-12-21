@@ -9,9 +9,17 @@
             org.mariadb.jdbc.Driver
         </property>
 
+        <property name="hibernate.connection.autocommit">
+            true
+        </property>
+
         <property name="hbm2ddl.auto">validate</property>
 
         <mapping class="net.chrotos.chrotoscloud.player.CloudPlayer" />
         <mapping class="net.chrotos.chrotoscloud.economy.CloudAccount" />
+
+        <mapping class="net.chrotos.chrotoscloud.permissions.CloudPermission" />
+
+        <mapping package = "net.chrotos.chrotoscloud" />
     </session-factory>
 </hibernate-configuration>
