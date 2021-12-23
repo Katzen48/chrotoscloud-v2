@@ -26,7 +26,6 @@ const resolveMaven = require('./resolveMaven');
         kc.loadFromDefault();
         const k8sApi = kc.makeApiClient(k8s.CustomObjectsApi);
 
-        let gameMode;
         try {
             gameMode = await k8sApi.getNamespacedCustomObject('chrotoscloud.chrotos.net', 'v1',
                 'servers', 'gamemodes', GAMEMODE);
