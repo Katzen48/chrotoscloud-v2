@@ -5,7 +5,7 @@ plugins {
     id 'maven-publish'
 }
 
-group 'net.chrotos.chrotoscloud:velocity'
+group 'net.chrotos.chrotoscloud'
 version '3.0-SNAPSHOT'
 
 repositories {
