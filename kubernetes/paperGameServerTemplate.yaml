@@ -46,6 +46,17 @@ spec:
               mountPath: /workdir
             - name: podinfo
               mountPath: /etc/podinfo
+            env:
+              - name: GITHUB_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: github-credentials
+                    key: GITHUB_USER
+              - name: GITHUB_TOKEN
+                valueFrom:
+                  secretKeyRef:
+                    name: github-credentials
+                    key: GITHUB_TOKEN
           imagePullPolicy: IfNotPresent
       containers:
         - name: paper

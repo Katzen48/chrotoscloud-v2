@@ -43,6 +43,19 @@ spec:
           volumeMounts:
             - name: workdir
               mountPath: /workdir
+          env:
+            - name: CLOUD_VERSION
+              value: 3.0-SNAPSHOT
+            - name: GITHUB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: github-credentials
+                  key: GITHUB_USER
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: github-credentials
+                  key: GITHUB_TOKEN
           imagePullPolicy: IfNotPresent
       containers:
         - name: velocity-proxy

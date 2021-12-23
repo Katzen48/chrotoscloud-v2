@@ -12,6 +12,7 @@ const resolveMaven = require('./resolveMaven');
 
 (async () => {
     const SOFTWARE = process.env.SERVER_SOFTWARE;
+    let gameMode;
 
     if (SOFTWARE === 'paper') {
         const properties = PropertiesReader('/etc/podinfo/labels');
