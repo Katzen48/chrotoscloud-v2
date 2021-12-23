@@ -40,10 +40,9 @@ publishing {
         }
     }
     publications {
-        gpr(MavenPublication) {
+        gpr(MavenPublication) { publication ->
             artifactId = 'paper'
-            from components.java
-            artifact shadowJar
+            from shadow.component(publication)
         }
     }
 }
