@@ -4,7 +4,7 @@ import net.chrotos.chrotoscloud.CoreCloud;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class CloudPlugin extends JavaPlugin {
-    private CoreCloud cloud;
+    private final CoreCloud cloud;
 
     public CloudPlugin() {
         this.cloud = new PaperCloud(this);

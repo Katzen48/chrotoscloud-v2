@@ -1,4 +1,4 @@
-package net.chrotos.chrotoscloud.paper;
+package net.chrotos.chrotoscloud.velocity;
 
 import net.chrotos.chrotoscloud.CloudConfig;
 

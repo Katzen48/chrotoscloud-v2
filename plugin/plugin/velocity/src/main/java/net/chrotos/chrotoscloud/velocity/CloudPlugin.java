@@ -1,4 +1,4 @@
-package net.chrotos.chrotoscloud.paper;
+package net.chrotos.chrotoscloud.velocity;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
