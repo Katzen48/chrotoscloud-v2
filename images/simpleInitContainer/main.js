@@ -3,13 +3,17 @@
 const BASE_URL = 'https://papermc.io/api/v2/projects/';
 const CLOUD_BASE_URL = 'https://maven.pkg.github.com/katzen48/chrotoscloud-v2/'
 const PATH = '/workdir'
+const PropertiesReader = require('properties-reader');
 const fetch = require('cross-fetch')
 const fs = require('fs');
 const k8s = require('@kubernetes/client-node');
 const download = require('./download');
 const resolveMaven = require('./resolveMaven');
 
-if (!process.env.SERVER_GAMEMODE || process.env.SERVER_GAMEMODE == '') {
+const properties = PropertiesReader('/etc/podinfo/labels');
+const GAMEMODE = properties.get("net.chrotos.chrotoscloud.gameserver/gamemode");
+
+if (!GAMEMODE || GAMEMODE == '') {
     throw new Error('Game Mode was not defined!')
 }
 
@@ -19,7 +23,7 @@ const k8sApi = kc.makeApiClient(k8s.CustomObjectsApi);
 
 (async () => {
     let gameMode = await k8sApi.getNamespacedCustomObject('chrotoscloud.chrotos.net', 'v1',
-                                                'servers', 'gamemodes', process.env.SERVER_GAMEMODE);
+                                                'servers', 'gamemodes', GAMEMODE);
 
     if (!gameMode) {
         throw new Error('Game Mode could not be resolved!')

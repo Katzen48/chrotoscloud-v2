@@ -32,18 +32,21 @@ spec:
       volumes:
         - name: workdir
           emptyDir: {}
+        - name: podinfo
+          downwardAPI:
+            items:
+              - path: "labels"
+                fieldRef:
+                  fieldPath: metadata.labels
       initContainers:
         - name: paper-download
           image: ghcr.io/katzen48/chrotoscloud-v2:paper-init-container
           volumeMounts:
             - name: workdir
               mountPath: /workdir
+            - name: podinfo
+              mountPath: /etc/podinfo
           imagePullPolicy: IfNotPresent
-          env:
-            - name: SERVER_GAMEMODE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.labels."net.chrotos.chrotoscloud.gameserver/gamemode"
       containers:
         - name: paper
           image: openjdk:16-jdk-alpine
