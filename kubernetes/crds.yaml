@@ -1,0 +1,96 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: gamemodes.chrotoscloud.chrotos.net
+spec:
+  group: chrotoscloud.chrotos.net
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                version:
+                  type: string
+                  enum:
+                  - "1.17.1"
+                  default: "1.17.1"
+                cloudVersion:
+                  type: string
+                  default: "2.0.0"
+                maps:
+                  type: object
+                  properties:
+                    random:
+                      type: boolean
+                      default: false
+                    pool:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          required:
+                            type: boolean
+                            default: true
+                          name:
+                            type: string
+                          dependency:
+                            type: object
+                            properties:
+                              mavenLike:
+                                type: object
+                                properties:
+                                  groupId:
+                                    type: string
+                                  artifactId:
+                                    type: string
+                                  version:
+                                    type: string
+                                required:
+                                - groupId
+                                - artifactId
+                                - version
+                              url:
+                               type: string
+                        required:
+                        - name
+                        - dependency
+                plugins:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      dependency:
+                        type: object
+                        properties:
+                          maven:
+                            type: object
+                            properties:
+                              groupId:
+                                type: string
+                              artifactId:
+                                type: string
+                              version:
+                                type: string
+                            required:
+                            - groupId
+                            - artifactId
+                            - version
+                          url:
+                           type: string
+                    required:
+                    - dependency
+              required:
+              - maps
+  scope: Namespaced
+  names:
+    plural: gamemodes
+    singular: gamemode
+    kind: GameMode
+    shortNames:
+    - gm
