@@ -33,6 +33,8 @@ jobs:
           CHROTOSCLOUD_TEST_DB_STRING: ${{ secrets.CHROTOSCLOUD_TEST_DB_STRING }}
           CHROTOSCLOUD_TEST_DB_USER: ${{ secrets.CHROTOSCLOUD_TEST_DB_USER }}
           CHROTOSCLOUD_TEST_DB_PASSWORD: ${{ secrets.CHROTOSCLOUD_TEST_DB_PASSWORD }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - uses: actions/upload-artifact@v2
         with:
