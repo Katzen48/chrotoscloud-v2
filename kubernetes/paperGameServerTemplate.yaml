@@ -39,6 +39,11 @@ spec:
             - name: workdir
               mountPath: /workdir
           imagePullPolicy: IfNotPresent
+          env:
+            - name: SERVER_GAMEMODE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels."net.chrotos.chrotoscloud.gameserver/gamemode"
       containers:
         - name: paper
           image: openjdk:16-jdk-alpine
