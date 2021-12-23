@@ -11,7 +11,7 @@ const download = require('./download');
 const resolveMaven = require('./resolveMaven');
 
 const properties = PropertiesReader('/etc/podinfo/labels');
-const GAMEMODE = properties.get("net.chrotos.chrotoscloud.gameserver/gamemode");
+const GAMEMODE = properties.get("net.chrotos.chrotoscloud.gameserver/gamemode").replaceAll('"', '');
 
 if (!GAMEMODE || GAMEMODE == '') {
     throw new Error('Game Mode was not defined!')
@@ -22,11 +22,16 @@ kc.loadFromDefault();
 const k8sApi = kc.makeApiClient(k8s.CustomObjectsApi);
 
 (async () => {
-    let gameMode = await k8sApi.getNamespacedCustomObject('chrotoscloud.chrotos.net', 'v1',
-                                                'servers', 'gamemodes', GAMEMODE);
+    let gameMode;
+    try {
+        gameMode = await k8sApi.getNamespacedCustomObject('chrotoscloud.chrotos.net', 'v1',
+            'servers', 'gamemodes', GAMEMODE);
+    } catch (e) {
+        throw new Error('Game Mode could not be resolved!');
+    }
 
     if (!gameMode) {
-        throw new Error('Game Mode could not be resolved!')
+        throw new Error('Game Mode could not be resolved!');
     }
 
     const SOFTWARE = process.env.SERVER_SOFTWARE;
