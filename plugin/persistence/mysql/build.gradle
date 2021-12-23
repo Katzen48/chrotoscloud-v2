@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
 }
 
-group 'net.chrotos.chrotoscloud:persistence-mysql'
+group 'net.chrotos.chrotoscloud'
 version '3.0-SNAPSHOT'
 
 repositories {
@@ -45,6 +45,7 @@ publishing {
     }
     publications {
         gpr(MavenPublication) {
+            artifactId = 'persistence-models'
             from(components.java)
         }
     }

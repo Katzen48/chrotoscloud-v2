@@ -5,7 +5,7 @@ plugins {
     id 'maven-publish'
 }
 
-group 'net.chrotos.chrotoscloud:paper'
+group 'net.chrotos.chrotoscloud'
 version '3.0-SNAPSHOT'
 
 repositories {
@@ -40,8 +40,10 @@ publishing {
         }
     }
     publications {
-        shadow(MavenPublication) { publication ->
-            project.shadow.component(publication)
+        gpr(MavenPublication) {
+            artifactId = 'paper'
+            from components.java
+            artifact shadowJar
         }
     }
 }
