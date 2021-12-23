@@ -1,0 +1,41 @@
+version: 2
+
+updates:
+  - package-ecosystem: "gradle"
+    directory: "plugin/api"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "gradle"
+    directory: "plugin/core"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "gradle"
+    directory: "plugin/persistence/models"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "gradle"
+    directory: "plugin/persistence/mysql"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "docker"
+    directory: "images/paperInitContainer"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "docker"
+    directory: "images/simpleInitContainer"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "docker"
+    directory: "images/velocityInitContainer"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "docker"
+    directory: "images/waterfallInitContainer"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "npm"
+    directory: "images/simpleInitContainer"
+    schedule:
+      interval: "daily"
