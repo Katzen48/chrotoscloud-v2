@@ -19,15 +19,17 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: 17
+
       - uses: gradle/gradle-build-action@v2
         with:
-          arguments: build
+          arguments: publish
           gradle-version: 7.2
           build-root-directory: plugin
         env:
           CHROTOSCLOUD_TEST_DB_STRING: ${{ secrets.CHROTOSCLOUD_TEST_DB_STRING }}
           CHROTOSCLOUD_TEST_DB_USER: ${{ secrets.CHROTOSCLOUD_TEST_DB_USER }}
           CHROTOSCLOUD_TEST_DB_PASSWORD: ${{ secrets.CHROTOSCLOUD_TEST_DB_PASSWORD }}
+
       - uses: actions/upload-artifact@v2
         with:
           name: api

@@ -30,8 +30,6 @@ public abstract class Cloud {
         return instance;
     }
 
-    public abstract List<Player> getOnlinePlayers();
-
     // Management stuff (loading, initialization
 
     /**

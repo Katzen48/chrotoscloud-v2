@@ -16,4 +16,4 @@ include 'services:webservice'
 */
 
 rootProject.name = 'chrotoscloud-v2'
-include 'api', 'persistence:models', 'core', 'persistence:mysql'
+include 'api', 'persistence:models', 'core', 'persistence:mysql', 'plugin:velocity', 'plugin:paper'

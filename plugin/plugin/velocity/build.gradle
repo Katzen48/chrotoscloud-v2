@@ -1,31 +1,29 @@
 plugins {
+    id 'idea'
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.1'
     id 'maven-publish'
 }
 
-group 'net.chrotos.chrotoscloud:persistence-mysql'
+group 'net.chrotos.chrotoscloud:velocity'
 version '3.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://nexus.velocitypowered.com/repository/maven-public/"
+    }
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
     implementation project(':api')
     implementation project(':persistence:models')
     implementation project(':core')
+    implementation project(':persistence:mysql')
 
-    implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.4'
-
-    implementation 'org.flywaydb:flyway-core:8.3.0'
-    implementation "org.flywaydb:flyway-mysql:8.3.0"
-
-    implementation 'org.hibernate:hibernate-core:5.6.3.Final'
-    implementation 'org.hibernate:hibernate-entitymanager:5.6.3.Final'
-
-    implementation 'com.vladmihalcea:hibernate-types-55:2.14.0'
+    compileOnly 'com.velocitypowered:velocity-api:3.0.1'
+    annotationProcessor 'com.velocitypowered:velocity-api:3.0.1'
+    implementation 'io.kubernetes:client-java-extended:10.0.0'
 }
 
 test {
@@ -44,8 +42,8 @@ publishing {
         }
     }
     publications {
-        gpr(MavenPublication) {
-            from(components.java)
+        shadow(MavenPublication) { publication ->
+            project.shadow.component(publication)
         }
     }
 }
