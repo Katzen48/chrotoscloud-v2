@@ -3,7 +3,6 @@ const { XMLParser } = require("fast-xml-parser");
 const parser = new XMLParser({preserveOrder: true});
 
 module.exports = async function(repository, groupId, artifactId, version, user, password) {
-    await new Promise((resolve, reject) => {
         let artifactUrl = repository + '/' + groupId.replaceAll('.', '/') + '/' + artifactId + '/' + version;
 
         let metadataUrl = artifactUrl + '/maven-metadata.xml';
@@ -19,28 +18,26 @@ module.exports = async function(repository, groupId, artifactId, version, user, 
             promise = fetch(metadataUrl);
         }
 
-        let outerResolve = resolve;
+        let response = await promise;
+        let xmlContent = await response.text();
 
-        promise.then(response => response.text()).then(xmlContent => {
-            console.log('Parsing metadata');
-            let pomResponse = parser.parse(xmlContent);
-            let metadata = pomResponse[0].metadata;
-            let versioning = metadata[3].versioning;
+        console.log('Parsing metadata');
+        let pomResponse = parser.parse(xmlContent);
+        let metadata = pomResponse[0].metadata;
+        let versioning = metadata[3].versioning;
 
-            let versionString = artifactId + '-';
-            if (version.endsWith('-SNAPSHOT')) {
-                let snapshot = versioning[0].snapshot;
-                versionString += version.substr(0, version.lastIndexOf('-SNAPSHOT') + 1);
-                versionString += snapshot[0].timestamp[0]['#text'] + '-' +
-                    snapshot[1].buildNumber[0]['#text'];
-            } else {
-                versionString += metadata.release[0];
-            }
+        let versionString = artifactId + '-';
+        if (version.endsWith('-SNAPSHOT')) {
+            let snapshot = versioning[0].snapshot;
+            versionString += version.substr(0, version.lastIndexOf('-SNAPSHOT') + 1);
+            versionString += snapshot[0].timestamp[0]['#text'] + '-' +
+                snapshot[1].buildNumber[0]['#text'];
+        } else {
+            versionString += metadata.release[0];
+        }
 
-            versionString += '-all.jar';
+        versionString += '-all.jar';
+        console.log('Version String:', versionString);
 
-            console.log('Version String:', versionString);
-            outerResolve(artifactUrl + '/' + versionString);
-        }).catch(error => reject(error));
-    });
+        return artifactUrl + '/' + versioning;
 }
