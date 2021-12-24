@@ -3,20 +3,13 @@ const parser = require('pom-parser');
 
 module.exports = async function(repository, groupId, artifactId, version, user, password) {
     await new Promise((resolve, reject) => {
-        let options = {};
-
-        if (user && password) {
-            options.headers = {
-                'Authorization': 'Basic ' + Buffer.from(user + ':' + password).toString('base64')
-            }
-        }
         let artifactUrl = repository + '/' + groupId.replaceAll('.', '/') + '/' + artifactId + '/' + version;
         console.log('Requesting maven-metadata from\'', artifactUrl, '\'');
 
         let metadataUrl = artifactUrl + '/maven-metadata.xml';
         let promise;
         if (user && password) {
-            let headers = new Headers();
+            let headers = new fetch.Headers();
             headers.append('Authorization',
                             'Basic ' + Buffer.from(user + ':' + password).toString('base64'));
 
