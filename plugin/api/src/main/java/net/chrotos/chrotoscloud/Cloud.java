@@ -2,10 +2,8 @@ package net.chrotos.chrotoscloud;
 
 import lombok.Getter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
-import net.chrotos.chrotoscloud.player.Player;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.ServiceLoader;
 
 @Getter
@@ -30,7 +28,7 @@ public abstract class Cloud {
         return instance;
     }
 
-    // Management stuff (loading, initialization
+    // Management stuff (loading, initialization)
 
     /**
      * Load the module with it's services, before it can be initialized

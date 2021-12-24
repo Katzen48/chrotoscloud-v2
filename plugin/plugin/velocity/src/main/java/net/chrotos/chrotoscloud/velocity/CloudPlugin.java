@@ -9,21 +9,22 @@ import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.CoreCloud;
 import org.slf4j.Logger;
 
-@Plugin(id="chrotoscloud", name = "ChrotosCloud", version = "3.0", authors = {"Katzen48"})
+@Plugin(id="chrotoscloud", name = "ChrotosCloud", version = "3.0-SNAPSHOT", authors = {"Katzen48"})
 public class CloudPlugin {
     private final ProxyServer proxyServer;
     private final Logger logger;
-    private final VelocityCloud cloud;
+    private VelocityCloud cloud;
 
     @Inject
     public CloudPlugin(ProxyServer proxyServer, Logger logger) {
         this.proxyServer = proxyServer;
         this.logger = logger;
-        this.cloud = (VelocityCloud) Cloud.getInstance();
     }
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
+        this.cloud = (VelocityCloud) Cloud.getInstance();
+
         cloud.load();
         cloud.initialize();
     }
