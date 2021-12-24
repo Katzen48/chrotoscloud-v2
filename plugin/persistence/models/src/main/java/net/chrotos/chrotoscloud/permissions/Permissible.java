@@ -8,6 +8,7 @@ import java.util.UUID;
 public interface Permissible {
     boolean hasPermission(@NonNull String permission);
     boolean hasPermission(@NonNull String permission, boolean ignoreCache);
+    void clearCache();
     List<Permission> getPermissions();
     UUID getUniqueId();
     String getName();

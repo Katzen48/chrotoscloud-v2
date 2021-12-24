@@ -56,6 +56,21 @@ spec:
                 secretKeyRef:
                   name: github-credentials
                   key: GITHUB_TOKEN
+            - name: DB_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: cloud-secret
+                  key: DB_STRING
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cloud-secret
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cloud-secret
+                  key: DB_PASSWORD
           imagePullPolicy: IfNotPresent
       containers:
         - name: velocity-proxy
@@ -68,6 +83,22 @@ spec:
             - '-jar'
             - server.jar
           workingDir: /opt/proxy
+          env:
+            - name: DB_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: cloud-secret
+                  key: DB_STRING
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cloud-secret
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cloud-secret
+                  key: DB_PASSWORD
           ports:
             - name: minecraft
               hostPort: 25565

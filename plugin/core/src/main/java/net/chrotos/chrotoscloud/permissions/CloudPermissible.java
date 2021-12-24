@@ -25,7 +25,7 @@ public abstract class CloudPermissible implements Permissible {
     public boolean hasPermission(@NonNull String permission, boolean ignoreCache) {
         try {
             if (ignoreCache) {
-                return calculatePermission(permission);
+                permissionsCache.invalidate(permission);
             }
 
             return permissionsCache.get(permission.toLowerCase());
@@ -33,6 +33,11 @@ public abstract class CloudPermissible implements Permissible {
             e.printStackTrace();
             return false;
         }
+    }
+
+    @Override
+    public void clearCache() {
+        permissionsCache.invalidateAll();
     }
 
     public boolean calculatePermission(@NonNull String permission) {

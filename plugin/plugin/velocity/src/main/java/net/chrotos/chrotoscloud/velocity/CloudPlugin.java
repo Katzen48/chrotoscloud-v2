@@ -2,6 +2,7 @@ package net.chrotos.chrotoscloud.velocity;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -14,6 +15,7 @@ public class CloudPlugin {
     private final ProxyServer proxyServer;
     private final Logger logger;
     private final VelocityCloud cloud;
+    private final PermissionsProvider permissionsProvider = new PermissionsProvider();
 
     @Inject
     public CloudPlugin(ProxyServer proxyServer, Logger logger) {
@@ -28,5 +30,10 @@ public class CloudPlugin {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         cloud.load();
         cloud.initialize();
+    }
+
+    @Subscribe
+    public void onPermissionsSetup(PermissionsSetupEvent event) {
+        event.setProvider(permissionsProvider);
     }
 }
