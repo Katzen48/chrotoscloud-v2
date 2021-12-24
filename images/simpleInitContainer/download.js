@@ -1,4 +1,5 @@
 const https = require('https');
+const path = require('path');
 const fs = require('fs');
 
 module.exports = async function(url, path, user, password) {
@@ -18,6 +19,12 @@ module.exports = async function(url, path, user, password) {
         }
 
         https.get(url, options, (res) => {
+            let dir = path.dirname(path);
+
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, {recursive: true});
+            }
+
             const stream = fs.createWriteStream(path);
             res.pipe(stream);
 
