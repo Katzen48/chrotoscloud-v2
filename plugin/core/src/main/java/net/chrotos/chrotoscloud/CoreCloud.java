@@ -48,7 +48,7 @@ public abstract class CoreCloud extends Cloud {
     }
 
     private <E> E loadService(Class<E> clazz) {
-        ServiceLoader<E> serviceLoader = ServiceLoader.load(clazz);
+        ServiceLoader<E> serviceLoader = ServiceLoader.load(clazz, getServiceClassLoader());
 
         Iterator<E> iterator = serviceLoader.iterator();
 

@@ -17,8 +17,7 @@ public abstract class Cloud {
 
     public static Cloud getInstance() {
         if (Cloud.instance == null) {
-            ServiceLoader<Cloud> serviceLoader = ServiceLoader.load(Cloud.class, serviceClassLoader != null ?
-                                                    serviceClassLoader : Thread.currentThread().getContextClassLoader());
+            ServiceLoader<Cloud> serviceLoader = ServiceLoader.load(Cloud.class, getServiceClassLoader());
 
             Iterator<Cloud> iterator = serviceLoader.iterator();
 
@@ -30,6 +29,10 @@ public abstract class Cloud {
         }
 
         return instance;
+    }
+
+    public static ClassLoader getServiceClassLoader() {
+        return serviceClassLoader != null ? serviceClassLoader : Thread.currentThread().getContextClassLoader();
     }
 
     // Management stuff (loading, initialization)

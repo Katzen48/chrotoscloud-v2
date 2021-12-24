@@ -19,6 +19,8 @@ public class CloudPlugin {
     public CloudPlugin(ProxyServer proxyServer, Logger logger) {
         this.proxyServer = proxyServer;
         this.logger = logger;
+
+        Cloud.setServiceClassLoader(getClass().getClassLoader());
         this.cloud = (VelocityCloud) Cloud.getInstance();
     }
 
