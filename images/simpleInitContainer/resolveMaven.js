@@ -7,7 +7,7 @@ module.exports = async function (repository, groupId, artifactId, version, user,
 
         if (user && password) {
             options.headers = {
-                'Authorization': 'Basic ' + new Buffer(user + ':' + password).toString('base64')
+                'Authorization': 'Basic ' + Buffer.from(user + ':' + password).toString('base64')
             }
         }
         let artifactUrl = repository + '/' + groupId.replaceAll('.', '/') + '/' + artifactId + '/' + version;
@@ -15,13 +15,16 @@ module.exports = async function (repository, groupId, artifactId, version, user,
         let xmlContent = '';
         https.get(artifactUrl + '/maven-metadata.xml', options, (res) => {
             res.on('data', chunk => xmlContent += chunk);
+            res.on('error', function (error) {
+                reject(error);
+            })
             res.on('finish', function () {
                 parser.parse({
                     xmlContent
                 }, function (err, pomResponse) {
                     if (err) {
                         console.log("ERROR: " + err);
-                        process.exit(1);
+                        reject(err);
                     }
 
                     let versionString = 'core-';

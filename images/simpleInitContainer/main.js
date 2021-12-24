@@ -52,9 +52,15 @@ const resolveMaven = require('./resolveMaven');
     await download(`${VERSIONS_URL}/${VERSION}/builds/${newestBuild}/downloads/${SOFTWARE}-${VERSION}-${newestBuild}.jar`, PATH + '/server.jar');
 
     // Download ChrotosCloud-V2 implementation
-    let cloudUrl = await resolveMaven(CLOUD_BASE_URL, 'net.chrotos.chrotoscloud',
-                                      SOFTWARE, CLOUD_VERSION, process.env.GITHUB_USER,  process.env.GITHUB_TOKEN);
-    await download(cloudUrl, PATH + '/plugins/chrotoscloud.jar', process.env.GITHUB_USER, process.env.GITHUB_TOKEN);
+    try {
+        let cloudUrl = await resolveMaven(CLOUD_BASE_URL, 'net.chrotos.chrotoscloud',
+            SOFTWARE, CLOUD_VERSION, process.env.GITHUB_USER,  process.env.GITHUB_TOKEN);
+
+        await download(cloudUrl, PATH + '/plugins/chrotoscloud.jar', process.env.GITHUB_USER, process.env.GITHUB_TOKEN);
+    } catch (e) {
+        console.error('Could not download chrotoscloud: ' + e);
+        process.exit(1);
+    }
     
     fs.writeFileSync(PATH + '/eula.txt', 'eula=true');
 })();

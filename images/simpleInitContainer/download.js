@@ -10,7 +10,7 @@ module.exports = async function(url, path, user, password) {
 
         if (user && password) {
             options.headers = {
-                'Authorization': 'Basic ' + new Buffer(user + ':' + password).toString('base64')
+                'Authorization': 'Basic ' + Buffer.from(user + ':' + password).toString('base64')
             }
         }
 
