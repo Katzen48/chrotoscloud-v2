@@ -1,6 +1,6 @@
 const fetch = require('cross-fetch')
 const { XMLParser } = require("fast-xml-parser");
-const parser = new XMLParser({preserveOrder: true, parseAttributeValue: false});
+const parser = new XMLParser({preserveOrder: true, parseAttributeValue: false, parseTagValue: false});
 
 module.exports = async function(repository, groupId, artifactId, version, user, password) {
         let artifactUrl = repository + '/' + groupId.replaceAll('.', '/') + '/' + artifactId + '/' + version;
