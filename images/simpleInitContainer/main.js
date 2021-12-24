@@ -53,9 +53,11 @@ const resolveMaven = require('./resolveMaven');
 
     // Download ChrotosCloud-V2 implementation
     try {
-        console.log('Resolving newest build of ChrotosCloud-Plugin', newestBuild);
+        console.log('Resolving newest build of ChrotosCloud-Plugin');
         let cloudUrl = await resolveMaven(CLOUD_BASE_URL, 'net.chrotos.chrotoscloud',
             SOFTWARE, CLOUD_VERSION, process.env.GITHUB_USER,  process.env.GITHUB_TOKEN);
+
+        console.log('Found newest build url:', cloudUrl);
 
         await download(cloudUrl, PATH + '/plugins/chrotoscloud.jar', process.env.GITHUB_USER, process.env.GITHUB_TOKEN);
     } catch (e) {

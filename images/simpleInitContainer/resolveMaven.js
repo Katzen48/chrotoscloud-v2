@@ -1,7 +1,7 @@
 const https = require('https');
 const parser = require('pom-parser');
 
-module.exports = async function (repository, groupId, artifactId, version, user, password) {
+module.exports = async function(repository, groupId, artifactId, version, user, password) {
     await new Promise((resolve, reject) => {
         let options = {};
 
@@ -11,6 +11,7 @@ module.exports = async function (repository, groupId, artifactId, version, user,
             }
         }
         let artifactUrl = repository + '/' + groupId.replaceAll('.', '/') + '/' + artifactId + '/' + version;
+        console.log('Requesting maven-metadata from\'', artifactUrl, '\'');
 
         let xmlContent = '';
         https.get(artifactUrl + '/maven-metadata.xml', options, (res) => {
@@ -19,6 +20,7 @@ module.exports = async function (repository, groupId, artifactId, version, user,
                 reject(error);
             })
             res.on('finish', function () {
+                console.log('Parsing metadata')
                 parser.parse({
                     xmlContent
                 }, function (err, pomResponse) {
@@ -37,6 +39,8 @@ module.exports = async function (repository, groupId, artifactId, version, user,
                     }
 
                     versionString += '-all.jar';
+
+                    console.log('Version String:', versionString);
 
                     resolve(artifactUrl + '/' + versionString);
                 })
