@@ -1,16 +1,23 @@
 package net.chrotos.chrotoscloud;
 
-import lombok.Getter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
 public abstract class CoreCloud extends Cloud {
-    @Getter
-    private boolean loaded;
-    @Getter
-    private boolean initialized;
+    private static boolean loaded;
+    private static boolean initialized;
+
+    @Override
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    @Override
+    public boolean isLoaded() {
+        return loaded;
+    }
 
     public void load() {
         if (loaded) {
@@ -19,7 +26,7 @@ public abstract class CoreCloud extends Cloud {
 
         loadServices();
 
-        this.loaded = true;
+        loaded = true;
     }
 
     public void initialize() {
@@ -33,7 +40,7 @@ public abstract class CoreCloud extends Cloud {
 
         this.persistence.configure(getCloudConfig());
 
-        this.initialized = true;
+        initialized = true;
     }
 
     private void loadServices() {
