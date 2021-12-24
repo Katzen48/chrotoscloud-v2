@@ -9,8 +9,10 @@ module.exports = async function(url, path, user, password) {
         let options = {};
 
         if (user && password) {
-            options.headers = {
-                'Authorization': 'Basic ' + Buffer.from(user + ':' + password).toString('base64')
+           options = {
+               headers: {
+                   'Authorization': 'Basic ' + Buffer.from(user + ':' + password).toString('base64')
+               }
             }
         }
 
