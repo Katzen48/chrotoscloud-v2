@@ -19,7 +19,7 @@ module.exports = async function(repository, groupId, artifactId, version, user, 
             promise = fetch(metadataUrl);
         }
 
-        promise.then(xmlContent => {
+        promise.then(response => response.text()).then(xmlContent => {
             console.log('Parsing metadata')
             let pomResponse = parser.parse(xmlContent);
 
