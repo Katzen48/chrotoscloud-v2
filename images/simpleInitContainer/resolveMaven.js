@@ -39,5 +39,5 @@ module.exports = async function(repository, groupId, artifactId, version, user, 
         versionString += '-all.jar';
         console.log('Version String:', versionString);
 
-        return artifactUrl + '/' + versioning;
+        return artifactUrl + '/' + versionString;
 }
