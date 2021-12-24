@@ -19,16 +19,18 @@ module.exports = async function(repository, groupId, artifactId, version, user, 
             promise = fetch(metadataUrl);
         }
 
+        let outerResolve = resolve;
+
         promise.then(response => response.text()).then(xmlContent => {
             console.log('Parsing metadata');
             let pomResponse = parser.parse(xmlContent);
             let metadata = pomResponse[0].metadata;
             let versioning = metadata[3].versioning;
 
-            let versionString = 'core-';
+            let versionString = artifactId + '-';
             if (version.endsWith('-SNAPSHOT')) {
                 let snapshot = versioning[0].snapshot;
-                versionString += version.substr(0, version.lastIndexOf('-SNAPSHOT') + 2);
+                versionString += version.substr(0, version.lastIndexOf('-SNAPSHOT') + 1);
                 versionString += snapshot[0].timestamp[0]['#text'] + '-' +
                     snapshot[1].buildNumber[0]['#text'];
             } else {
@@ -38,7 +40,7 @@ module.exports = async function(repository, groupId, artifactId, version, user, 
             versionString += '-all.jar';
 
             console.log('Version String:', versionString);
-            resolve(artifactUrl + '/' + versionString);
+            outerResolve(artifactUrl + '/' + versionString);
         }).catch(error => reject(error));
     });
 }
