@@ -10,7 +10,7 @@ const k8s = require('@kubernetes/client-node');
 const download = require('./download');
 const resolveMaven = require('./resolveMaven');
 
-await (async () => {
+(async () => {
     const SOFTWARE = process.env.SERVER_SOFTWARE;
     let gameMode;
 
@@ -53,6 +53,7 @@ await (async () => {
 
     // Download ChrotosCloud-V2 implementation
     try {
+        console.log('Resolving newest build of ChrotosCloud-Plugin', newestBuild);
         let cloudUrl = await resolveMaven(CLOUD_BASE_URL, 'net.chrotos.chrotoscloud',
             SOFTWARE, CLOUD_VERSION, process.env.GITHUB_USER,  process.env.GITHUB_TOKEN);
 

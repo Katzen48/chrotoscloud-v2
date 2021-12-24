@@ -20,6 +20,7 @@ module.exports = async function(url, path, user, password) {
 
             stream.on('finish', () => {
                 stream.close();
+                console.log('Finished downloading');
                 resolve();
             });
 
