@@ -1,7 +1,6 @@
 package net.chrotos.chrotoscloud;
 
 import lombok.Getter;
-import lombok.Setter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 
 import java.util.Iterator;
@@ -10,15 +9,12 @@ import java.util.ServiceLoader;
 @Getter
 public abstract class Cloud {
     private static Cloud instance;
-    @Setter
-    private static ClassLoader serviceClassLoader;
     protected PersistenceAdapter persistence;
     protected CloudConfig cloudConfig;
 
     public static Cloud getInstance() {
         if (Cloud.instance == null) {
-            ServiceLoader<Cloud> serviceLoader = ServiceLoader.load(Cloud.class, serviceClassLoader != null ?
-                                                    serviceClassLoader : Thread.currentThread().getContextClassLoader());
+            ServiceLoader<Cloud> serviceLoader = ServiceLoader.load(Cloud.class);
 
             Iterator<Cloud> iterator = serviceLoader.iterator();
 
