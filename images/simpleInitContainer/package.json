@@ -6,6 +6,7 @@
     "@kubernetes/client-node": "^0.16.1",
     "cross-fetch": "^3.1.4",
     "fast-xml-parser": "^4.0.0-beta.8",
+    "follow-redirects": "^1.14.6",
     "properties-reader": "^2.2.0"
   }
 }

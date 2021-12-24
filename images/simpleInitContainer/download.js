@@ -1,4 +1,4 @@
-const https = require('https');
+const { https } = require('follow-redirects');
 const filePath = require('path');
 const fs = require('fs');
 
