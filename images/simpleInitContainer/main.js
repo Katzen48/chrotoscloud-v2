@@ -10,7 +10,7 @@ const k8s = require('@kubernetes/client-node');
 const download = require('./download');
 const resolveMaven = require('./resolveMaven');
 
-(async () => {
+await (async () => {
     const SOFTWARE = process.env.SERVER_SOFTWARE;
     let gameMode;
 
