@@ -1,5 +1,6 @@
 package net.chrotos.chrotoscloud.persistence.mysql;
 
+import com.google.auto.service.AutoService;
 import net.chrotos.chrotoscloud.CloudConfig;
 import net.chrotos.chrotoscloud.persistence.DataSelectFilter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
@@ -17,6 +18,7 @@ import javax.persistence.criteria.Root;
 import java.util.Collections;
 import java.util.List;
 
+@AutoService(PersistenceAdapter.class)
 public class MysqlPersistenceAdapter implements PersistenceAdapter {
     private SessionFactory sessionFactory;
     private EntityManager entityManager;

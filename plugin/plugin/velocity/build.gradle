@@ -24,6 +24,9 @@ dependencies {
     compileOnly 'com.velocitypowered:velocity-api:3.0.1'
     annotationProcessor 'com.velocitypowered:velocity-api:3.0.1'
     implementation 'io.kubernetes:client-java-extended:10.0.0'
+
+    compileOnly 'com.google.auto.service:auto-service-annotations:1.0.1'
+    annotationProcessor 'com.google.auto.service:auto-service-annotations:1.0.1'
 }
 
 test {
