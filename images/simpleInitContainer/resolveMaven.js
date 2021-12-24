@@ -29,9 +29,8 @@ module.exports = async function(repository, groupId, artifactId, version, user, 
             if (version.endsWith('-SNAPSHOT')) {
                 let snapshot = versioning[0].snapshot;
                 versionString += version.substr(0, version.lastIndexOf('-SNAPSHOT') + 2);
-                console.log(snapshot[0].timestamp[0]);
-                versionString += snapshot[0].timestamp + '-' +
-                    snapshot[1].buildNumber;
+                versionString += snapshot[0].timestamp[0]['#text'] + '-' +
+                    snapshot[1].buildNumber[0]['#text'];
             } else {
                 versionString += metadata.release[0];
             }
