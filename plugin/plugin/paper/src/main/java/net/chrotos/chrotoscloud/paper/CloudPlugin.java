@@ -14,6 +14,7 @@ public class CloudPlugin extends JavaPlugin {
     private final PaperCloud cloud;
 
     public CloudPlugin() {
+        Cloud.setServiceClassLoader(getClassLoader());
         this.cloud = (PaperCloud) Cloud.getInstance();
     }
 
