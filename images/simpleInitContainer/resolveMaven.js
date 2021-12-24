@@ -22,18 +22,16 @@ module.exports = async function(repository, groupId, artifactId, version, user, 
         promise.then(response => response.text()).then(xmlContent => {
             console.log('Parsing metadata');
             let pomResponse = parser.parse(xmlContent);
-            let metadata = pomResponse[0].metadata[0];
-            console.log(pomResponse[0].metadata);
+            let metadata = pomResponse[0].metadata;
+            let versioning = metadata[3].versioning;
 
             let versionString = 'core-';
             if (version.endsWith('-SNAPSHOT')) {
-                console.log(metadata);
-                let versioning = metadata.versioning[0];
-                let snapshot = versioning.snapshot[0];
+                let snapshot = versioning[0].snapshot;
                 versionString += version.substr(0, version.lastIndexOf('-SNAPSHOT') + 2);
-                console.log(snapshot.timestamp[0]);
-                versionString += snapshot.timestamp[0] + '-' +
-                    snapshot.buildNumber[0];
+                console.log(snapshot[0].timestamp[0]);
+                versionString += snapshot[0].timestamp + '-' +
+                    snapshot[1].buildNumber;
             } else {
                 versionString += metadata.release[0];
             }
