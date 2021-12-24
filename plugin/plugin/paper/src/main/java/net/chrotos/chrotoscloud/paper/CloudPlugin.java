@@ -1,14 +1,13 @@
 package net.chrotos.chrotoscloud.paper;
 
-import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.CoreCloud;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class CloudPlugin extends JavaPlugin {
-    private final PaperCloud cloud;
+    private final CoreCloud cloud;
 
     public CloudPlugin() {
-        this.cloud = (PaperCloud) Cloud.getInstance();
+        this.cloud = new PaperCloud(this);
     }
 
     @Override
