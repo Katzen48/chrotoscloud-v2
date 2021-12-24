@@ -38,7 +38,12 @@ public abstract class CoreCloud extends Cloud {
             throw new IllegalArgumentException("Not loaded! Cannot initialize!");
         }
 
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+
+        Thread.currentThread().setContextClassLoader(getServiceClassLoader());
         this.persistence.configure(getCloudConfig());
+
+        Thread.currentThread().setContextClassLoader(loader);
 
         initialized = true;
     }
