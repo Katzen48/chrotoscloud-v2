@@ -20,8 +20,10 @@ module.exports = async function(repository, groupId, artifactId, version, user, 
         }
 
         promise.then(response => response.text()).then(xmlContent => {
-            console.log('Parsing metadata')
+            console.log('Parsing metadata');
+            console.log(xmlContent);
             let pomResponse = parser.parse(xmlContent);
+            console.log(pomResponse);
 
             let versionString = 'core-';
             if (version.endsWith('-SNAPSHOT')) {
