@@ -12,7 +12,8 @@ module.exports = async function(url, path, user, password) {
            options = {
                headers: {
                    'Authorization': 'Basic ' + Buffer.from(user + ':' + password).toString('base64')
-               }
+               },
+               method: 'GET'
             }
         }
 
@@ -26,9 +27,9 @@ module.exports = async function(url, path, user, password) {
                 resolve();
             });
 
-            stream.on('error', () => {
+            stream.on('error', (e) => {
                 stream.close();
-                reject('Error whilst downloading from \'' + url + '\'');
+                reject('Error whilst downloading from \'' + url + '\': ' + e);
             })
         })
     });

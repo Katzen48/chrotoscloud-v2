@@ -6,7 +6,7 @@ module.exports = async function(repository, groupId, artifactId, version, user, 
         let artifactUrl = repository + '/' + groupId.replaceAll('.', '/') + '/' + artifactId + '/' + version;
 
         let metadataUrl = artifactUrl + '/maven-metadata.xml';
-        console.log('Requesting maven-metadata from\'' + metadataUrl + '\'');
+        console.log('Requesting maven-metadata from \'' + metadataUrl + '\'');
         let promise;
         if (user && password) {
             let headers = new fetch.Headers();
