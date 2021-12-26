@@ -24,6 +24,7 @@ public class VelocityEventHandler {
     @Subscribe
     public void onPermissionsSetup(PermissionsSetupEvent event, Continuation continuation) {
         if (!(event.getSubject() instanceof Player)) {
+            continuation.resume();
             return;
         }
 
@@ -41,6 +42,10 @@ public class VelocityEventHandler {
 
     @Subscribe(order = PostOrder.LAST)
     public void onDisconnect(DisconnectEvent event) {
+        if (event.getPlayer() == null || event.getLoginStatus() != DisconnectEvent.LoginStatus.SUCCESSFUL_LOGIN) {
+            return;
+        }
+
         plugin.cloud.getPlayerManager().logoutPlayer(event.getPlayer().getUniqueId());
     }
 }
