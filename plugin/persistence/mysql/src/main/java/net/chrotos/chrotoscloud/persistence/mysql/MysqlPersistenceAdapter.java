@@ -116,4 +116,11 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
             throw e;
         }
     }
+
+    @Override
+    public void refresh(Object object) {
+        if (entityManager.contains(object)) {
+            entityManager.refresh(object);
+        }
+    }
 }

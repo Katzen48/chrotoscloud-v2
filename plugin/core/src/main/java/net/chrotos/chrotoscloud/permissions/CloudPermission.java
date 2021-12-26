@@ -12,6 +12,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicUpdate
 public class CloudPermission implements Permission {
     @Id
     @Column(updatable = false, nullable = false, name = "unique_id")

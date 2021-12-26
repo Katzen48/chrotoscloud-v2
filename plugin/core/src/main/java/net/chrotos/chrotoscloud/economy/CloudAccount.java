@@ -1,12 +1,10 @@
 package net.chrotos.chrotoscloud.economy;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import net.chrotos.chrotoscloud.persistence.SoftDeletable;
 import net.chrotos.chrotoscloud.player.CloudPlayer;
 import net.chrotos.chrotoscloud.player.Player;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
@@ -19,6 +17,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
+@DynamicUpdate
 public class CloudAccount implements Account, SoftDeletable {
     @Id
     @GeneratedValue(generator = "UUID")
@@ -47,6 +46,9 @@ public class CloudAccount implements Account, SoftDeletable {
     private Calendar updatedAt = Calendar.getInstance();
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar deletedAt;
+
+    @Setter
+    private transient long lastRefreshed;
 
     @Override
     public Collection<Transaction> getTransactions() {

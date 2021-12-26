@@ -13,4 +13,5 @@ public interface PersistenceAdapter {
     <E> void save(E entity);
     void removeFromContext(Object object);
     void runInTransaction(Runnable runnable);
+    void refresh(Object object);
 }

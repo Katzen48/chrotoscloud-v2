@@ -8,6 +8,7 @@ import net.chrotos.chrotoscloud.permissions.CloudPermissible;
 import net.chrotos.chrotoscloud.permissions.CloudPermission;
 import net.chrotos.chrotoscloud.permissions.Permission;
 import net.chrotos.chrotoscloud.persistence.SoftDeletable;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
 
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor
 @RequiredArgsConstructor
+@DynamicUpdate
 public class CloudPlayer extends CloudPermissible implements Player, SoftDeletable {
     @Id
     @Column(updatable = false, nullable = false)
@@ -46,6 +48,9 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     private Calendar updatedAt = Calendar.getInstance();
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar deletedAt;
+
+    @Setter
+    private transient long lastRefreshed;
 
     @Override
     public List<Account> getAccounts(AccountType type) {
