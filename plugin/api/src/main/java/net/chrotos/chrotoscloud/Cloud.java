@@ -3,6 +3,7 @@ package net.chrotos.chrotoscloud;
 import lombok.Getter;
 import lombok.Setter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
+import net.chrotos.chrotoscloud.player.PlayerManager;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
@@ -52,4 +53,7 @@ public abstract class Cloud {
     public abstract boolean isInitialized();
 
     public abstract boolean isLoaded();
+
+    // Getter
+    public abstract PlayerManager getPlayerManager();
 }

@@ -26,5 +26,6 @@ public class CloudPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         cloud.initialize();
+        getServer().getPluginManager().registerEvents(new PaperEventHandler(cloud), this);
     }
 }

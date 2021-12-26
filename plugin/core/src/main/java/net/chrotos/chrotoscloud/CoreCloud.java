@@ -1,6 +1,8 @@
 package net.chrotos.chrotoscloud;
 
+import lombok.Getter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
+import net.chrotos.chrotoscloud.player.CloudPlayerManager;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
@@ -8,6 +10,12 @@ import java.util.ServiceLoader;
 public abstract class CoreCloud extends Cloud {
     private static boolean loaded;
     private static boolean initialized;
+    @Getter
+    private final CloudPlayerManager playerManager;
+
+    protected CoreCloud() {
+        this.playerManager = new CloudPlayerManager(this);
+    }
 
     @Override
     public boolean isInitialized() {

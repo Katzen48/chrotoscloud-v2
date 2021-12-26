@@ -1,9 +1,6 @@
 package net.chrotos.chrotoscloud.player;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import net.chrotos.chrotoscloud.economy.Account;
 import net.chrotos.chrotoscloud.economy.AccountType;
 import net.chrotos.chrotoscloud.economy.CloudAccount;
@@ -32,6 +29,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @NonNull
     private String name;
 
+    @Setter
     private transient SidedPlayer sidedPlayer;
 
     @OneToMany(mappedBy = "owner", targetEntity = CloudAccount.class, cascade = CascadeType.ALL)
