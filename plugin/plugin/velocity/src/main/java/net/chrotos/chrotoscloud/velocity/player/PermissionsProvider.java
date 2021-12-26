@@ -17,11 +17,9 @@ public class PermissionsProvider implements PermissionProvider {
         return permission -> {
             Player player = (Player) subject;
 
-            if (cloud.getPlayerManager().getPlayer(player.getUniqueId()).hasPermission(permission)) {
-                return Tristate.TRUE;
-            } else {
-                return Tristate.FALSE;
-            }
+            return Tristate.fromBoolean(
+                cloud.getPlayerManager().getPlayer(player.getUniqueId()).hasPermission(permission)
+            );
         };
     }
 }
