@@ -24,7 +24,7 @@ public class CloudPlugin {
         this.cloud = (VelocityCloud) Cloud.getInstance();
     }
 
-    @Subscribe
+    @Subscribe(async = false)
     public void onProxyInitialization(ProxyInitializeEvent event) {
         cloud.load();
         cloud.initialize();

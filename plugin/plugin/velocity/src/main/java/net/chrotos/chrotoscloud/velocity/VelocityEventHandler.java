@@ -27,11 +27,16 @@ public class VelocityEventHandler {
             return;
         }
 
-        SidedPlayer sidedPlayer = new VelocitySidedPlayer((Player) event.getSubject());
-        plugin.cloud.getPlayerManager().getOrCreatePlayer(sidedPlayer);
+        try {
+            SidedPlayer sidedPlayer = new VelocitySidedPlayer((Player) event.getSubject());
+            plugin.cloud.getPlayerManager().getOrCreatePlayer(sidedPlayer);
 
-        event.setProvider(permissionsProvider);
-        continuation.resume();
+            event.setProvider(permissionsProvider);
+        } catch (Exception e) {
+            continuation.resumeWithException(e);
+        } finally {
+            continuation.resume();
+        }
     }
 
     @Subscribe(order = PostOrder.LAST)

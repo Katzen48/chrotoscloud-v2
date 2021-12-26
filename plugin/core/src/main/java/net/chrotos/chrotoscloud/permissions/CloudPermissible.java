@@ -41,15 +41,11 @@ public abstract class CloudPermissible implements Permissible {
     }
 
     public boolean calculatePermission(@NonNull String permission) {
-        System.out.format("Checking Permission value for \"%s\"\n", permission); // TODO remove debugging
-
         Optional<Permission> optional = getPermissionExact(permission);
 
         if (optional.isPresent()) {
             return optional.get().getValue();
         }
-
-        System.out.println("No exact Permission found. Checking recursive permissions."); // TODO remove debugging
 
         String permPart = permission;
         int index;
@@ -63,15 +59,11 @@ public abstract class CloudPermissible implements Permissible {
             }
         }
 
-        System.out.println("No Permission found. Denying access."); // TODO remove debugging
-
         return false;
     }
 
     @Transactional
     private Optional<Permission> getPermissionExact(@NonNull String permission) {
-        System.out.println("getPermissionExacht: " + permission); // TODO remove debugging
-
         return getPermissions().stream().filter(permissionFilter ->
                 permissionFilter.getName().equalsIgnoreCase(permission)
         ).findFirst();
