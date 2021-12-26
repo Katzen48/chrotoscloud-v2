@@ -27,6 +27,7 @@ spec:
       labels:
         app: paper-template
         net.chrotos.ingress.minecraft/discover: 'true'
+        net.chrotos.ingress.minecraft/lobby: 'true'
         net.chrotos.chrotoscloud.gameserver/gamemode: 'lobby'
     spec:
       volumes:
