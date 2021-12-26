@@ -7,8 +7,6 @@ import org.bukkit.permissions.PermissibleBase;
 import org.bukkit.permissions.ServerOperator;
 
 import java.lang.reflect.Field;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class PermissibleInjector {
     private static final Field HUMAN_ENTITY_PERMISSIBLE_FIELD;
@@ -21,16 +19,7 @@ public class PermissibleInjector {
     }
 
     static {
-        Class<?> craftBukkitServer = Bukkit.getServer().getClass();
-        Matcher matcher = Pattern.compile("^org\\\\.bukkit\\\\.craftbukkit\\\\.(\\\\w+)\\\\.CraftServer$")
-                                    .matcher(craftBukkitServer.getName());
-
-        String craftBukkitPackage;
-        if (matcher.matches()) {
-            craftBukkitPackage = "org.bukkit.craftbukkit." + matcher.group(1) + ".";
-        } else {
-            throw new IllegalStateException("Unsupported Bukkit implementation");
-        }
+        String craftBukkitPackage = Bukkit.getServer().getClass().getPackage().getName() + ".";
 
         try {
             HUMAN_ENTITY_PERMISSIBLE_FIELD = Class.forName(craftBukkitPackage + "entity.CraftHumanEntity")

@@ -11,5 +11,6 @@ public interface PersistenceAdapter {
     <E> List<E> getAll(Class<E> clazz, DataSelectFilter filter);
     <E> E getOne(Class<E> clazz, DataSelectFilter filter);
     <E> void save(E entity);
+    void removeFromContext(Object object);
     void runInTransaction(Runnable runnable);
 }

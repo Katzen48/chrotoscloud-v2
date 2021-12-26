@@ -1,6 +1,8 @@
 package net.chrotos.chrotoscloud.velocity;
 
+import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
 import com.velocitypowered.api.proxy.Player;
@@ -18,7 +20,7 @@ public class VelocityEventHandler {
         this.permissionsProvider = new PermissionsProvider(plugin.cloud);
     }
 
-    @Subscribe
+    @Subscribe(async = false, order = PostOrder.FIRST)
     public void onLogin(LoginEvent event) {
         SidedPlayer sidedPlayer = new VelocitySidedPlayer(event.getPlayer());
         plugin.cloud.getPlayerManager().getOrCreatePlayer(sidedPlayer);
@@ -31,5 +33,10 @@ public class VelocityEventHandler {
         }
 
         event.setProvider(permissionsProvider);
+    }
+
+    @Subscribe(order = PostOrder.LAST)
+    public void onDisconnect(DisconnectEvent event) {
+        plugin.cloud.getPlayerManager().logoutPlayer(event.getPlayer().getUniqueId());
     }
 }

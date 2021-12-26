@@ -96,6 +96,13 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     }
 
     @Override
+    public void removeFromContext(Object object) {
+        if (entityManager.contains(object)) {
+            entityManager.detach(object);
+        }
+    }
+
+    @Override
     public void runInTransaction(Runnable runnable) {
         EntityTransaction transaction = entityManager.getTransaction();
         transaction.begin();

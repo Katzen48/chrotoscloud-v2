@@ -48,6 +48,27 @@ public class CloudPlayerManager implements PlayerManager {
         return player;
     }
 
+    @Override
+    public void logoutPlayer(@NonNull Player player) {
+        cloud.getPersistence().removeFromContext(player);
+    }
+
+    @Override
+    public void logoutPlayer(@NonNull SidedPlayer player) {
+        logoutPlayer(player.getUniqueId());
+    }
+
+    @Override
+    public void logoutPlayer(@NonNull UUID uniqueId) {
+        Player player = getPlayer(uniqueId);
+
+        if (player == null) {
+            return;
+        }
+
+        logoutPlayer(player);
+    }
+
     private CloudPlayer createPlayer(@NonNull UUID uniqueId, @NonNull String name) {
         CloudPlayer player = new CloudPlayer(uniqueId, name);
         cloud.getPersistence().save(player);
