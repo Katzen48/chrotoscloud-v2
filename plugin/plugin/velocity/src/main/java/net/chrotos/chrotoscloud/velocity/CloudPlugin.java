@@ -30,5 +30,8 @@ public class CloudPlugin {
         cloud.initialize();
 
         proxyServer.getEventManager().register(this, new VelocityEventHandler(this));
+
+        // Reload function is incompatible with the manipulations done by the plugin, so remove the whole command
+        proxyServer.getCommandManager().unregister("velocity");
     }
 }
