@@ -4,7 +4,6 @@ import com.velocitypowered.api.event.Continuation;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
-import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
 import com.velocitypowered.api.proxy.Player;
 import lombok.NonNull;
@@ -21,7 +20,7 @@ public class VelocityEventHandler {
         this.permissionsProvider = new PermissionsProvider(plugin.cloud);
     }
 
-    @Subscribe
+    @Subscribe(order = PostOrder.FIRST)
     public void onPermissionsSetup(PermissionsSetupEvent event, Continuation continuation) {
         if (!(event.getSubject() instanceof Player)) {
             continuation.resume();
