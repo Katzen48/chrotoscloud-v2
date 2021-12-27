@@ -22,7 +22,7 @@ dependencies {
     implementation 'org.hibernate:hibernate-core:5.6.3.Final'
     implementation 'org.hibernate:hibernate-entitymanager:5.6.3.Final'
 
-    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.2'
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:3.0.1'
     implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.2'
 }
 
