@@ -43,6 +43,7 @@ public class CloudPlugin extends JavaPlugin {
             Map<String, Command> knownCommands = (Map<String, Command>) knownCommandsField.get(getServer().getCommandMap());
             knownCommands.remove("reload");
             knownCommands.remove("bukkit:reload");
+            knownCommands.remove("bukkit:rl");
             knownCommands.remove("spigot:reload");
             knownCommands.remove("paper:paper");
         } catch (Exception e) {
