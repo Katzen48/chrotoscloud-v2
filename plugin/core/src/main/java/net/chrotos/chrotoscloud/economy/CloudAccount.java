@@ -28,7 +28,7 @@ public class CloudAccount implements Account, SoftDeletable {
     private UUID uniqueId;
 
     @ManyToOne(targetEntity = CloudPlayer.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "owner_id", updatable = false)
+    @JoinColumn(name = "owner_unique_id", updatable = false)
     @NonNull
     private Player owner;
 
@@ -38,7 +38,7 @@ public class CloudAccount implements Account, SoftDeletable {
     private float balance;
     private float balanceLimit;
     private float creditLimit;
-    private boolean sharedAccount;
+    private boolean sharedAccount = false;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar createdAt = Calendar.getInstance();

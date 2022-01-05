@@ -2,7 +2,9 @@ package net.chrotos.chrotoscloud.persistence.mysql;
 
 import net.chrotos.chrotoscloud.CloudConfig;
 import net.chrotos.chrotoscloud.persistence.DataSelectFilter;
+import net.chrotos.chrotoscloud.persistence.DatabaseTransaction;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
+import net.chrotos.chrotoscloud.persistence.TransactionRunnable;
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
@@ -92,7 +94,11 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
             return;
         }
 
-        runInTransaction(() -> entityManager.persist(entity));
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.persist(entity);
+        } else {
+            runInTransaction((databaseTransaction) -> entityManager.persist(entity));
+        }
     }
 
     @Override
@@ -103,12 +109,23 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     }
 
     @Override
-    public void runInTransaction(Runnable runnable) {
+    public void runInTransaction(TransactionRunnable runnable) {
         EntityTransaction transaction = entityManager.getTransaction();
         transaction.begin();
 
         try {
-            runnable.run();
+            runnable.run(new DatabaseTransaction() {
+                @Override
+                public void commit() {
+                    transaction.commit();
+                    transaction.begin();
+                }
+
+                @Override
+                public void rollback() {
+                    transaction.rollback();
+                }
+            });
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();

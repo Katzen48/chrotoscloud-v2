@@ -63,7 +63,9 @@ public abstract class CloudPermissible implements Permissible {
     }
 
     @Transactional
-    private Optional<Permission> getPermissionExact(@NonNull String permission) {
+    @Override
+    @NonNull
+    public Optional<Permission> getPermissionExact(@NonNull String permission) {
         return getPermissions().stream().filter(permissionFilter ->
                 permissionFilter.getName().equalsIgnoreCase(permission)
         ).findFirst();

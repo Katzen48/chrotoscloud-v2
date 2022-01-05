@@ -5,6 +5,7 @@ import net.chrotos.chrotoscloud.economy.Account;
 import net.chrotos.chrotoscloud.economy.AccountType;
 import net.chrotos.chrotoscloud.economy.CloudAccount;
 import net.chrotos.chrotoscloud.permissions.CloudPermission;
+import net.chrotos.chrotoscloud.permissions.CloudRank;
 import net.chrotos.chrotoscloud.permissions.Permission;
 import net.chrotos.chrotoscloud.persistence.DataSelectFilter;
 import net.chrotos.chrotoscloud.player.CloudPlayer;
@@ -60,7 +61,7 @@ public class MysqlPersistenceTest {
         Player player = new CloudPlayer(UUID.randomUUID(), "test");
         cloud.getPersistence().save(player);
 
-        cloud.getPersistence().runInTransaction(() -> {
+        cloud.getPersistence().runInTransaction((databaseTransaction) -> {
             Account account = new CloudAccount(player, AccountType.BANK);
             Player finalPlayer = player;
             finalPlayer.getAccounts().add(account);
@@ -83,7 +84,7 @@ public class MysqlPersistenceTest {
         Player player = new CloudPlayer(UUID.randomUUID(), "test");
         cloud.getPersistence().save(player);
 
-        cloud.getPersistence().runInTransaction(() -> {
+        cloud.getPersistence().runInTransaction((databaseTransaction) -> {
             CloudPermission permission = new CloudPermission(UUID.randomUUID(), "test.test", false, player);
             player.getPermissions().add(permission);
 
@@ -103,6 +104,19 @@ public class MysqlPersistenceTest {
             assertFalse(player.hasPermission("test.test", true));
             assertTrue(player.hasPermission("test.*", true));
             assertTrue(player.hasPermission("test.test2", true));
+            assertFalse(player.hasPermission("test2.test"));
+
+            CloudRank rank = new CloudRank(UUID.randomUUID(), UUID.randomUUID().toString(), "test");
+            cloud.getPersistence().save(rank);
+            player.setRank(rank);
+            rank.getPermissions().add(new CloudPermission(UUID.randomUUID(), "test3.*", true, rank));
+            CloudRank parentRank = new CloudRank(UUID.randomUUID(), UUID.randomUUID().toString(), "test2");
+            cloud.getPersistence().save(parentRank);
+            rank.setParent(parentRank);
+            parentRank.getPermissions().add(new CloudPermission(UUID.randomUUID(), "test4.*", true, parentRank));
+
+            assertTrue(player.hasPermission("test3.test"));
+            assertTrue(player.hasPermission("test4.test"));
         });
     }
 }

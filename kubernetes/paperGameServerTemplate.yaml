@@ -80,7 +80,7 @@ spec:
           command:
             - java
           args:
-            - '-Xms3000M'
+            - '-Xms4G'
             - '-Xmx4G'
             - '-jar'
             - server.jar
@@ -107,11 +107,11 @@ spec:
               protocol: TCP
           resources:
             limits:
-              cpu: 2
+              cpu: 1
               memory: 4G
             requests:
               cpu: 1
-              memory: 3000M
+              memory: 4G
           volumeMounts:
             - name: workdir
               mountPath: /opt/paper

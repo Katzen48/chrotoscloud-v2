@@ -9,9 +9,4 @@ public class MockCloud extends CoreCloud {
     public MockCloud() {
         setCloudConfig(new MockConfig());
     }
-
-    @Override
-    public List<Player> getOnlinePlayers() {
-        return null;
-    }
 }

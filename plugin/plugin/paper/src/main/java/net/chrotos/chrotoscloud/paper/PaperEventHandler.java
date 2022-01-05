@@ -30,6 +30,10 @@ public class PaperEventHandler implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
-        cloud.getPlayerManager().logoutPlayer(event.getPlayer().getUniqueId());
+        try {
+            cloud.getPlayerManager().logoutPlayer(event.getPlayer().getUniqueId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

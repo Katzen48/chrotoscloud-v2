@@ -40,11 +40,15 @@ public class VelocityEventHandler {
     }
 
     @Subscribe(order = PostOrder.LAST)
-    public void onDisconnect(DisconnectEvent event) {
+    public void onDisconnect(DisconnectEvent event, Continuation continuation) {
         if (event.getPlayer() == null || event.getLoginStatus() != DisconnectEvent.LoginStatus.SUCCESSFUL_LOGIN) {
             return;
         }
 
-        plugin.cloud.getPlayerManager().logoutPlayer(event.getPlayer().getUniqueId());
+        try {
+            plugin.cloud.getPlayerManager().logoutPlayer(event.getPlayer().getUniqueId());
+        } catch (Exception e) {
+            continuation.resumeWithException(e);
+        }
     }
 }

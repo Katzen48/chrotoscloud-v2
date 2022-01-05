@@ -28,7 +28,7 @@ public class CloudPermission implements Permission {
 
     @Any(metaColumn = @Column(name = "permissible_type"),
             metaDef = "PermissionMetaDef", optional = false)
-    @JoinColumn(name = "permissible", updatable = false)
+    @JoinColumn(name = "permissible_unique_id", updatable = false)
     @NonNull
     private Permissible permissible;
 

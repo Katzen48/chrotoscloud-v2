@@ -1,13 +1,16 @@
 package net.chrotos.chrotoscloud.permissions;
 
+import lombok.NonNull;
 import net.chrotos.chrotoscloud.player.Player;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface Rank extends Permissible {
-    String getName();
     Rank getParent();
+    void setParent(Rank rank);
+    @NonNull
     String getPrefix();
     boolean isTeam();
-    Collection<Player> getPlayers();
+    @NonNull
+    List<Player> getPlayers();
 }
