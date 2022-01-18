@@ -19,7 +19,8 @@ spec:
                   type: string
                   enum:
                   - "1.17.1"
-                  default: "1.17.1"
+                  - "1.18.1"
+                  default: "1.18.1"
                 cloudVersion:
                   type: string
                   default: "2.0.0"
