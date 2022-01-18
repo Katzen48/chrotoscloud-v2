@@ -37,4 +37,9 @@ public class PermissibleReplacement extends PermissibleBase {
     public synchronized @NotNull Set<PermissionAttachmentInfo> getEffectivePermissions() {
         return Collections.emptySet();
     }
+
+    @Override
+    public boolean isOp() {
+        return hasPermission("minecraft.command.op");
+    }
 }
