@@ -5,18 +5,30 @@ updates:
     directory: "plugin/api"
     schedule:
       interval: "daily"
+    ignore:
+    - dependency-name: "*"
+      update-types: ["version-update:semver-major"]
   - package-ecosystem: "gradle"
     directory: "plugin/core"
     schedule:
       interval: "daily"
+    ignore:
+    - dependency-name: "*"
+      update-types: ["version-update:semver-major"]
   - package-ecosystem: "gradle"
     directory: "plugin/persistence/models"
     schedule:
       interval: "daily"
+    ignore:
+    - dependency-name: "*"
+      update-types: ["version-update:semver-major"]
   - package-ecosystem: "gradle"
     directory: "plugin/persistence/mysql"
     schedule:
       interval: "daily"
+    ignore:
+    - dependency-name: "*"
+      update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "docker"
     directory: "images/paperInitContainer"
