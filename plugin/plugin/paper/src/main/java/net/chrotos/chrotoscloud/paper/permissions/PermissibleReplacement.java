@@ -42,4 +42,11 @@ public class PermissibleReplacement extends PermissibleBase {
     public boolean isOp() {
         return hasPermission("minecraft.command.op");
     }
+
+    @Override
+    public synchronized void recalculatePermissions() {
+        if (cloud != null) {
+            cloud.getPlayerManager().getPlayer(player.getUniqueId()).clearPermissionsCache();
+        }
+    }
 }

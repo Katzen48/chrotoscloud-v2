@@ -9,7 +9,7 @@ import java.util.UUID;
 public interface Permissible {
     boolean hasPermission(@NonNull String permission);
     boolean hasPermission(@NonNull String permission, boolean ignoreCache);
-    void clearCache();
+    void clearPermissionsCache();
     @NonNull
     List<Permission> getPermissions();
     @NonNull

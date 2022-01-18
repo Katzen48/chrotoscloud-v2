@@ -36,7 +36,7 @@ public abstract class CloudPermissible implements Permissible {
     }
 
     @Override
-    public void clearCache() {
+    public void clearPermissionsCache() {
         permissionsCache.invalidateAll();
     }
 
