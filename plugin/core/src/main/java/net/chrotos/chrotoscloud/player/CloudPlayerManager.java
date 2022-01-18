@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.persistence.DataSelectFilter;
+import net.chrotos.chrotoscloud.persistence.EntityExistsException;
 
 import java.util.UUID;
 
@@ -17,7 +18,8 @@ public class CloudPlayerManager implements PlayerManager {
                                                                                 .primaryKeyValue(uniqueId).build());
 
         if (player.getLastRefreshed() > 0 && (System.currentTimeMillis() - player.getLastRefreshed()) > 60000) {
-            cloud.getPersistence().refresh(player);
+            cloud.getPersistence().merge(player);
+            player.setLastRefreshed(System.currentTimeMillis());
         }
 
         return player;
@@ -29,7 +31,7 @@ public class CloudPlayerManager implements PlayerManager {
     }
 
     @Override
-    public Player getOrCreatePlayer(@NonNull UUID uniqueId, String name) {
+    public Player getOrCreatePlayer(@NonNull UUID uniqueId, String name) throws PlayerSoftDeletedException {
         Player player = getPlayer(uniqueId);
 
         if (player != null) {
@@ -40,11 +42,15 @@ public class CloudPlayerManager implements PlayerManager {
             throw new IllegalArgumentException("'name' cannot be null");
         }
 
-        return createPlayer(uniqueId, name);
+        try {
+            return createPlayer(uniqueId, name);
+        } catch (EntityExistsException e) {
+            throw new PlayerSoftDeletedException(uniqueId);
+        }
     }
 
     @Override
-    public Player getOrCreatePlayer(@NonNull SidedPlayer sidedPlayer) {
+    public Player getOrCreatePlayer(@NonNull SidedPlayer sidedPlayer) throws PlayerSoftDeletedException {
         CloudPlayer player = (CloudPlayer) getOrCreatePlayer(sidedPlayer.getUniqueId(), sidedPlayer.getName());
 
         if (player != null) {

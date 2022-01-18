@@ -5,6 +5,7 @@ import net.chrotos.chrotoscloud.persistence.SoftDeletable;
 import net.chrotos.chrotoscloud.player.CloudPlayer;
 import net.chrotos.chrotoscloud.player.Player;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
 
@@ -17,6 +18,8 @@ import java.util.*;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @DynamicUpdate
+@SQLDelete(sql = "UPDATE ranks SET deleted_at=now() WHERE unique_id = ?")
+@Where(clause = "deleted_at=NUlL")
 public class CloudRank extends CloudPermissible implements Rank, SoftDeletable {
     @Id
     @Column(updatable = false, nullable = false)

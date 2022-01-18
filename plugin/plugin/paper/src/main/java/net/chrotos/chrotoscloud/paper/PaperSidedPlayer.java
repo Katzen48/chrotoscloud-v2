@@ -1,6 +1,7 @@
 package net.chrotos.chrotoscloud.paper;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.chrotos.chrotoscloud.player.SidedPlayer;
 import org.bukkit.entity.Player;
 
@@ -8,8 +9,9 @@ import java.util.Locale;
 import java.util.UUID;
 
 @Getter
+@RequiredArgsConstructor
 public class PaperSidedPlayer implements SidedPlayer {
-    private Player sidedObject;
+    private final Player sidedObject;
 
     @Override
     public UUID getUniqueId() {

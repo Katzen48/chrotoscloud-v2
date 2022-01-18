@@ -10,8 +10,9 @@ public interface PersistenceAdapter {
     <E> List<E> getAll(Class<E> clazz);
     <E> List<E> getAll(Class<E> clazz, DataSelectFilter filter);
     <E> E getOne(Class<E> clazz, DataSelectFilter filter);
-    <E> void save(E entity);
+    <E> void save(E entity) throws EntityExistsException;
     void removeFromContext(Object object);
     void runInTransaction(TransactionRunnable runnable);
     void refresh(Object object);
+    void merge(Object object);
 }

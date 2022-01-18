@@ -4,11 +4,11 @@ import lombok.*;
 import net.chrotos.chrotoscloud.persistence.SoftDeletable;
 import net.chrotos.chrotoscloud.player.CloudPlayer;
 import net.chrotos.chrotoscloud.player.Player;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.UUID;
@@ -18,6 +18,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @DynamicUpdate
+@SQLDelete(sql = "UPDATE accounts SET deleted_at=now() WHERE unique_id = ?")
+@Where(clause = "deleted_at=NUlL")
 public class CloudAccount implements Account, SoftDeletable {
     @Id
     @GeneratedValue(generator = "UUID")

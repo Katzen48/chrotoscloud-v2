@@ -10,6 +10,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
 import org.hibernate.cfg.Configuration;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
@@ -89,15 +90,19 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     }
 
     @Override
-    public <E> void save(E entity) {
+    public <E> void save(E entity) throws net.chrotos.chrotoscloud.persistence.EntityExistsException {
         if (entityManager.contains(entity)) {
             return;
         }
 
-        if (entityManager.getTransaction().isActive()) {
-            entityManager.persist(entity);
-        } else {
-            runInTransaction((databaseTransaction) -> entityManager.persist(entity));
+        try {
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.persist(entity);
+            } else {
+                runInTransaction((databaseTransaction) -> entityManager.persist(entity));
+            }
+        } catch (EntityExistsException e) {
+            throw new net.chrotos.chrotoscloud.persistence.EntityExistsException(entity);
         }
     }
 
@@ -138,6 +143,20 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     public void refresh(Object object) {
         if (entityManager.contains(object)) {
             entityManager.refresh(object);
+        }
+    }
+
+    @Override
+    public void merge(Object object) {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.merge(object);
+        } else {
+            EntityTransaction transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            entityManager.merge(object);
+
+            transaction.commit();
         }
     }
 }

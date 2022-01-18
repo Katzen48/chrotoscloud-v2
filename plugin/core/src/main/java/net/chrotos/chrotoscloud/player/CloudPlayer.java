@@ -7,6 +7,7 @@ import net.chrotos.chrotoscloud.economy.CloudAccount;
 import net.chrotos.chrotoscloud.permissions.*;
 import net.chrotos.chrotoscloud.persistence.SoftDeletable;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
 
@@ -19,6 +20,8 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @DynamicUpdate
+@SQLDelete(sql = "UPDATE players SET deleted_at=now() WHERE unique_id = ?")
+@Where(clause = "deleted_at=NUlL")
 public class CloudPlayer extends CloudPermissible implements Player, SoftDeletable {
     @Id
     @Column(updatable = false, nullable = false)
