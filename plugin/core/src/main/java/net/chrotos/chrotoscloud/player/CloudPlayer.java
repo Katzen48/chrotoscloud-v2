@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @DynamicUpdate
 @SQLDelete(sql = "UPDATE players SET deleted_at=now() WHERE unique_id = ?")
-@Where(clause = "deleted_at=NUlL")
+@Where(clause = "deleted_at IS NUlL")
 public class CloudPlayer extends CloudPermissible implements Player, SoftDeletable {
     @Id
     @Column(updatable = false, nullable = false)

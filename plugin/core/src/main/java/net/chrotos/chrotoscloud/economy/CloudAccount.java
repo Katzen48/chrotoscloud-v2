@@ -19,7 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @DynamicUpdate
 @SQLDelete(sql = "UPDATE accounts SET deleted_at=now() WHERE unique_id = ?")
-@Where(clause = "deleted_at=NUlL")
+@Where(clause = "deleted_at IS NUlL")
 public class CloudAccount implements Account, SoftDeletable {
     @Id
     @GeneratedValue(generator = "UUID")

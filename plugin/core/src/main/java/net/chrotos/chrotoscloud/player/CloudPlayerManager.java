@@ -62,6 +62,7 @@ public class CloudPlayerManager implements PlayerManager {
 
     @Override
     public void logoutPlayer(@NonNull Player player) {
+        cloud.getPersistence().merge(player);
         cloud.getPersistence().removeFromContext(player);
     }
 
