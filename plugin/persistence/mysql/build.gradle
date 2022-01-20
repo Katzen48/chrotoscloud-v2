@@ -17,7 +17,7 @@ dependencies {
     implementation project(':persistence:models')
     implementation project(':core')
 
-    implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.4'
+    implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.5'
 
     implementation 'org.flywaydb:flyway-core:8.4.1'
     implementation "org.flywaydb:flyway-mysql:8.4.1"
