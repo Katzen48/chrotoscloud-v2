@@ -11,10 +11,7 @@ import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.exception.ConstraintViolationException;
 
-import javax.persistence.EntityExistsException;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -102,8 +99,12 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
             } else {
                 runInTransaction((databaseTransaction) -> entityManager.persist(entity));
             }
-        } catch (EntityExistsException | ConstraintViolationException e) {
-            throw new net.chrotos.chrotoscloud.persistence.EntityExistsException(entity);
+        } catch (PersistenceException e) {
+            if (e.getCause() instanceof ConstraintViolationException) {
+                throw new net.chrotos.chrotoscloud.persistence.EntityExistsException(entity);
+            }
+
+            throw e;
         }
     }
 
