@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 @RequiredArgsConstructor
 public class PaperEventHandler implements Listener {
     private final PaperCloud cloud;
-    private PaperChatRenderer renderer = new PaperChatRenderer();
+    private final PaperChatRenderer renderer = new PaperChatRenderer();
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerLogin(PlayerLoginEvent event) {
