@@ -9,6 +9,7 @@ import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.exception.ConstraintViolationException;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
@@ -101,7 +102,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
             } else {
                 runInTransaction((databaseTransaction) -> entityManager.persist(entity));
             }
-        } catch (EntityExistsException e) {
+        } catch (EntityExistsException | ConstraintViolationException e) {
             throw new net.chrotos.chrotoscloud.persistence.EntityExistsException(entity);
         }
     }
