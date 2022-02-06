@@ -42,10 +42,10 @@ public class CoreChatManager implements ChatManager {
         for (ChatPrefix prefix : getApplicablePrefixes(player)) {
             prefixBuilder.append(prefix.getColor())
                             .append(prefix.getPrefix(player))
-                            .append("&r ");
+                            .append("§r ");
         }
 
-        return String.format("%s %s", prefixBuilder.toString().trim(), getRankColor(player));
+        return String.format("%s %s", prefixBuilder.toString().trim(), getRankColor(player)).trim();
     }
 
     private List<ChatPrefix> getApplicablePrefixes(Player player) {
