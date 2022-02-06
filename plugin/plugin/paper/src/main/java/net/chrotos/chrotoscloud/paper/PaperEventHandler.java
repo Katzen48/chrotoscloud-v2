@@ -26,6 +26,7 @@ public class PaperEventHandler implements Listener {
         try {
             cloud.getPlayerManager().getOrCreatePlayer(new PaperSidedPlayer(player));
             PermissibleInjector.inject(player, cloud);
+            player.sendOpLevel((byte) (player.isOp() ? 4 : 0));
         } catch (PlayerSoftDeletedException e) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("Your account has been deleted!")); // TODO: Translate
         } catch (Exception e) {
