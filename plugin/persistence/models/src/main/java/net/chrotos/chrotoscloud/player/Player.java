@@ -4,6 +4,7 @@ import lombok.NonNull;
 import net.chrotos.chrotoscloud.economy.AccountHolder;
 import net.chrotos.chrotoscloud.permissions.Permissible;
 import net.chrotos.chrotoscloud.permissions.Rank;
+import net.kyori.adventure.text.Component;
 
 import java.util.UUID;
 
@@ -16,5 +17,5 @@ public interface Player extends AccountHolder, Permissible {
     Rank getRank();
     void setRank(Rank rank);
     @NonNull
-    String getPrefixes(); //TODO Change to kyori component
+    Component getPrefixes(); //TODO Change to kyori component
 }
