@@ -1,6 +1,7 @@
 package net.chrotos.chrotoscloud.player;
 
 import lombok.*;
+import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.economy.Account;
 import net.chrotos.chrotoscloud.economy.AccountType;
 import net.chrotos.chrotoscloud.economy.CloudAccount;
@@ -78,5 +79,11 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
         Optional<Permission> optionalPermission = super.getPermissionExact(permission);
 
         return optionalPermission.isPresent() || getRank() == null ? optionalPermission : getRank().getPermissionExact(permission);
+    }
+
+    @Override
+    @NonNull
+    public String getPrefixes() {
+        return Cloud.getInstance().getChatManager().getPrefixes(this);
     }
 }

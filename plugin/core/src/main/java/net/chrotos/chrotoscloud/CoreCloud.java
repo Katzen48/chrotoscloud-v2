@@ -1,6 +1,8 @@
 package net.chrotos.chrotoscloud;
 
 import lombok.Getter;
+import net.chrotos.chrotoscloud.chat.ChatManager;
+import net.chrotos.chrotoscloud.chat.CoreChatManager;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 import net.chrotos.chrotoscloud.player.CloudPlayerManager;
 
@@ -12,9 +14,12 @@ public abstract class CoreCloud extends Cloud {
     private static boolean initialized;
     @Getter
     private final CloudPlayerManager playerManager;
+    @Getter
+    private final ChatManager chatManager;
 
     protected CoreCloud() {
         this.playerManager = new CloudPlayerManager(this);
+        this.chatManager = new CoreChatManager();
     }
 
     @Override
