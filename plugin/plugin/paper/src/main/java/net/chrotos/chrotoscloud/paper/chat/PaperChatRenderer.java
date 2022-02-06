@@ -14,9 +14,11 @@ public class PaperChatRenderer implements io.papermc.paper.chat.ChatRenderer {
                                                                             .getPlayer(source.getUniqueId());
 
         if (player != null) {
-            return Component.text(player.getPrefixes())
-                    .append(Component.space())
-                    .append(sourceDisplayName)
+            return Component.text(String.format(
+                    "%s &r%s:",                     //TODO configurable chat format
+                    player.getPrefixes(),
+                    player.getName()
+            )).append(Component.space())
                     .append(message);
         }
 
