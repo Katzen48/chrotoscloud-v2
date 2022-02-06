@@ -1,6 +1,7 @@
 package net.chrotos.chrotoscloud.chat;
 
 import net.chrotos.chrotoscloud.player.Player;
+import net.kyori.adventure.text.format.TextColor;
 
 public interface ChatPrefix {
     /**
@@ -13,7 +14,7 @@ public interface ChatPrefix {
      * @return the priority index
      */
     int getPriority();
-    String getPrefix(Player player); //TODO Change to kyori component
+    String getPrefix(Player player);
     boolean isActive(Player player);
-    String getColor(); //TODO Change to kyori component
+    TextColor getColor();
 }

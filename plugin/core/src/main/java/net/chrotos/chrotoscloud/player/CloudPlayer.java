@@ -7,6 +7,7 @@ import net.chrotos.chrotoscloud.economy.AccountType;
 import net.chrotos.chrotoscloud.economy.CloudAccount;
 import net.chrotos.chrotoscloud.permissions.*;
 import net.chrotos.chrotoscloud.persistence.SoftDeletable;
+import net.kyori.adventure.text.Component;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
@@ -83,7 +84,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
 
     @Override
     @NonNull
-    public String getPrefixes() {
+    public Component getPrefixes() {
         return Cloud.getInstance().getChatManager().getPrefixes(this);
     }
 }
