@@ -4,6 +4,7 @@ import io.papermc.paper.chat.ChatRenderer;
 import net.chrotos.chrotoscloud.Cloud;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +17,9 @@ public class PaperChatRenderer implements io.papermc.paper.chat.ChatRenderer {
 
         if (player != null) {
             return player.getPrefixes() //TODO configurable chat format
-                            .append(Component.text(player.getName()))
+                            .append(Component.space())
+                            .append(Component.text(player.getName())
+                                        .clickEvent(ClickEvent.suggestCommand("/tell " + source.getName())))
                             .append(Component.text(":"))
                             .append(Component.space())
                             .append(message.color(NamedTextColor.DARK_GRAY)); //TODO configurable
