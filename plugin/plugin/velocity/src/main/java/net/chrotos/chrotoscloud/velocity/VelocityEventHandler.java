@@ -7,9 +7,11 @@ import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
 import com.velocitypowered.api.proxy.Player;
 import lombok.NonNull;
+import net.chrotos.chrotoscloud.player.PlayerSoftDeletedException;
 import net.chrotos.chrotoscloud.player.SidedPlayer;
 import net.chrotos.chrotoscloud.velocity.player.PermissionsProvider;
 import net.chrotos.chrotoscloud.velocity.player.VelocitySidedPlayer;
+import net.kyori.adventure.text.Component;
 
 public class VelocityEventHandler {
     private final CloudPlugin plugin;
@@ -22,16 +24,18 @@ public class VelocityEventHandler {
 
     @Subscribe(order = PostOrder.FIRST)
     public void onPermissionsSetup(PermissionsSetupEvent event, Continuation continuation) {
-        if (!(event.getSubject() instanceof Player)) {
+        if (!(event.getSubject() instanceof Player player)) {
             continuation.resume();
             return;
         }
 
         try {
-            SidedPlayer sidedPlayer = new VelocitySidedPlayer((Player) event.getSubject());
+            SidedPlayer sidedPlayer = new VelocitySidedPlayer(player);
             plugin.cloud.getPlayerManager().getOrCreatePlayer(sidedPlayer);
 
             event.setProvider(permissionsProvider);
+        } catch (PlayerSoftDeletedException e) {
+            player.disconnect(Component.text("Your account has been deleted!")); //TODO translate
         } catch (Exception e) {
             continuation.resumeWithException(e);
         } finally {
