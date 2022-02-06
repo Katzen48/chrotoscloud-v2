@@ -3,6 +3,7 @@ package net.chrotos.chrotoscloud.paper;
 import com.destroystokyo.paper.event.profile.ProfileWhitelistVerifyEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.RequiredArgsConstructor;
+import net.chrotos.chrotoscloud.paper.chat.PaperChatRenderer;
 import net.chrotos.chrotoscloud.paper.permissions.PermissibleInjector;
 import net.chrotos.chrotoscloud.player.PlayerSoftDeletedException;
 import net.kyori.adventure.text.Component;
@@ -16,6 +17,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 @RequiredArgsConstructor
 public class PaperEventHandler implements Listener {
     private final PaperCloud cloud;
+    private PaperChatRenderer renderer = new PaperChatRenderer();
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerLogin(PlayerLoginEvent event) {
@@ -66,14 +68,6 @@ public class PaperEventHandler implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerChat(AsyncChatEvent event) {
-        net.chrotos.chrotoscloud.player.Player player = cloud.getPlayerManager().getPlayer(event.getPlayer().getUniqueId());
-
-        if (player != null) {
-            Component text = Component.text(player.getPrefixes())
-                                        .append(Component.space())
-                                        .append(event.message());
-
-            event.message(text);
-        }
+        event.renderer(renderer);
     }
 }
