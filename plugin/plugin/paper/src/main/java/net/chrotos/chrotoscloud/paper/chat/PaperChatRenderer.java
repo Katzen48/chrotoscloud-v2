@@ -4,6 +4,7 @@ import io.papermc.paper.chat.ChatRenderer;
 import net.chrotos.chrotoscloud.Cloud;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,8 +15,9 @@ public class PaperChatRenderer implements io.papermc.paper.chat.ChatRenderer {
                                                                             .getPlayer(source.getUniqueId());
 
         if (player != null) {
-            return Component.text(String.format(
-                    "%s &r%s:&8",                     //TODO configurable chat format
+            return  LegacyComponentSerializer.builder().build().
+                    deserialize(String.format(
+                    "%s §r%s:§8",                     //TODO configurable chat format
                     player.getPrefixes(),
                     player.getName()
             )).append(Component.space())
