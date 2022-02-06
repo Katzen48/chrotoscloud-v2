@@ -17,7 +17,8 @@ public class CloudPlayerManager implements PlayerManager {
         CloudPlayer player = cloud.getPersistence().getOne(CloudPlayer.class, DataSelectFilter.builder()
                                                                                 .primaryKeyValue(uniqueId).build());
 
-        if (player.getLastRefreshed() > 0 && (System.currentTimeMillis() - player.getLastRefreshed()) > 60000) {
+        if (player != null &&
+                player.getLastRefreshed() > 0 && (System.currentTimeMillis() - player.getLastRefreshed()) > 60000) {
             cloud.getPersistence().merge(player);
             player.setLastRefreshed(System.currentTimeMillis());
         }
