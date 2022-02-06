@@ -1,6 +1,7 @@
 package net.chrotos.chrotoscloud.paper;
 
 import com.destroystokyo.paper.event.profile.ProfileWhitelistVerifyEvent;
+import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.RequiredArgsConstructor;
 import net.chrotos.chrotoscloud.paper.permissions.PermissibleInjector;
 import net.chrotos.chrotoscloud.player.PlayerSoftDeletedException;
@@ -60,6 +61,19 @@ public class PaperEventHandler implements Listener {
             cloud.getPlayerManager().logoutPlayer(event.getPlayer().getUniqueId());
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerChat(AsyncChatEvent event) {
+        net.chrotos.chrotoscloud.player.Player player = cloud.getPlayerManager().getPlayer(event.getPlayer().getUniqueId());
+
+        if (player != null) {
+            Component text = Component.text(player.getPrefixes())
+                                        .append(Component.space())
+                                        .append(event.message());
+
+            event.message(text);
         }
     }
 }

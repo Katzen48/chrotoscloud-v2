@@ -2,6 +2,7 @@ package net.chrotos.chrotoscloud;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.chrotos.chrotoscloud.chat.ChatManager;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 import net.chrotos.chrotoscloud.player.PlayerManager;
 
@@ -56,4 +57,6 @@ public abstract class Cloud {
 
     // Getter
     public abstract PlayerManager getPlayerManager();
+
+    public abstract ChatManager getChatManager();
 }
