@@ -37,15 +37,15 @@ public class CoreChatManager implements ChatManager {
     }
 
     private String getFormattedPrefix(Player player) {
-        StringBuilder formattedMessage = new StringBuilder();
+        StringBuilder prefixBuilder = new StringBuilder();
 
         for (ChatPrefix prefix : getApplicablePrefixes(player)) {
-            formattedMessage.append(prefix.getColor())
+            prefixBuilder.append(prefix.getColor())
                             .append(prefix.getPrefix(player))
                             .append("&r ");
         }
 
-        return formattedMessage + getRankColor(player) + player.getName() + ": ";
+        return String.format("%s %s", prefixBuilder.toString().trim(), getRankColor(player));
     }
 
     private List<ChatPrefix> getApplicablePrefixes(Player player) {
