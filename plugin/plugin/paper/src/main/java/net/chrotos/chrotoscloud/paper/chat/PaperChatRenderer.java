@@ -15,7 +15,7 @@ public class PaperChatRenderer implements io.papermc.paper.chat.ChatRenderer {
 
         if (player != null) {
             return Component.text(String.format(
-                    "%s &r%s:",                     //TODO configurable chat format
+                    "%s &r%s:&8",                     //TODO configurable chat format
                     player.getPrefixes(),
                     player.getName()
             )).append(Component.space())
