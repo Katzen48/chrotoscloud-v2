@@ -8,5 +8,5 @@ import lombok.Getter;
 public enum AccountType {
     BANK(true), HAND(false);
 
-    private boolean shareable;
+    private final boolean shareable;
 }

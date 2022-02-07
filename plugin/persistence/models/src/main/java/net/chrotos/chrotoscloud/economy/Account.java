@@ -1,18 +1,27 @@
 package net.chrotos.chrotoscloud.economy;
 
-import net.chrotos.chrotoscloud.player.Player;
-
-import java.util.Collection;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 public interface Account {
+
     UUID getUniqueId();
-    Player getOwner();
+    AccountHolder getOwner();
     AccountType getAccountType();
-    Collection<Transaction> getTransactions();
+    List<Transaction> getTransactions();
     float getBalance();
     float getBalanceLimit();
     float getCreditLimit();
     boolean isSharedAccount();
-    Collection<UUID> getSharedWith();
+
+    /*
+     * Transactions
+     */
+    void addTransaction(TransactionOrigin origin, float amount);
+    void addTransaction(TransactionOrigin origin, float amount, Account source);
+    void addTransaction(TransactionOrigin origin, float amount, LocalDateTime createdAt);
+    void addTransaction(TransactionOrigin origin, float amount, LocalDateTime createdAt, Account source);
+    void addTransaction(TransactionOrigin origin, float amount, LocalDateTime createdAt, String transactionCode);
+    void addTransaction(TransactionOrigin origin, float amount, LocalDateTime createdAt, String transactionCode, Account source);
 }

@@ -12,6 +12,7 @@ import net.chrotos.chrotoscloud.player.SidedPlayer;
 import net.chrotos.chrotoscloud.velocity.player.PermissionsProvider;
 import net.chrotos.chrotoscloud.velocity.player.VelocitySidedPlayer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class VelocityEventHandler {
     private final CloudPlugin plugin;
@@ -35,7 +36,7 @@ public class VelocityEventHandler {
 
             event.setProvider(permissionsProvider);
         } catch (PlayerSoftDeletedException e) {
-            player.disconnect(Component.text("Your account has been deleted!")); //TODO translate
+            player.disconnect(Component.text("Your account has been deleted!").color(NamedTextColor.RED)); //TODO translate
         } catch (Exception e) {
             continuation.resumeWithException(e);
         } finally {

@@ -12,6 +12,7 @@
         <property name="c3p0.idle_test_period">5</property>
 
         <mapping class="net.chrotos.chrotoscloud.player.CloudPlayer" />
+        <mapping class="net.chrotos.chrotoscloud.economy.CloudTransaction" />
         <mapping class="net.chrotos.chrotoscloud.economy.CloudAccount" />
 
         <mapping class="net.chrotos.chrotoscloud.permissions.CloudPermission" />

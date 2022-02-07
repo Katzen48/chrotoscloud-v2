@@ -57,7 +57,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar deletedAt;
 
-    @Setter
+    @Setter(AccessLevel.PACKAGE)
     private transient long lastRefreshed;
 
     @Override
