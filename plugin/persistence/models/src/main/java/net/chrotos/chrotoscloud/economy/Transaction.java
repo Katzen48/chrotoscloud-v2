@@ -6,11 +6,12 @@ import java.util.UUID;
 public interface Transaction {
     String getTransactionCode();
     AccountType getAccountType();
-    String getAccountCode();
+    UUID getAccountId();
+    Account getAccount();
     UUID getFromUniqueId();
     UUID getToUniqueId();
     TransactionType getType();
-    TransactionOrigin getTransactionOrigin();
+    TransactionOrigin getOrigin();
     float getAmount();
     float getAbsolute();
     boolean isPositive();

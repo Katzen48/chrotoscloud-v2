@@ -153,12 +153,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
         if (entityManager.getTransaction().isActive()) {
             entityManager.merge(object);
         } else {
-            EntityTransaction transaction = entityManager.getTransaction();
-            transaction.begin();
-
-            entityManager.merge(object);
-
-            transaction.commit();
+            runInTransaction((databaseTransaction) -> entityManager.merge(object));
         }
     }
 }

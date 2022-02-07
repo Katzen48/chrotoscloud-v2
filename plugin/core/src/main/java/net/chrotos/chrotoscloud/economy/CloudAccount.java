@@ -1,42 +1,36 @@
 package net.chrotos.chrotoscloud.economy;
 
 import lombok.*;
+import net.chrotos.chrotoscloud.Cloud;
+import net.chrotos.chrotoscloud.permissions.CloudPermission;
 import net.chrotos.chrotoscloud.persistence.SoftDeletable;
 import net.chrotos.chrotoscloud.player.CloudPlayer;
-import net.chrotos.chrotoscloud.player.Player;
 import org.hibernate.annotations.*;
 
 import javax.persistence.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Entity(name = "accounts")
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 @DynamicUpdate
 @SQLDelete(sql = "UPDATE accounts SET deleted_at=now() WHERE unique_id = ?")
 @Where(clause = "deleted_at IS NUlL")
 public class CloudAccount implements Account, SoftDeletable {
-    @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-        name = "UUID",
-        strategy = "org.hibernate.id.UUIDGenerator")
-    @Type(type = "uuid-char")
-    private UUID uniqueId;
+    @EmbeddedId
+    private AccountKey key;
 
     @ManyToOne(targetEntity = CloudPlayer.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_unique_id", updatable = false)
     @NonNull
-    private Player owner;
+    private AccountHolder owner;
 
-    @Enumerated(EnumType.STRING)
-    @NonNull
-    private AccountType accountType;
     private float balance;
     private float balanceLimit;
     private float creditLimit;
@@ -52,13 +46,65 @@ public class CloudAccount implements Account, SoftDeletable {
     @Setter
     private transient long lastRefreshed;
 
-    @Override
-    public Collection<Transaction> getTransactions() {
-        return null;
+    @OneToMany(targetEntity = CloudTransaction.class, cascade = CascadeType.ALL, mappedBy = "account")
+    private List<Transaction> transactions;
+
+    public CloudAccount(AccountHolder owner, AccountType accountType) {
+        super();
+        key = new AccountKey(UUID.randomUUID(), accountType);
     }
 
     @Override
-    public Collection<UUID> getSharedWith() {
-        return null;
+    public void addTransaction(TransactionOrigin origin, float amount) {
+        addTransaction(origin, amount, LocalDateTime.now());
+    }
+
+    @Override
+    public void addTransaction(TransactionOrigin origin, float amount, Account source) {
+        addTransaction(origin, amount, LocalDateTime.now(), source);
+    }
+
+    @Override
+    public void addTransaction(TransactionOrigin origin, float amount, LocalDateTime createdAt) {
+        addTransaction(origin, amount, createdAt, UUID.randomUUID().toString());
+    }
+
+    @Override
+    public void addTransaction(TransactionOrigin origin, float amount, LocalDateTime createdAt, Account source) {
+        addTransaction(origin, amount, createdAt, UUID.randomUUID().toString(), source);
+    }
+
+    @Override
+    public void addTransaction(TransactionOrigin origin, float amount, LocalDateTime createdAt, String transactionCode) {
+        addTransaction(origin, amount, createdAt, transactionCode, null);
+    }
+
+    @Override
+    public void addTransaction(TransactionOrigin origin, float amount, LocalDateTime createdAt, String transactionCode, Account source) {
+        float signedAmount = amount * origin.getTransactionType().getSign();
+
+        Cloud.getInstance().getPersistence().save(new CloudTransaction(
+                    transactionCode, getAccountType(), getUniqueId(),
+                    source != null ? source.getUniqueId() : null,
+                    getUniqueId(),
+                    origin.getTransactionType(),
+                    origin,
+                    signedAmount,
+                    Math.abs(amount),
+                    signedAmount >= 0,
+                    createdAt
+                ));
+
+        balance += signedAmount;
+    }
+
+    @Override
+    public UUID getUniqueId() {
+        return key.getUniqueId();
+    }
+
+    @Override
+    public AccountType getAccountType() {
+        return key.getAccountType();
     }
 }

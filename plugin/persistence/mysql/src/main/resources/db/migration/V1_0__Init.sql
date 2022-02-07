@@ -11,6 +11,26 @@ create table players (
     index (rank_unique_id)
 ) engine=InnoDB;
 
+create table transactions (
+                          transaction_code varchar(36) not null,
+                          account_type varchar(30) not null,
+                          account_id varchar(36) not null,
+                          from_unique_id varchar(36),
+                          to_unique_id varchar(36),
+                          type varchar(30) not null,
+                          origin varchar(30) not null,
+                          amount float not null,
+                          absolute float not null,
+                          positive bit not null,
+                          created_at datetime not null,
+
+                          primary key (transaction_code),
+                          index (account_type, account_id),
+                          index (from_unique_id),
+                          index (to_unique_id),
+                          index (created_at)
+) engine=InnoDB;
+
 create table accounts (
                           unique_id varchar(36) not null,
                           account_type varchar(30) not null,
