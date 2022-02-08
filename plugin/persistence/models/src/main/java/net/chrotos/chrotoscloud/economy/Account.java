@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface Account {
-
     UUID getUniqueId();
     AccountHolder getOwner();
     AccountType getAccountType();
@@ -24,4 +23,5 @@ public interface Account {
     void addTransaction(TransactionOrigin origin, float amount, LocalDateTime createdAt, Account source);
     void addTransaction(TransactionOrigin origin, float amount, LocalDateTime createdAt, String transactionCode);
     void addTransaction(TransactionOrigin origin, float amount, LocalDateTime createdAt, String transactionCode, Account source);
+    void addTransaction(Transaction transaction);
 }
