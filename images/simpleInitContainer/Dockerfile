@@ -1,4 +1,4 @@
-FROM node:17
+FROM node:17-bullseye
 
 COPY package*.json ./
 RUN npm install
