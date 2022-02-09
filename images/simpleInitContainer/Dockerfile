@@ -4,7 +4,9 @@ COPY package*.json ./
 RUN npm install
 COPY main.js .
 COPY download.js .
+
 COPY resolveMaven.js .
 COPY pluginDownloader.js .
+COPY worldDownloader.js .
 
 CMD [ "node", "main.js" ]
