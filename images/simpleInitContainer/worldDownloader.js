@@ -25,7 +25,7 @@ module.exports = async function (worldDirectory, gameMode, repoUrl, repoUser, re
     // Required
     let selection = maps.filter(map => map.required == true);
     if (selection.length > 0) {
-        mapsToDownload.concat(selection);
+        mapsToDownload = mapsToDownload.concat(selection);
     }
 
     if (mapsToDownload.length < 1) {
