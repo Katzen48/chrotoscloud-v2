@@ -14,8 +14,8 @@ module.exports = async function (worldDirectory, gameMode, repoUrl, repoUser, re
     let mapsToDownload = [];
 
     // Random
-    if (gameMode.body.spec.maps['random'] === true) {
-        let selection = maps.filter(map => map.required === false);
+    if (gameMode.body.spec.maps['random'] == true) {
+        let selection = maps.filter(map => map.required == false);
 
         if (selection.length > 0) {
             mapsToDownload.push(selection[Math.floor(Math.random() * selection.length)])
@@ -23,7 +23,7 @@ module.exports = async function (worldDirectory, gameMode, repoUrl, repoUser, re
     }
 
     // Required
-    let selection = maps.filter(map => map.required === true);
+    let selection = maps.filter(map => map.required == true);
     if (selection.length > 0) {
         mapsToDownload.push(selection);
     }
@@ -31,20 +31,22 @@ module.exports = async function (worldDirectory, gameMode, repoUrl, repoUser, re
     if (mapsToDownload.length < 1) {
         return;
     }
-    let mapCheck = mapsToDownload.filter(map => map.name === 'world');
-    if (mapCheck.length < 1) {
-        throw new Error('At least one map to download has to be named "world"');
-    }
 
     let mapNames = [];
     for (let i = 0; i < mapsToDownload.length; i++) {
-        let mapName = mapsToDownload[i].name;
+        let mapName = mapsToDownload[i].name.toString();
 
         if (mapNames.includes(mapName)) {
             throw new Error('Map "' + mapName + '" is defined multiple times')
         }
 
         mapNames.push(mapName);
+    }
+    console.log('Maps to download:', mapNames.join(','));
+
+    let mapCheck = mapsToDownload.filter(map => map.name == 'world');
+    if (mapCheck.length < 1) {
+        throw new Error('At least one map to download has to be named "world"');
     }
 
     for (let i = 0; i < mapsToDownload.length; i++) {
