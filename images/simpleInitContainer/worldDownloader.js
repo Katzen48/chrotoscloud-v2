@@ -76,7 +76,7 @@ module.exports = async function (worldDirectory, gameMode, repoUrl, repoUser, re
             throw new Error('No World URL found for entry ' + i);
         }
 
-        console.log('Found World URL: ' + url);
+        console.log('World', fileName, 'has URL:', url);
 
         await download(url, worldDirectory + '/' + fileName, user, password);
     }
