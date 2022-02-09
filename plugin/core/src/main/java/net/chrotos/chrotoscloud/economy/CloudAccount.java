@@ -81,10 +81,23 @@ public class CloudAccount implements Account, SoftDeletable {
 
     @Override
     public void addTransaction(TransactionOrigin origin, float amount, LocalDateTime createdAt, String transactionCode, Account source) {
-        float signedAmount = amount * origin.getTransactionType().getSign();
+        Cloud.getInstance().getPersistence().runInTransaction(databaseTransaction -> {
+            if ((origin.getInverse() == null) != (source == null)) {
+                if (source == null) {
+                    throw new AssertionError("Transaction source must not be null for transaction origin " +
+                                                origin.name());
+                } else {
+                    throw new AssertionError("Transaction source must be null for transaction origin " +
+                                                origin.name());
+                }
+            }
 
-        Cloud.getInstance().getPersistence().save(new CloudTransaction(
-                    transactionCode, getAccountType(), getUniqueId(),
+            float signedAmount = amount * origin.getTransactionType().getSign();
+
+            addTransaction(new CloudTransaction(
+                    transactionCode,
+                    getAccountType(),
+                    getUniqueId(),
                     source != null ? source.getUniqueId() : null,
                     getUniqueId(),
                     origin.getTransactionType(),
@@ -93,9 +106,42 @@ public class CloudAccount implements Account, SoftDeletable {
                     Math.abs(amount),
                     signedAmount >= 0,
                     createdAt
-                ));
+            ));
 
-        balance += signedAmount;
+            if (source != null) {
+                TransactionOrigin inverseOrigin = origin.getInverse();
+                float inverseAmount = amount * inverseOrigin.getTransactionType().getSign();
+
+                if ((inverseAmount * -1) != signedAmount) {
+                    throw new AssertionError("Balanced Transaction must not have the same sign");
+                }
+
+                source.addTransaction(new CloudTransaction(
+                        transactionCode,
+                        source.getAccountType(),
+                        source.getUniqueId(),
+                        this.getUniqueId(),
+                        source.getUniqueId(),
+                        inverseOrigin.getTransactionType(),
+                        inverseOrigin,
+                        inverseAmount,
+                        Math.abs(amount),
+                        inverseAmount >= 0,
+                        createdAt
+                ));
+            }
+        });
+    }
+
+    @Override
+    public void addTransaction(Transaction transaction) {
+        Cloud.getInstance().getPersistence().runInTransaction(databaseTransaction -> {
+            checkTransaction(transaction);
+
+            Cloud.getInstance().getPersistence().save(transaction);
+            balance += transaction.getAmount();
+            Cloud.getInstance().getPersistence().merge(this);
+        });
     }
 
     @Override
@@ -106,5 +152,25 @@ public class CloudAccount implements Account, SoftDeletable {
     @Override
     public AccountType getAccountType() {
         return key.getAccountType();
+    }
+
+    private void checkTransaction(Transaction transaction) {
+        if (transaction.getAccount() != this) {
+            throw new AssertionError("Transaction account must be this");
+        }
+
+        if (transaction.getAccountId() != getUniqueId()) {
+            throw new AssertionError("Transaction account id must be " + getUniqueId());
+        }
+
+        if (transaction.getAbsolute() != Math.abs(transaction.getAmount())) {
+            throw new AssertionError("Transaction absolute must be " + Math.abs(transaction.getAmount()));
+        }
+
+        if (transaction.isPositive() != (transaction.getAmount() > 0)) {
+            throw new AssertionError("Transaction positive must be " + (transaction.getAmount() > 0 ?
+                                        "true" : "false")
+            );
+        }
     }
 }

@@ -9,9 +9,14 @@ const fs = require('fs');
 const k8s = require('@kubernetes/client-node');
 const download = require('./download');
 const resolveMaven = require('./resolveMaven');
+const downloadPlugins = require('./pluginDownloader.js');
 
 (async () => {
     const SOFTWARE = process.env.SERVER_SOFTWARE;
+    const MAVEN_URL = process.env.MAVEN_URL;
+    const MAVEN_USER = process.env.MAVEN_USER;
+    const MAVEN_PASSWORD = process.env.MAVEN_PASSWORD;
+
     let gameMode;
 
     if (SOFTWARE === 'paper') {
@@ -42,7 +47,7 @@ const resolveMaven = require('./resolveMaven');
     const VERSION = (SOFTWARE === 'paper') ? gameMode.body.spec.version : process.env.SERVER_SOFTWARE_VERSION;
     const CLOUD_VERSION = (SOFTWARE === 'paper') ? gameMode.body.spec.cloudVersion : process.env.CLOUD_VERSION;
 
-    console.log('Fetching newest Build of', SOFTWARE, 'of version', VERSION);
+    console.log('Fetching newest Build of', SOFTWARE, 'of version', VERSION); // Maybe remove and include in image?
 
     let versionResponse = await fetch(`${VERSIONS_URL}/${VERSION}`)
     let json = await versionResponse.json();
@@ -56,6 +61,7 @@ const resolveMaven = require('./resolveMaven');
         console.log('Resolving newest build of ChrotosCloud-Plugin');
         let cloudUrl = await resolveMaven(CLOUD_BASE_URL, 'net.chrotos.chrotoscloud',
             SOFTWARE, CLOUD_VERSION, process.env.GITHUB_USER,  process.env.GITHUB_TOKEN);
+        cloudUrl += '-all.jar';
 
         console.log('Found newest build url:', cloudUrl);
 
@@ -64,6 +70,16 @@ const resolveMaven = require('./resolveMaven');
         console.error('Could not download chrotoscloud: ' + e);
         process.exit(1);
     }
-    
+
+    // Download Plugins
+    try {
+        console.log('Starting download of plugins');
+        await downloadPlugins(PATH + '/plugins', gameMode, MAVEN_URL, MAVEN_USER, MAVEN_PASSWORD);
+    } catch (e) {
+        console.error('Could not download plugins: ' + e);
+        process.exit(1);
+    }
+
+    // Set EULA
     fs.writeFileSync(PATH + '/eula.txt', 'eula=true');
 })();

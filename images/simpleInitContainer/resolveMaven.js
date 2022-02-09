@@ -36,7 +36,6 @@ module.exports = async function(repository, groupId, artifactId, version, user, 
             versionString += metadata.release[0];
         }
 
-        versionString += '-all.jar';
         console.log('Version String:', versionString);
 
         return artifactUrl + '/' + versionString;

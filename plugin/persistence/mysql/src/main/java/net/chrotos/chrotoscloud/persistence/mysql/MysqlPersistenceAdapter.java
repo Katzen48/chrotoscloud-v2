@@ -118,7 +118,11 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     @Override
     public void runInTransaction(TransactionRunnable runnable) {
         EntityTransaction transaction = entityManager.getTransaction();
-        transaction.begin();
+        boolean insideTransaction = transaction.isActive();
+
+        if (!insideTransaction) {
+            transaction.begin();
+        }
 
         try {
             runnable.run(new DatabaseTransaction() {
@@ -133,7 +137,10 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
                     transaction.rollback();
                 }
             });
-            transaction.commit();
+
+            if (!insideTransaction) {
+                transaction.commit();
+            }
         } catch (Exception e) {
             transaction.rollback();
 
