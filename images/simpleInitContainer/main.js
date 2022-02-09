@@ -71,10 +71,12 @@ const downloadPlugins = require('./pluginDownloader.js');
         process.exit(1);
     }
 
-    // Download Plugins
+    // Download Paper Plugins
     try {
-        console.log('Starting download of plugins');
-        await downloadPlugins(PATH + '/plugins', gameMode, MAVEN_URL, MAVEN_USER, MAVEN_PASSWORD);
+        if (SOFTWARE === 'paper') {
+            console.log('Starting download of plugins');
+            await downloadPlugins(PATH + '/plugins', gameMode, MAVEN_URL, MAVEN_USER, MAVEN_PASSWORD);
+        }
     } catch (e) {
         console.error('Could not download plugins: ' + e);
         process.exit(1);
