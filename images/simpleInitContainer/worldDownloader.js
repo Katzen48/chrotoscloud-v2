@@ -52,7 +52,7 @@ module.exports = async function (worldDirectory, gameMode, repoUrl, repoUser, re
     for (let i = 0; i < mapsToDownload.length; i++) {
         let map = mapsToDownload[i];
         let url;
-        let fileName = map.name;
+        let fileName = map.name + ".zip";
         let user = null;
         let password = null;
         if (map.dependency.mavenLike) {
