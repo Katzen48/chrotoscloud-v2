@@ -10,12 +10,16 @@ const k8s = require('@kubernetes/client-node');
 const download = require('./download');
 const resolveMaven = require('./resolveMaven');
 const downloadPlugins = require('./pluginDownloader.js');
+const downloadWorlds = require('./worldDownloader.js');
 
 (async () => {
     const SOFTWARE = process.env.SERVER_SOFTWARE;
     const MAVEN_URL = process.env.MAVEN_URL;
     const MAVEN_USER = process.env.MAVEN_USER;
     const MAVEN_PASSWORD = process.env.MAVEN_PASSWORD;
+    const WORLD_REPO_URL = process.env.WORLD_REPO_URL;
+    const WORLD_REPO_USER = process.env.WORLD_REPO_USER;
+    const WORLD_REPO_PASSWORD = process.env.WORLD_REPO_PASSWORD;
 
     let gameMode;
 
@@ -71,14 +75,25 @@ const downloadPlugins = require('./pluginDownloader.js');
         process.exit(1);
     }
 
-    // Download Paper Plugins
+    // Download Plugins
     try {
-        if (SOFTWARE === 'paper') {
+        if (gameMode) {
             console.log('Starting download of plugins');
             await downloadPlugins(PATH + '/plugins', gameMode, MAVEN_URL, MAVEN_USER, MAVEN_PASSWORD);
         }
     } catch (e) {
         console.error('Could not download plugins: ' + e);
+        process.exit(1);
+    }
+
+    // Download Worlds
+    try {
+        if (gameMode) {
+            console.log('Starting download of worlds');
+            await downloadWorlds(PATH + '/worlds', gameMode, WORLD_REPO_URL, WORLD_REPO_USER, WORLD_REPO_PASSWORD);
+        }
+    } catch (e) {
+        console.error('Could not download worlds: ' + e);
         process.exit(1);
     }
 
