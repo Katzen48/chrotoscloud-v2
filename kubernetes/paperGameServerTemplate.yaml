@@ -33,6 +33,9 @@ spec:
       volumes:
         - name: workdir
           emptyDir: {}
+        - name: velocity-config
+          configMap:
+            name: velocity-config
         - name: podinfo
           downwardAPI:
             items:
@@ -45,6 +48,8 @@ spec:
           volumeMounts:
             - name: workdir
               mountPath: /workdir
+            - name: paper-config
+              mountPath: /etc/config
             - name: podinfo
               mountPath: /etc/podinfo
             env:
@@ -73,6 +78,11 @@ spec:
                   secretKeyRef:
                     name: cloud-secret
                     key: DB_PASSWORD
+              - name: VELOCITY_SECRET
+                valueFrom:
+                  secretKeyRef:
+                    name: velocity-secret
+                    key: VELOCITY_SECRET
           imagePullPolicy: IfNotPresent
       containers:
         - name: paper
