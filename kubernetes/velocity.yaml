@@ -31,6 +31,9 @@ spec:
       volumes:
         - name: workdir
           emptyDir: {}
+        - name: velocity-config
+          configMap:
+            name: velocity-config
         - name: k8s-token
           projected:
             sources:
@@ -43,6 +46,8 @@ spec:
           volumeMounts:
             - name: workdir
               mountPath: /workdir
+            - name: velocity-config
+              mountPath: /etc/config
           env:
             - name: CLOUD_VERSION
               value: 3.0-SNAPSHOT
@@ -71,6 +76,11 @@ spec:
                 secretKeyRef:
                   name: cloud-secret
                   key: DB_PASSWORD
+            - name: VELOCITY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: velocity-secret
+                  key: VELOCITY_SECRET
           imagePullPolicy: IfNotPresent
       containers:
         - name: velocity-proxy
@@ -78,7 +88,7 @@ spec:
           command:
             - java
           args:
-            - '-Xms3000M'
+            - '-Xms4G'
             - '-Xmx4G'
             - '-jar'
             - server.jar
