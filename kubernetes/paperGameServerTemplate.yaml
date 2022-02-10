@@ -33,9 +33,9 @@ spec:
       volumes:
         - name: workdir
           emptyDir: {}
-        - name: velocity-config
+        - name: paper-config
           configMap:
-            name: velocity-config
+            name: paper-config
         - name: podinfo
           downwardAPI:
             items:
