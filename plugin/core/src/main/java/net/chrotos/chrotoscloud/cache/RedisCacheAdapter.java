@@ -10,6 +10,7 @@ import redis.clients.jedis.UnifiedJedis;
 import redis.clients.jedis.params.SetParams;
 
 import java.time.Duration;
+import java.util.Set;
 
 public class RedisCacheAdapter implements CacheAdapter {
     private String host;
@@ -233,6 +234,20 @@ public class RedisCacheAdapter implements CacheAdapter {
         checkConnected();
 
         return client.sismember(key, value);
+    }
+
+    @Override
+    public long setSize(@NonNull String key) {
+        checkConnected();
+
+        return client.scard(key);
+    }
+
+    @Override
+    public Set<String> setMembers(@NonNull String key) {
+        checkConnected();
+
+        return client.smembers(key);
     }
 
     private void checkConnected() {

@@ -7,6 +7,8 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
+import com.velocitypowered.api.event.proxy.ProxyPingEvent;
+import com.velocitypowered.api.proxy.server.ServerPing;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import com.velocitypowered.api.scheduler.TaskStatus;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +16,10 @@ import net.chrotos.chrotoscloud.messaging.pubsub.Registration;
 import net.kyori.adventure.text.Component;
 
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class VelocityCacheSynchronizer {
@@ -77,6 +81,30 @@ public class VelocityCacheSynchronizer {
         }
 
         plugin.cloud.getCache().setRemove(proxyKey, value);
+    }
+
+    @Subscribe(order = PostOrder.LAST)
+    public void onProxyPing(ProxyPingEvent event) {
+        int onlinePlayers = getPlayerCount();
+
+        event.setPing(event.getPing().asBuilder()
+                        .onlinePlayers(onlinePlayers)
+                        .maximumPlayers(onlinePlayers + 1)
+                        .build());
+    }
+
+    public int getPlayerCount() {
+        return (int) proxies.stream().mapToLong((proxy) -> plugin.cloud.getCache().setSize("proxy:" + proxy + ":players")).sum();
+    }
+
+    public Set<String> getPlayers() {
+        Set<String> players = new HashSet<>();
+
+        for (String proxy : proxies) {
+            players.addAll(plugin.cloud.getCache().setMembers("proxy:" + proxy + ":players"));
+        }
+
+        return players;
     }
 
     private void onPubSub(String channel, String message) {

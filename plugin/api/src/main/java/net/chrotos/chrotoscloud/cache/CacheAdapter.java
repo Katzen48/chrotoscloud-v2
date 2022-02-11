@@ -4,6 +4,7 @@ import lombok.NonNull;
 import net.chrotos.chrotoscloud.CloudConfig;
 
 import java.time.Duration;
+import java.util.Set;
 
 public interface CacheAdapter {
     void configure(CloudConfig config);
@@ -39,4 +40,6 @@ public interface CacheAdapter {
     void setAdd(@NonNull String key, @NonNull String... values);
     void setRemove(@NonNull String key, @NonNull String... values);
     boolean setContains(@NonNull String key, @NonNull String value);
+    long setSize(@NonNull String key);
+    Set<String> setMembers(@NonNull String key);
 }

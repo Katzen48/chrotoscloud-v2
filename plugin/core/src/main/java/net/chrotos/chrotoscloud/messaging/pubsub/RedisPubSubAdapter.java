@@ -27,11 +27,20 @@ public class RedisPubSubAdapter implements PubSubAdapter {
             }
         };
 
-        futures.add(CompletableFuture.runAsync(() -> {
+        Future future = CompletableFuture.runAsync(() -> {
             jedisFactory.get().subscribe(pubSub, channels);
-        }));
+        });
+
+        futures.add(future);
 
         return new Registration() {
+            @Override
+            public void close() throws Exception {
+                pubSub.unsubscribe();
+                future.cancel(true);
+                futures.remove(future);
+            }
+
             @Override
             public void subscribe(String... channels) {
                 pubSub.subscribe(channels);
