@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import net.chrotos.chrotoscloud.messaging.pubsub.Registration;
 import net.kyori.adventure.text.Component;
 
+import java.time.Duration;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -22,8 +23,11 @@ public class VelocityCacheSynchronizer {
     private final CloudPlugin plugin;
     private Registration pubSub;
     private ScheduledTask checkTask;
+    private String proxyKey;
 
     public void initialize() {
+        proxyKey = "proxy:" + System.getenv("HOSTNAME") + ":players";
+
         pubSub = plugin.cloud.getPubSub().register(this::onPubSub, "proxy:register");
         checkTask = plugin.proxyServer.getScheduler()
                                         .buildTask(plugin, this::checkProxies)
@@ -61,29 +65,30 @@ public class VelocityCacheSynchronizer {
 
     @Subscribe(order = PostOrder.FIRST)
     public void onPostLogin(PostLoginEvent event) {
-        plugin.cloud.getCache().setAdd("proxy:" + System.getenv("HOSTNAME") + ":players",
-                event.getPlayer().getUniqueId().toString());
+        plugin.cloud.getCache().setAdd(proxyKey, event.getPlayer().getUniqueId().toString());
     }
 
     @Subscribe(order = PostOrder.FIRST)
     public void onDisconnect(DisconnectEvent event) {
-        String key = "proxy:" + System.getenv("HOSTNAME") + ":players";
         String value = event.getPlayer().getUniqueId().toString();
 
-        if (!plugin.cloud.getCache().setContains(key, value)) {
+        if (!plugin.cloud.getCache().setContains(proxyKey, value)) {
             return;
         }
 
-        plugin.cloud.getCache().setRemove(key, value);
+        plugin.cloud.getCache().setRemove(proxyKey, value);
     }
 
     private void onPubSub(String channel, String message) {
         if (channel.equalsIgnoreCase("proxy:register")) {
-            proxies.add(message);
+            if (!message.equals(System.getenv("HOSTNAME"))) {
+                proxies.add(message);
+            }
         }
     }
 
     private void checkProxies() {
         proxies.removeIf(proxy -> !plugin.cloud.getCache().exists("proxy:" + proxy + ":players"));
+        plugin.cloud.getCache().expire(proxyKey, Duration.ofSeconds(10L));
     }
 }

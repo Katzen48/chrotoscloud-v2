@@ -19,17 +19,25 @@ public class RedisCacheAdapter implements CacheAdapter {
 
     @Override
     public void configure(CloudConfig config) {
+        if (client != null) {
+            throw new IllegalStateException("Already configured.");
+        }
+
         host = config.getCacheHost();
         port = config.getCachePort();
         password = config.getCachePassword();
 
-        client = new JedisPooled(new HostAndPort(host, port), DefaultJedisClientConfig.builder()
-                .password(password)
-                .build());
+        client = createJedisPooled();
     }
 
     public RedisPubSubAdapter getPubSub() {
-        return new RedisPubSubAdapter(client);
+        return new RedisPubSubAdapter(this::createJedisPooled);
+    }
+
+    private JedisPooled createJedisPooled() {
+        return new JedisPooled(new HostAndPort(host, port), DefaultJedisClientConfig.builder()
+                .password(password)
+                .build());
     }
 
     @Override
