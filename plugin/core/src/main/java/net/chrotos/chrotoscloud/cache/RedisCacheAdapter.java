@@ -2,6 +2,7 @@ package net.chrotos.chrotoscloud.cache;
 
 import lombok.NonNull;
 import net.chrotos.chrotoscloud.CloudConfig;
+import net.chrotos.chrotoscloud.messaging.pubsub.RedisPubSubAdapter;
 import redis.clients.jedis.DefaultJedisClientConfig;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisPooled;
@@ -21,16 +22,14 @@ public class RedisCacheAdapter implements CacheAdapter {
         host = config.getCacheHost();
         port = config.getCachePort();
         password = config.getCachePassword();
-    }
-
-    public void connect() {
-        if (client != null) {
-            return;
-        }
 
         client = new JedisPooled(new HostAndPort(host, port), DefaultJedisClientConfig.builder()
-                                    .password(password)
-                                    .build());
+                .password(password)
+                .build());
+    }
+
+    public RedisPubSubAdapter getPubSub() {
+        return new RedisPubSubAdapter(client);
     }
 
     @Override
@@ -81,6 +80,13 @@ public class RedisCacheAdapter implements CacheAdapter {
         if (duration != null) {
             expire(key, duration);
         }
+    }
+
+    @Override
+    public boolean exists(@NonNull String key) {
+        checkConnected();
+
+        return client.exists(key);
     }
 
     @Override
@@ -198,6 +204,27 @@ public class RedisCacheAdapter implements CacheAdapter {
         checkConnected();
 
         return client.lpop(key);
+    }
+
+    @Override
+    public void setAdd(@NonNull String key, @NonNull String... values) {
+        checkConnected();
+
+        client.sadd(key, values);
+    }
+
+    @Override
+    public void setRemove(@NonNull String key, @NonNull String... values) {
+        checkConnected();
+
+        client.srem(key, values);
+    }
+
+    @Override
+    public boolean setContains(@NonNull String key, @NonNull String value) {
+        checkConnected();
+
+        return client.sismember(key, value);
     }
 
     private void checkConnected() {
