@@ -1,12 +1,22 @@
 package net.chrotos.chrotoscloud.messaging.pubsub;
 
-import lombok.RequiredArgsConstructor;
+import redis.clients.jedis.JedisPooled;
 import redis.clients.jedis.JedisPubSub;
-import redis.clients.jedis.UnifiedJedis;
 
-@RequiredArgsConstructor
+import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.function.Supplier;
+
 public class RedisPubSubAdapter implements PubSubAdapter {
-    private final UnifiedJedis client;
+    private final Supplier<JedisPooled> jedisFactory;
+    private final JedisPooled client;
+    private final ArrayList<Future> futures = new ArrayList<>();
+
+    public RedisPubSubAdapter(Supplier<JedisPooled> jedisFactory) {
+        this.jedisFactory = jedisFactory;
+        this.client = jedisFactory.get();
+    }
 
     @Override
     public Registration register(Listener listener, String... channels) {
@@ -17,7 +27,9 @@ public class RedisPubSubAdapter implements PubSubAdapter {
             }
         };
 
-        client.subscribe(pubSub, channels);
+        futures.add(CompletableFuture.runAsync(() -> {
+            jedisFactory.get().subscribe(pubSub, channels);
+        }));
 
         return new Registration() {
             @Override
