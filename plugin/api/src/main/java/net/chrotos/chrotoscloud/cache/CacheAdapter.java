@@ -42,4 +42,6 @@ public interface CacheAdapter {
     boolean setContains(@NonNull String key, @NonNull String value);
     long setSize(@NonNull String key);
     Set<String> setMembers(@NonNull String key);
+
+    Set<String> keys(@NonNull String pattern);
 }

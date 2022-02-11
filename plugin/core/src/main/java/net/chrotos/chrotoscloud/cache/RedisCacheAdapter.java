@@ -250,6 +250,11 @@ public class RedisCacheAdapter implements CacheAdapter {
         return client.smembers(key);
     }
 
+    @Override
+    public Set<String> keys(@NonNull String pattern) {
+        return client.keys(pattern);
+    }
+
     private void checkConnected() {
         if (client == null) {
             throw new CacheUnconnectedException();
