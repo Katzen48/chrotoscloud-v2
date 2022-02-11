@@ -116,7 +116,11 @@ public class VelocityCacheSynchronizer {
     }
 
     private void checkProxies() {
-        proxies.removeIf(proxy -> !plugin.cloud.getCache().exists("proxy:" + proxy + ":players"));
+        Set<String> keys = plugin.cloud.getCache().keys("proxy:*:players");
+
+        proxies.clear();
+        keys.forEach((key) -> proxies.add(key.split(":")[1]));
+
         plugin.cloud.getCache().expire(proxyKey, Duration.ofSeconds(10L));
     }
 }
