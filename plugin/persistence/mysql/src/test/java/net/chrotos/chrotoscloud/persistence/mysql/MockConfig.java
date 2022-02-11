@@ -19,6 +19,21 @@ public class MockConfig implements CloudConfig {
     }
 
     @Override
+    public String getCacheHost() {
+        return System.getenv("CHROTOSCLOUD_TEST_CACHE_HOST");
+    }
+
+    @Override
+    public int getCachePort() {
+        return Integer.parseInt(System.getenv("CHROTOSCLOUD_TEST_CACHE_PORT"));
+    }
+
+    @Override
+    public String getCachePassword() {
+        return System.getenv("CHROTOSCLOUD_TEST_CACHE_PASSWORD");
+    }
+
+    @Override
     public boolean shouldRunMigrations() {
         return true;
     }

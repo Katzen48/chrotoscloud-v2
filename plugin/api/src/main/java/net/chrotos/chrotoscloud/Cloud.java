@@ -2,6 +2,7 @@ package net.chrotos.chrotoscloud;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.chrotos.chrotoscloud.cache.CacheAdapter;
 import net.chrotos.chrotoscloud.chat.ChatManager;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 import net.chrotos.chrotoscloud.player.PlayerManager;
@@ -14,8 +15,9 @@ public abstract class Cloud {
     private static Cloud instance;
     @Setter
     private static ClassLoader serviceClassLoader;
-    protected PersistenceAdapter persistence;
     protected CloudConfig cloudConfig;
+    protected PersistenceAdapter persistence;
+    protected CacheAdapter cache;
 
     public static Cloud getInstance() {
         if (Cloud.instance == null) {

@@ -1,6 +1,7 @@
 package net.chrotos.chrotoscloud;
 
 import lombok.Getter;
+import net.chrotos.chrotoscloud.cache.RedisCacheAdapter;
 import net.chrotos.chrotoscloud.chat.ChatManager;
 import net.chrotos.chrotoscloud.chat.CoreChatManager;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
@@ -55,6 +56,7 @@ public abstract class CoreCloud extends Cloud {
 
         Thread.currentThread().setContextClassLoader(getServiceClassLoader());
         this.persistence.configure(getCloudConfig());
+        this.cache = new RedisCacheAdapter();
 
         Thread.currentThread().setContextClassLoader(loader);
 
