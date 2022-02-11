@@ -86,7 +86,7 @@ spec:
           imagePullPolicy: IfNotPresent
       containers:
         - name: paper
-          image: openjdk:16-jdk-alpine
+          image: openjdk:17-jdk
           command:
             - java
           args:
@@ -111,6 +111,16 @@ spec:
                 secretKeyRef:
                   name: cloud-secret
                   key: DB_PASSWORD
+            - name: CACHE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: CACHE_HOST
+            - name: CACHE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: CACHE_PASSWORD
           ports:
             - name: minecraft
               containerPort: 25565

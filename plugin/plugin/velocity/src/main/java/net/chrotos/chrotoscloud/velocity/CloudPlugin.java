@@ -3,6 +3,7 @@ package net.chrotos.chrotoscloud.velocity;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.chrotos.chrotoscloud.Cloud;
@@ -11,9 +12,10 @@ import org.slf4j.Logger;
 
 @Plugin(id="chrotoscloud", name = "ChrotosCloud", version = "3.0-SNAPSHOT", authors = {"Katzen48"})
 public class CloudPlugin {
-    private final ProxyServer proxyServer;
+    protected final ProxyServer proxyServer;
     private final Logger logger;
     protected final VelocityCloud cloud;
+    private VelocityCacheSynchronizer synchronizer;
 
     @Inject
     public CloudPlugin(ProxyServer proxyServer, Logger logger) {
@@ -31,7 +33,16 @@ public class CloudPlugin {
 
         proxyServer.getEventManager().register(this, new VelocityEventHandler(this));
 
+        synchronizer = new VelocityCacheSynchronizer(this);
+        synchronizer.initialize();
+        proxyServer.getEventManager().register(this, synchronizer);
+
         // Reload function is incompatible with the manipulations done by the plugin, so remove the whole command
         proxyServer.getCommandManager().unregister("velocity");
+    }
+
+    @Subscribe(async = false)
+    public void onProxyShutdown(ProxyShutdownEvent event) {
+        synchronizer.destruct();
     }
 }

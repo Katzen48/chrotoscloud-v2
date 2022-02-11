@@ -19,6 +19,21 @@ public class PaperConfig implements CloudConfig {
     }
 
     @Override
+    public String getCacheHost() {
+        return System.getenv("CACHE_HOST");
+    }
+
+    @Override
+    public int getCachePort() {
+        return Integer.parseInt(System.getenv("CACHE_PORT"));
+    }
+
+    @Override
+    public String getCachePassword() {
+        return System.getenv("CACHE_PASSWORD");
+    }
+
+    @Override
     public boolean shouldRunMigrations() {
         String value = System.getenv("DB_UPGRADE");
 
