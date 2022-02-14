@@ -5,6 +5,7 @@ import lombok.Setter;
 import net.chrotos.chrotoscloud.cache.CacheAdapter;
 import net.chrotos.chrotoscloud.chat.ChatManager;
 import net.chrotos.chrotoscloud.messaging.pubsub.PubSubAdapter;
+import net.chrotos.chrotoscloud.messaging.queue.QueueAdapter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 import net.chrotos.chrotoscloud.player.PlayerManager;
 
@@ -20,6 +21,7 @@ public abstract class Cloud {
     protected PersistenceAdapter persistence;
     protected CacheAdapter cache;
     protected PubSubAdapter pubSub;
+    protected QueueAdapter queue;
 
     public static Cloud getInstance() {
         if (Cloud.instance == null) {
@@ -63,4 +65,6 @@ public abstract class Cloud {
     public abstract PlayerManager getPlayerManager();
 
     public abstract ChatManager getChatManager();
+
+    public abstract String getHostname();
 }

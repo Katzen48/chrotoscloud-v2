@@ -5,6 +5,7 @@ import net.chrotos.chrotoscloud.cache.RedisCacheAdapter;
 import net.chrotos.chrotoscloud.chat.ChatManager;
 import net.chrotos.chrotoscloud.chat.CoreChatManager;
 import net.chrotos.chrotoscloud.messaging.pubsub.RedisPubSubAdapter;
+import net.chrotos.chrotoscloud.messaging.queue.RabbitQueueAdapter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 import net.chrotos.chrotoscloud.player.CloudPlayerManager;
 
@@ -41,6 +42,9 @@ public abstract class CoreCloud extends Cloud {
 
         loadServices();
 
+        RabbitQueueAdapter queueAdapter = new RabbitQueueAdapter();
+        this.queue = queueAdapter;
+        queueAdapter.configure(getCloudConfig());
 
         loaded = true;
     }
@@ -63,6 +67,7 @@ public abstract class CoreCloud extends Cloud {
         this.cache = redisAdapter;
         this.cache.configure(getCloudConfig());
         this.pubSub = redisAdapter.getPubSub();
+        queue.initialize();
 
         Thread.currentThread().setContextClassLoader(loader);
 

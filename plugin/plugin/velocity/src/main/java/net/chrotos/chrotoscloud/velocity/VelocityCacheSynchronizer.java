@@ -11,6 +11,7 @@ import com.velocitypowered.api.event.proxy.ProxyPingEvent;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import com.velocitypowered.api.scheduler.TaskStatus;
 import lombok.RequiredArgsConstructor;
+import net.chrotos.chrotoscloud.Cloud;
 import net.kyori.adventure.text.Component;
 
 import java.time.Duration;
@@ -27,7 +28,7 @@ public class VelocityCacheSynchronizer {
     private int playerCount;
 
     public void initialize() {
-        proxyKey = "proxy:" + System.getenv("HOSTNAME") + ":players";
+        proxyKey = "proxy:" + Cloud.getInstance().getHostname() + ":players";
 
         checkTask = plugin.proxyServer.getScheduler()
                                         .buildTask(plugin, this::checkProxies)
