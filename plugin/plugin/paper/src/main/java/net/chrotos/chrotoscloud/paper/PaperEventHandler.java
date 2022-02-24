@@ -7,6 +7,7 @@ import net.chrotos.chrotoscloud.paper.chat.PaperChatRenderer;
 import net.chrotos.chrotoscloud.paper.permissions.PermissibleInjector;
 import net.chrotos.chrotoscloud.player.PlayerSoftDeletedException;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -16,6 +17,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 @RequiredArgsConstructor
 public class PaperEventHandler implements Listener {
+    private final byte opLevel;
     private final PaperCloud cloud;
     private final PaperChatRenderer renderer = new PaperChatRenderer();
 
@@ -26,7 +28,8 @@ public class PaperEventHandler implements Listener {
         try {
             cloud.getPlayerManager().getOrCreatePlayer(new PaperSidedPlayer(player));
             PermissibleInjector.inject(player, cloud);
-            player.sendOpLevel((byte) (player.isOp() ? 4 : 0));
+
+            player.sendOpLevel(player.hasPermission("minecraft.command.op") ? opLevel : (byte) 0);
         } catch (PlayerSoftDeletedException e) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("Your account has been deleted!")); // TODO: Translate
         } catch (Exception e) {
