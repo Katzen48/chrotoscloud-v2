@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @AllArgsConstructor
 public class HubCommand implements SimpleCommand {
-    private ProxyServer proxyServer;
+    private final ProxyServer proxyServer;
 
     @Override
     public void execute(Invocation invocation) {
@@ -47,6 +47,6 @@ public class HubCommand implements SimpleCommand {
             return;
         }
 
-        player.createConnectionRequest(serverOptional.get());
+        player.createConnectionRequest(serverOptional.get()).fireAndForget();
     }
 }

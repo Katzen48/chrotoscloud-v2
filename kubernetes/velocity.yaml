@@ -109,6 +109,20 @@ spec:
                 secretKeyRef:
                   name: cloud-secret
                   key: DB_PASSWORD
+            - name: QUEUE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret
+                  key: RABBITMQ_USERNAME
+            - name: QUEUE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret
+                  key: RABBITMQ_PASSWORD
+            - name: QUEUE_HOST
+              value: rabbitmq.core
+            - name: QUEUE_PORT
+              value: "5672"
           ports:
             - name: minecraft
               hostPort: 25565

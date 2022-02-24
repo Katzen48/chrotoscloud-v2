@@ -9,7 +9,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class PaperChatRenderer implements io.papermc.paper.chat.ChatRenderer {
+public class PaperChatRenderer implements ChatRenderer {
     @Override
     public @NotNull Component render(@NotNull Player source, @NotNull Component sourceDisplayName, @NotNull Component message, @NotNull Audience viewer) {
         net.chrotos.chrotoscloud.player.Player player = Cloud.getInstance().getPlayerManager()
