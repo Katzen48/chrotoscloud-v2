@@ -1,12 +1,14 @@
 package net.chrotos.chrotoscloud.velocity;
 
 import com.google.inject.Inject;
+import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.chrotos.chrotoscloud.Cloud;
+import net.chrotos.chrotoscloud.velocity.commands.HubCommand;
 import net.chrotos.chrotoscloud.velocity.player.PermissionsProvider;
 import org.slf4j.Logger;
 
@@ -39,6 +41,17 @@ public class CloudPlugin {
 
         // Reload function is incompatible with the manipulations done by the plugin, so remove the whole command
         proxyServer.getCommandManager().unregister("velocity");
+
+        registerCommands();
+    }
+
+    private void registerCommands() {
+        CommandMeta lobbyMeta = proxyServer.getCommandManager()
+                                            .metaBuilder("hub")
+                                            .aliases("lobby", "back")
+                                            .build();
+
+        proxyServer.getCommandManager().register(lobbyMeta, new HubCommand(proxyServer));
     }
 
     @Subscribe(async = false)

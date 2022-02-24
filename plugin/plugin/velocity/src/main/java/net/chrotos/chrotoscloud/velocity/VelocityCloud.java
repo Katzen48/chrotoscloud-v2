@@ -6,4 +6,9 @@ public class VelocityCloud extends CoreCloud {
     public VelocityCloud() {
         setCloudConfig(new VelocityConfig());
     }
+
+    @Override
+    public String getHostname() {
+        return System.getenv("HOSTNAME");
+    }
 }

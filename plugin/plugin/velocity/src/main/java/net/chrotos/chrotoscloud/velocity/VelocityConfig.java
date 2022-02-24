@@ -34,6 +34,26 @@ public class VelocityConfig implements CloudConfig {
     }
 
     @Override
+    public String getQueueHost() {
+        return System.getenv("QUEUE_HOST");
+    }
+
+    @Override
+    public int getQueuePort() {
+        return Integer.parseInt(System.getenv("QUEUE_PORT"));
+    }
+
+    @Override
+    public String getQueueUser() {
+        return System.getenv("QUEUE_USER");
+    }
+
+    @Override
+    public String getQueuePassword() {
+        return System.getenv("QUEUE_PASSWORD");
+    }
+
+    @Override
     public boolean shouldRunMigrations() {
         String value = System.getenv("DB_UPGRADE");
 

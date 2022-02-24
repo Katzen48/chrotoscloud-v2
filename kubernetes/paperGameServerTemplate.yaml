@@ -116,6 +116,11 @@ spec:
                 secretKeyRef:
                   name: redis-secret
                   key: CACHE_HOST
+            - name: CACHE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: CACHE_PORT
             - name: CACHE_PASSWORD
               valueFrom:
                 secretKeyRef:

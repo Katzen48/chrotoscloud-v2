@@ -9,4 +9,9 @@ public class MockCloud extends CoreCloud {
     public MockCloud() {
         setCloudConfig(new MockConfig());
     }
+
+    @Override
+    public String getHostname() {
+        return System.getenv("HOSTNAME");
+    }
 }
