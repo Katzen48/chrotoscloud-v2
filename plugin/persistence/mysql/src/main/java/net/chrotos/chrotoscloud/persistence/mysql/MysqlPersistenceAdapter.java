@@ -20,7 +20,6 @@ import java.util.List;
 
 public class MysqlPersistenceAdapter implements PersistenceAdapter {
     private SessionFactory sessionFactory;
-    private EntityManager entityManager;
 
     @Override
     public boolean isConnected() {
@@ -51,7 +50,6 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
 
             sessionFactory = dbConfig.buildSessionFactory();
-            entityManager = sessionFactory.createEntityManager();
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -62,6 +60,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
     @Override
     public <E> List<E> getAll(Class<E> clazz) {
+        EntityManager entityManager = getEntityManager();
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<E> cq = cb.createQuery(clazz);
         Root<E> rootEntry = cq.from(clazz);
@@ -84,11 +83,13 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
             throw new IllegalArgumentException("A primary Key Value needs to be defined");
         }
 
-        return entityManager.find(clazz, filter.getPrimaryKeyValue());
+        return getEntityManager().find(clazz, filter.getPrimaryKeyValue());
     }
 
     @Override
     public <E> void save(E entity) throws net.chrotos.chrotoscloud.persistence.EntityExistsException {
+        EntityManager entityManager = getEntityManager();
+
         if (entityManager.contains(entity)) {
             return;
         }
@@ -110,6 +111,8 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
     @Override
     public void removeFromContext(Object object) {
+        EntityManager entityManager = getEntityManager();
+
         if (entityManager.contains(object)) {
             entityManager.detach(object);
         }
@@ -117,6 +120,8 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
     @Override
     public void runInTransaction(TransactionRunnable runnable) {
+        EntityManager entityManager = getEntityManager();
+
         EntityTransaction transaction = entityManager.getTransaction();
         boolean insideTransaction = transaction.isActive();
 
@@ -150,6 +155,8 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
     @Override
     public void refresh(Object object) {
+        EntityManager entityManager = getEntityManager();
+
         if (entityManager.contains(object)) {
             entityManager.refresh(object);
         }
@@ -157,10 +164,16 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
     @Override
     public void merge(Object object) {
+        EntityManager entityManager = getEntityManager();
+
         if (entityManager.getTransaction().isActive()) {
             entityManager.merge(object);
         } else {
             runInTransaction((databaseTransaction) -> entityManager.merge(object));
         }
+    }
+
+    private EntityManager getEntityManager() {
+        return sessionFactory.createEntityManager();
     }
 }

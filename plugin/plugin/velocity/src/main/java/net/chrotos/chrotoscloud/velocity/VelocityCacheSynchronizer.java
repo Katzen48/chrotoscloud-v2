@@ -84,6 +84,8 @@ public class VelocityCacheSynchronizer {
         event.setPing(event.getPing().asBuilder()
                         .onlinePlayers(onlinePlayers)
                         .maximumPlayers(onlinePlayers + 1)
+                        .clearMods()
+                        .clearSamplePlayers()
                         .build());
     }
 
