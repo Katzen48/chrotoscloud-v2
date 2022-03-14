@@ -18,7 +18,7 @@ import java.util.Properties;
 @Plugin(name = "ChrotosCloud", version = "3.0-SNAPSHOT")
 @Author("Katzen48")
 @LoadOrder(PluginLoadOrder.STARTUP)
-@ApiVersion(ApiVersion.Target.v1_17)
+@ApiVersion(ApiVersion.Target.v1_18)
 public class CloudPlugin extends JavaPlugin {
     private final PaperCloud cloud;
 
