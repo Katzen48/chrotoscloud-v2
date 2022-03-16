@@ -22,7 +22,7 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
 
     implementation 'org.hibernate:hibernate-core:5.6.5.Final'
-    implementation 'org.hibernate:hibernate-entitymanager:5.6.5.Final'
+    implementation 'org.hibernate:hibernate-entitymanager:5.6.6.Final'
 
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.2'
     implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.2'
