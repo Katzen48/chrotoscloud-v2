@@ -10,5 +10,6 @@ COPY download.js .
 COPY resolveMaven.js .
 COPY pluginDownloader.js .
 COPY worldDownloader.js .
+COPY configurationDownloader.js .
 
 CMD [ "node", "main.js" ]

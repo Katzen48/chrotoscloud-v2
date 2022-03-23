@@ -85,6 +85,24 @@ spec:
                             - version
                           url:
                            type: string
+                      configuration:
+                        type: object
+                        properties:
+                          mavenLike:
+                            type: object
+                            properties:
+                              groupId:
+                                type: string
+                              artifactId:
+                                type: string
+                              version:
+                                type: string
+                            required:
+                            - groupId
+                            - artifactId
+                            - version
+                          url:
+                           type: string
                     required:
                     - dependency
               required:
