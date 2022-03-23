@@ -4,7 +4,9 @@ import com.velocitypowered.api.event.Continuation;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
+import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import lombok.NonNull;
 import net.chrotos.chrotoscloud.player.PlayerSoftDeletedException;
@@ -13,6 +15,7 @@ import net.chrotos.chrotoscloud.velocity.player.PermissionsProvider;
 import net.chrotos.chrotoscloud.velocity.player.VelocitySidedPlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class VelocityEventHandler {
     private final CloudPlugin plugin;
@@ -21,6 +24,11 @@ public class VelocityEventHandler {
     protected VelocityEventHandler(@NonNull CloudPlugin plugin) {
         this.plugin = plugin;
         this.permissionsProvider = new PermissionsProvider(plugin.cloud);
+    }
+
+    @Subscribe
+    public void onPostConnect(ServerPostConnectEvent event) {
+        event.getPlayer().sendPlayerListHeaderAndFooter(plugin.proxyServer.getConfiguration().getMotd(), Component.empty());
     }
 
     @Subscribe(order = PostOrder.FIRST)

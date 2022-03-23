@@ -52,37 +52,37 @@ spec:
               mountPath: /etc/config
             - name: podinfo
               mountPath: /etc/podinfo
-            env:
-              - name: GITHUB_USER
-                valueFrom:
-                  secretKeyRef:
-                    name: github-credentials
-                    key: GITHUB_USER
-              - name: GITHUB_TOKEN
-                valueFrom:
-                  secretKeyRef:
-                    name: github-credentials
-                    key: GITHUB_TOKEN
-              - name: DB_STRING
-                valueFrom:
-                  secretKeyRef:
-                    name: cloud-secret
-                    key: DB_STRING
-              - name: DB_USER
-                valueFrom:
-                  secretKeyRef:
-                    name: cloud-secret
-                    key: DB_USER
-              - name: DB_PASSWORD
-                valueFrom:
-                  secretKeyRef:
-                    name: cloud-secret
-                    key: DB_PASSWORD
-              - name: VELOCITY_SECRET
-                valueFrom:
-                  secretKeyRef:
-                    name: velocity-secret
-                    key: VELOCITY_SECRET
+          env:
+            - name: GITHUB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: github-credentials
+                  key: GITHUB_USER
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: github-credentials
+                  key: GITHUB_TOKEN
+            - name: DB_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: cloud-secret
+                  key: DB_STRING
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cloud-secret
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cloud-secret
+                  key: DB_PASSWORD
+            - name: VELOCITY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: velocity-secret
+                  key: VELOCITY_SECRET
           imagePullPolicy: IfNotPresent
       containers:
         - name: paper
@@ -146,11 +146,9 @@ spec:
               protocol: TCP
           resources:
             limits:
-              cpu: 1
-              memory: 4G
+              memory: 5G
             requests:
-              cpu: 1
-              memory: 4G
+              memory: 5G
           volumeMounts:
             - name: workdir
               mountPath: /opt/paper

@@ -130,11 +130,9 @@ spec:
               protocol: TCP
           resources:
             limits:
-              cpu: 2
-              memory: 4G
+              memory: 5G
             requests:
-              cpu: 1
-              memory: 3000M
+              memory: 5G
           volumeMounts:
             - name: workdir
               mountPath: /opt/proxy

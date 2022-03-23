@@ -1,5 +1,6 @@
 const resolveMaven = require('./resolveMaven');
 const download = require('./download');
+const configDownload = require('./configurationDownloader');
 
 module.exports = async function (pluginDirectory, gameMode, mavenUrl, mavenUser, mavenPassword) {
     let plugins = gameMode.body.spec.plugins;
@@ -38,5 +39,11 @@ module.exports = async function (pluginDirectory, gameMode, mavenUrl, mavenUser,
         console.log('Found Plugin URL: ' + url);
 
         await download(url, pluginDirectory + '/' + fileName, user, password);
+
+        if (plugin.configuration) {
+            console.log("Downloading Configuration");
+
+            await configDownload(pluginDirectory, fileName, plugin.configuration, mavenUrl, mavenUser, mavenPassword);
+        }
     }
 };
