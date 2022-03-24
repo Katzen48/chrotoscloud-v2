@@ -14,5 +14,7 @@ public interface CloudConfig {
     String getQueueUser();
     String getQueuePassword();
 
+    String getGameMode();
+
     boolean shouldRunMigrations();
 }

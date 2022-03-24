@@ -2,7 +2,18 @@ package net.chrotos.chrotoscloud.paper;
 
 import net.chrotos.chrotoscloud.CloudConfig;
 
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Properties;
+
 public class PaperConfig implements CloudConfig {
+    private final Properties podLabels;
+
+    protected PaperConfig() throws IOException {
+        this.podLabels = new Properties();
+        this.podLabels.load(new FileReader("/etc/podinfo/labels"));
+    }
+
     @Override
     public String getPersistenceConnectionString() {
         return System.getenv("DB_STRING");
@@ -51,6 +62,11 @@ public class PaperConfig implements CloudConfig {
     @Override
     public String getQueuePassword() {
         return System.getenv("QUEUE_PASSWORD");
+    }
+
+    @Override
+    public String getGameMode() {
+        return podLabels.getProperty("net.chrotos.chrotoscloud.gameserver/gamemode").replaceAll("\"", "");
     }
 
     @Override
