@@ -5,6 +5,8 @@ import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.economy.Account;
 import net.chrotos.chrotoscloud.economy.AccountType;
 import net.chrotos.chrotoscloud.economy.CloudAccount;
+import net.chrotos.chrotoscloud.games.stats.CloudGameStatistic;
+import net.chrotos.chrotoscloud.games.stats.GameStatistic;
 import net.chrotos.chrotoscloud.permissions.*;
 import net.chrotos.chrotoscloud.persistence.SoftDeletable;
 import net.kyori.adventure.text.Component;
@@ -50,12 +52,15 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @JoinColumn(name = "rank_unique_id")
     private Rank rank;
 
+    @OneToMany(mappedBy = "player", targetEntity = CloudGameStatistic.class, cascade = CascadeType.ALL)
+    private List<GameStatistic> stats = new ArrayList<>();
+
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar createdAt = Calendar.getInstance();
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar updatedAt = Calendar.getInstance();
     @Temporal(TemporalType.TIMESTAMP)
-    private Calendar deletedAt;
+    private Calendar deletedAt = null;
 
     @Setter(AccessLevel.PACKAGE)
     private transient long lastRefreshed;
@@ -86,5 +91,13 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @NonNull
     public Component getPrefixes() {
         return Cloud.getInstance().getChatManager().getPrefixes(this);
+    }
+
+    @Override
+    @NonNull
+    public List<GameStatistic> getStats(@NonNull String gameMode) {
+        return getStats().stream().filter(
+                gameStatistic -> gameStatistic.getGameMode().equals(gameMode)
+        ).collect(Collectors.toList());
     }
 }
