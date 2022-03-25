@@ -54,6 +54,11 @@ public class VelocityConfig implements CloudConfig {
     }
 
     @Override
+    public String getGameMode() {
+        return null;
+    }
+
+    @Override
     public boolean shouldRunMigrations() {
         String value = System.getenv("DB_UPGRADE");
 

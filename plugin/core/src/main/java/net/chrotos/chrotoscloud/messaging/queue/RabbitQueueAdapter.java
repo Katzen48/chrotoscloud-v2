@@ -2,14 +2,15 @@ package net.chrotos.chrotoscloud.messaging.queue;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import com.rabbitmq.client.*;
 import lombok.NonNull;
 import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.CloudConfig;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
     public static final String CLOUD_EXCHANGE = "cloud";
@@ -17,7 +18,7 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
     private Gson gson;
     private ConnectionFactory factory;
     private Connection connection;
-    private Channel channel;
+    private Channel publishOnlyChannel;
 
     public void configure(CloudConfig config) {
         gson = new GsonBuilder().create();
@@ -37,66 +38,86 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
 
         try {
             connection = factory.newConnection();
-            channel = connection.createChannel();
+            publishOnlyChannel = connection.createChannel();
 
-            channel.queueDeclare(Cloud.getInstance().getHostname(), false, true, true, null);
-            channel.exchangeDeclare("cloud", "fanout", true);
-            channel.queueBind(Cloud.getInstance().getHostname(), "cloud", "");
+            publishOnlyChannel.exchangeDeclare(CLOUD_EXCHANGE, "fanout", true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public <E,T> Registration<E,T> register(@NonNull Listener<E,T> listener, @NonNull String channel) {
+    public <E,T> Registration<E,T> register(@NonNull Listener<E,T> listener, @NonNull String channel) throws IOException {
         checkConnected();
 
-        DefaultConsumer consumer = new DefaultConsumer(this.channel) {
+        final Channel mqChannel = connection.createChannel();
+        final String queue = Cloud.getInstance().getHostname() + ":" + UUID.randomUUID();
+        mqChannel.queueDeclare(queue, false, true, true, null);
+        mqChannel.queueBind(queue, CLOUD_EXCHANGE, "");
+
+        DefaultConsumer consumer = new DefaultConsumer(mqChannel) {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
-                JsonObject message = gson.fromJson(new String(body, StandardCharsets.UTF_8), JsonObject.class);
+                // Channel header does not contain this channel
+                if (!(properties.getHeaders().containsKey("channel")
+                        && properties.getHeaders().get("channel").equals(channel))
+                    // or this message has no object
+                    || (body.length < 1)) {
 
-                        // If does not have a channel, which matches requested channel
-                if (!((message.has("channel") && channel.equals(message.get("channel").getAsString()))
-                            // And channel header does not contain this channel
-                            || (properties.getHeaders().containsKey("channel")
-                            && properties.getHeaders().get("channel").equals(channel)))
-                        // or this message has no object
-                        || (!message.has("object"))) {
                     return;
                 }
 
-                String sender = message.has("sender") ? message.get("sender").getAsString() : null;
+                String sender = properties.getHeaders().containsKey("sender") ? (String) properties.getHeaders().get("sender") : null;
 
-                try {
-                    if (envelope.getExchange().equals("")) {
-                        listener.onReply(makeMessage(channel, properties.getReplyTo(),
-                                        gson.fromJson(message.get("object"), listener.getReplyClass())), sender);
-                    } else {
-                        listener.onMessage(makeMessage(channel, properties.getReplyTo(),
-                                        gson.fromJson(message.get("object"), listener.getMessageClass())), sender);
+                if (envelope.getExchange().equals("")) {
+                    try {
+                        listener.onReply(makeMessage(mqChannel, channel, properties.getReplyTo(),
+                                gson.fromJson(new String(body, StandardCharsets.UTF_8), listener.getReplyClass())), sender);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } else {
+                    try {
+                        listener.onMessage(makeMessage(mqChannel, channel, properties.getReplyTo(),
+                                gson.fromJson(new String(body, StandardCharsets.UTF_8), listener.getMessageClass())), sender);
+                        mqChannel.basicAck(envelope.getDeliveryTag(), false);
+                    } catch (Exception e) {
+                        try {
+                            mqChannel.basicNack(envelope.getDeliveryTag(), false, true);
+                        } catch (Exception e2) {
+                            e.printStackTrace();
+                        }
+                        e.printStackTrace();
+                    }
                 }
             }
         };
 
         try {
-            this.channel.basicConsume(CLOUD_EXCHANGE, consumer);
-            this.channel.basicConsume("amq.rabbitmq.reply-to", true, consumer);
+            mqChannel.basicConsume(queue, consumer);
+            mqChannel.basicConsume("amq.rabbitmq.reply-to", true, consumer);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
         return new Registration<>() {
+            @Override
+            public void close() throws Exception {
+                unsubscribe();
+            }
+
             private boolean unsubscribed = false;
 
             @Override
             public void unsubscribe() {
                 try {
+                    if (!isSubscribed()) {
+                        return;
+                    }
+
                     unsubscribed = true;
-                    RabbitQueueAdapter.this.channel.basicCancel(consumer.getConsumerTag());
+                    mqChannel.close();
+                    //mqChannel.basicCancel(consumer.getConsumerTag());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -104,26 +125,47 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
 
             @Override
             public boolean isSubscribed() {
-                return !unsubscribed && RabbitQueueAdapter.this.channel.isOpen();
+                return !unsubscribed && isConnected();
+            }
+
+            @Override
+            public boolean isConnected() {
+                return mqChannel.isOpen();
             }
 
             @Override
             public Listener<E, T> getListener() {
                 return listener;
             }
+
+            @Override
+            public boolean publish(@NonNull Object message) throws IOException {
+                if (!isConnected()) {
+                    return false;
+                }
+
+                RabbitQueueAdapter.this.publish(mqChannel, CLOUD_EXCHANGE, channel, "", message);
+                return true;
+            }
         };
     }
 
-    private <E> Message<E> makeMessage(String channel, String replyTo, E object) {
-        return new Message<>() {
+    private <E> CloudMessage<E> makeMessage(Channel mqChannel, String channel, String replyTo, E object) {
+        return new CloudMessage<>() {
             @Override
+            protected Channel getMQChannel() {
+                return mqChannel;
+            }
+
+            @Override
+            @NonNull
             public E getMessage() {
                 return object;
             }
 
             @Override
-            public void replyTo(@NonNull Object object) {
-                publish("", channel, replyTo, object);
+            public void replyTo(@NonNull Object object) throws IOException {
+                publish(mqChannel, channel, replyTo, object);
             }
         };
     }
@@ -135,38 +177,47 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
 
     @Override
     public <E> void publish(@NonNull String channel, @NonNull String routingKey, @NonNull E object) {
-        publish(CLOUD_EXCHANGE, channel, routingKey, object);
-    }
-
-    private <E> void publish(@NonNull String exchange, @NonNull String channel, @NonNull String routingKey,
-                             @NonNull E object) {
         checkConnected();
 
         try {
-            this.channel.basicPublish(exchange, routingKey, getAMQPProperties(channel),
-                    gson.toJson(object).getBytes(StandardCharsets.UTF_8));
-        } catch (Exception e) {
+            publish(publishOnlyChannel, channel, "", object);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    private <E> void publish(@NonNull Channel mqChannel, @NonNull String channel, @NonNull String routingKey, @NonNull E object) throws IOException {
+        publish(mqChannel, CLOUD_EXCHANGE, channel, routingKey, object);
+    }
+
+    private <E> void publish(@NonNull Channel mqChannel, @NonNull String exchange, @NonNull String channel,
+                             @NonNull String routingKey, @NonNull E object) throws IOException {
+
+        mqChannel.basicPublish(exchange, routingKey, getAMQPProperties(channel),
+                gson.toJson(object).getBytes(StandardCharsets.UTF_8));
+    }
+
     private AMQP.BasicProperties getAMQPProperties(String channel) {
+        HashMap<String, Object> headers = new HashMap<>();
+        headers.put("channel", channel);
+        headers.put("sender", Cloud.getInstance().getHostname());
+
         return new AMQP.BasicProperties.Builder()
                     .replyTo("amq.rabbitmq.reply-to")
                     .contentType("application/json")
-                    .headers(Collections.singletonMap("channel", channel))
+                    .headers(headers)
                     .build();
     }
 
     private void checkConnected() {
-        if (channel == null || !channel.isOpen()) {
+        if (connection == null || !connection.isOpen()) {
             throw new QueueUnconnectedException();
         }
     }
 
     @Override
     public void close() throws Exception {
-        channel.close();
+        publishOnlyChannel.close();
         connection.close();
     }
 }

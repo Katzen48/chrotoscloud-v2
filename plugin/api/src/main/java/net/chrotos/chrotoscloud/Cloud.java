@@ -1,9 +1,11 @@
 package net.chrotos.chrotoscloud;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import net.chrotos.chrotoscloud.cache.CacheAdapter;
 import net.chrotos.chrotoscloud.chat.ChatManager;
+import net.chrotos.chrotoscloud.games.GameManager;
 import net.chrotos.chrotoscloud.messaging.pubsub.PubSubAdapter;
 import net.chrotos.chrotoscloud.messaging.queue.QueueAdapter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
@@ -23,6 +25,7 @@ public abstract class Cloud {
     protected PubSubAdapter pubSub;
     protected QueueAdapter queue;
 
+    @NonNull
     public static Cloud getInstance() {
         if (Cloud.instance == null) {
             ServiceLoader<Cloud> serviceLoader = ServiceLoader.load(Cloud.class, getServiceClassLoader());
@@ -39,6 +42,7 @@ public abstract class Cloud {
         return instance;
     }
 
+    @NonNull
     public static ClassLoader getServiceClassLoader() {
         return serviceClassLoader != null ? serviceClassLoader : Thread.currentThread().getContextClassLoader();
     }
@@ -62,9 +66,16 @@ public abstract class Cloud {
     public abstract boolean isLoaded();
 
     // Getter
+    @NonNull
     public abstract PlayerManager getPlayerManager();
-
+    @NonNull
     public abstract ChatManager getChatManager();
-
+    @NonNull
     public abstract String getHostname();
+    @NonNull
+    public abstract GameManager getGameManager();
+
+    public String getGameMode() {
+        return getCloudConfig().getGameMode();
+    }
 }

@@ -4,6 +4,8 @@ import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.economy.Account;
 import net.chrotos.chrotoscloud.economy.AccountType;
 import net.chrotos.chrotoscloud.economy.CloudAccount;
+import net.chrotos.chrotoscloud.games.stats.CloudGameStatistic;
+import net.chrotos.chrotoscloud.games.stats.GameStatistic;
 import net.chrotos.chrotoscloud.permissions.CloudPermission;
 import net.chrotos.chrotoscloud.permissions.CloudRank;
 import net.chrotos.chrotoscloud.permissions.Permission;
@@ -116,6 +118,40 @@ public class MysqlPersistenceTest {
 
             assertTrue(player.hasPermission("test3.test"));
             assertTrue(player.hasPermission("test4.test"));
+        });
+    }
+
+    @Test
+    @Order(3)
+    public void testGameStats() {
+        Cloud cloud = Cloud.getInstance();
+
+        cloud.initialize();
+        assertTrue(cloud.isInitialized());
+
+        assertNotNull(cloud.getPersistence().getAll(CloudGameStatistic.class));
+
+        Player player = new CloudPlayer(UUID.randomUUID(), "test");
+        cloud.getPersistence().save(player);
+
+        cloud.getPersistence().runInTransaction(databaseTransaction -> {
+            CloudGameStatistic gameStatistic = new CloudGameStatistic(UUID.randomUUID(), "test", "lobby-test", player, 1);
+            player.getStats().add(gameStatistic);
+
+            List<? extends GameStatistic> statistics = cloud.getPersistence().getAll(CloudGameStatistic.class);
+
+            assertFalse(statistics.isEmpty());
+            assertTrue(statistics.get(statistics.size() - 1) instanceof CloudGameStatistic);
+            assertTrue(statistics.get(statistics.size() - 1).getPlayer() instanceof CloudPlayer);
+
+            assertEquals(statistics.get(statistics.size() - 1).getValue(), 1);
+
+            GameStatistic statistic = statistics.get(statistics.size() - 1);
+            statistic.setValue(2);
+            cloud.getPersistence().save(statistic);
+
+            statistics = cloud.getPersistence().getAll(CloudGameStatistic.class);
+            assertEquals(statistics.get(statistics.size() - 1).getValue(), 2);
         });
     }
 }

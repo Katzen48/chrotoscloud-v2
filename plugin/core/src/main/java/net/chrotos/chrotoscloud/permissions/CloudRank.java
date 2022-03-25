@@ -51,7 +51,8 @@ public class CloudRank extends CloudPermissible implements Rank, SoftDeletable {
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar createdAt = Calendar.getInstance();
     @Temporal(TemporalType.TIMESTAMP)
-    private Calendar updatedAt = Calendar.getInstance();
+    @Version
+    private Calendar updatedAt;
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar deletedAt;
 

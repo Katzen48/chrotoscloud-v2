@@ -9,7 +9,6 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.velocity.commands.HubCommand;
-import net.chrotos.chrotoscloud.velocity.player.PermissionsProvider;
 import org.slf4j.Logger;
 
 @Plugin(id="chrotoscloud", name = "ChrotosCloud", version = "3.0-SNAPSHOT", authors = {"Katzen48"})
@@ -26,6 +25,7 @@ public class CloudPlugin {
 
         Cloud.setServiceClassLoader(getClass().getClassLoader());
         this.cloud = (VelocityCloud) Cloud.getInstance();
+        this.cloud.setProxyServer(proxyServer);
     }
 
     @Subscribe(async = false)

@@ -5,6 +5,8 @@ import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.economy.Account;
 import net.chrotos.chrotoscloud.economy.AccountType;
 import net.chrotos.chrotoscloud.economy.CloudAccount;
+import net.chrotos.chrotoscloud.games.stats.CloudGameStatistic;
+import net.chrotos.chrotoscloud.games.stats.GameStatistic;
 import net.chrotos.chrotoscloud.permissions.*;
 import net.chrotos.chrotoscloud.persistence.SoftDeletable;
 import net.kyori.adventure.text.Component;
@@ -38,11 +40,13 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     private transient SidedPlayer sidedPlayer;
 
     @OneToMany(mappedBy = "owner", targetEntity = CloudAccount.class, cascade = CascadeType.ALL)
+    @NonNull
     private List<Account> accounts = new ArrayList<>();
 
     @OneToMany(targetEntity = CloudPermission.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "permissible_unique_id")
     @Where(clause = "permissible_type='player'")
+    @NonNull
     private List<Permission> permissions = new ArrayList<>();
 
     @Setter
@@ -50,12 +54,21 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @JoinColumn(name = "rank_unique_id")
     private Rank rank;
 
+    @OneToMany(mappedBy = "player", targetEntity = CloudGameStatistic.class, cascade = CascadeType.ALL)
+    @NonNull
+    private List<GameStatistic> stats = new ArrayList<>();
+
+    @OneToMany(mappedBy = "player", targetEntity = CloudPlayerInventory.class, cascade = CascadeType.ALL)
+    @NonNull
+    private List<PlayerInventory> inventories = new ArrayList<>();
+
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar createdAt = Calendar.getInstance();
     @Temporal(TemporalType.TIMESTAMP)
-    private Calendar updatedAt = Calendar.getInstance();
+    @Version
+    private Calendar updatedAt;
     @Temporal(TemporalType.TIMESTAMP)
-    private Calendar deletedAt;
+    private Calendar deletedAt = null;
 
     @Setter(AccessLevel.PACKAGE)
     private transient long lastRefreshed;
@@ -86,5 +99,20 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @NonNull
     public Component getPrefixes() {
         return Cloud.getInstance().getChatManager().getPrefixes(this);
+    }
+
+    @Override
+    @NonNull
+    public List<GameStatistic> getStats(@NonNull String gameMode) {
+        return getStats().stream().filter(
+                gameStatistic -> gameStatistic.getGameMode().equals(gameMode)
+        ).collect(Collectors.toList());
+    }
+
+    @Override
+    public PlayerInventory getInventory(@NonNull String gameMode) {
+        return getInventories().stream().filter(
+                playerInventory -> playerInventory.getGameMode().equals(gameMode)
+        ).findFirst().orElse(null);
     }
 }

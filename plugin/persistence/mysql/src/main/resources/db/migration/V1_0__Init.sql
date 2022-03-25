@@ -48,6 +48,17 @@ create table accounts (
                           index (owner_unique_id)
 ) engine=InnoDB;
 
+create table game_stats (
+                            unique_id varchar(36) not null,
+                            name varchar(100) not null,
+                            game_mode varchar(100) not null,
+                            player_unique_id varchar(36) not null,
+                            value double not null,
+
+                            primary key (unique_id),
+                            index (player_unique_id, game_mode, name)
+) engine=InnoDB;
+
 create table permissions (
                              unique_id varchar(36) not null,
                              name varchar(100) not null,

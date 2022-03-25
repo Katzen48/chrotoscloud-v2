@@ -1,6 +1,7 @@
 package net.chrotos.chrotoscloud;
 
 import lombok.Getter;
+import lombok.NonNull;
 import net.chrotos.chrotoscloud.cache.RedisCacheAdapter;
 import net.chrotos.chrotoscloud.chat.ChatManager;
 import net.chrotos.chrotoscloud.chat.CoreChatManager;
@@ -16,8 +17,10 @@ public abstract class CoreCloud extends Cloud {
     private static boolean loaded;
     private static boolean initialized;
     @Getter
+    @NonNull
     private final CloudPlayerManager playerManager;
     @Getter
+    @NonNull
     private final ChatManager chatManager;
 
     protected CoreCloud() {

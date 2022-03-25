@@ -54,6 +54,11 @@ public class MockConfig implements CloudConfig {
     }
 
     @Override
+    public String getGameMode() {
+        return null;
+    }
+
+    @Override
     public boolean shouldRunMigrations() {
         return true;
     }
