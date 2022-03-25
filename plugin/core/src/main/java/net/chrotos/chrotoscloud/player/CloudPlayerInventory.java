@@ -31,6 +31,7 @@ public class CloudPlayerInventory implements PlayerInventory {
 
     @Setter
     @NonNull
+    @Type(type = "text")
     private String content;
 
     @Setter(AccessLevel.NONE)
