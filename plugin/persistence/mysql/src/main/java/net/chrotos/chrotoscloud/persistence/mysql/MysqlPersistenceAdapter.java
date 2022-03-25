@@ -6,6 +6,7 @@ import net.chrotos.chrotoscloud.persistence.DatabaseTransaction;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 import net.chrotos.chrotoscloud.persistence.TransactionRunnable;
 import org.flywaydb.core.Flyway;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
 import org.hibernate.cfg.Configuration;
@@ -20,6 +21,7 @@ import java.util.List;
 
 public class MysqlPersistenceAdapter implements PersistenceAdapter {
     private SessionFactory sessionFactory;
+    private ThreadLocal<EntityManager> entityManager = new ThreadLocal<>();
 
     @Override
     public boolean isConnected() {
@@ -69,7 +71,10 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
         // TODO apply order
 
-        return allQuery.getResultList();
+        List<E> list = allQuery.getResultList();
+        list.forEach(this::refresh);
+
+        return list;
     }
 
     @Override
@@ -83,7 +88,10 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
             throw new IllegalArgumentException("A primary Key Value needs to be defined");
         }
 
-        return getEntityManager().find(clazz, filter.getPrimaryKeyValue());
+        E entity = getEntityManager().find(clazz, filter.getPrimaryKeyValue());
+        refresh(entity);
+
+        return entity;
     }
 
     @Override
@@ -174,6 +182,10 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     }
 
     private EntityManager getEntityManager() {
-        return sessionFactory.createEntityManager();
+        if (entityManager.get() == null) {
+            entityManager.set(sessionFactory.createEntityManager());
+        }
+
+        return entityManager.get();
     }
 }

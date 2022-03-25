@@ -9,7 +9,7 @@ import net.kyori.adventure.text.Component;
 
 import java.util.UUID;
 
-public interface Player extends AccountHolder, StatsHolder, Permissible {
+public interface Player extends AccountHolder, StatsHolder, InventoryHolder, Permissible {
     SidedPlayer getSidedPlayer();
     @NonNull
     String getName();
