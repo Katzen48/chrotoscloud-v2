@@ -117,18 +117,18 @@ public class PaperEventHandler implements Listener {
         cloud.getPersistence().runInTransaction(databaseTransaction -> {
             PlayerInventory inventory = cloudPlayer.getInventory(cloud.getGameMode());
 
-            if (inventory == null) {
-                inventory = new CloudPlayerInventory(UUID.randomUUID(), cloud.getGameMode(), cloudPlayer, "");
-                cloud.getPersistence().save(inventory);
-            }
-
             YamlConfiguration inventoryContent = new YamlConfiguration();
             for (int i = 0; i < player.getInventory().getSize(); i++) {
                 inventoryContent.set(String.valueOf(i), player.getInventory().getItem(i));
             }
 
-            inventory.setContent(inventoryContent.saveToString());
-            cloud.getPersistence().merge(inventory);
+            if (inventory == null) {
+                inventory = new CloudPlayerInventory(UUID.randomUUID(), cloud.getGameMode(), cloudPlayer, inventoryContent.saveToString());
+                cloud.getPersistence().save(inventory);
+            } else {
+                inventory.setContent(inventoryContent.saveToString());
+                cloud.getPersistence().merge(inventory);
+            }
         });
     }
 }
