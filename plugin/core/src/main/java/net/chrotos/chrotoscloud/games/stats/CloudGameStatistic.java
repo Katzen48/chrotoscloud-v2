@@ -47,7 +47,28 @@ public class CloudGameStatistic implements GameStatistic, SoftDeletable {
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar createdAt = Calendar.getInstance();
     @Temporal(TemporalType.TIMESTAMP)
-    private Calendar updatedAt = Calendar.getInstance();
+    @Version
+    private Calendar updatedAt;
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar deletedAt;
+
+    @Override
+    public void increment() {
+        increment(1);
+    }
+
+    @Override
+    public void increment(double value) {
+        setValue(getValue() + value);
+    }
+
+    @Override
+    public void decrement() {
+        decrement(1);
+    }
+
+    @Override
+    public void decrement(double value) {
+        setValue(getValue() - value);
+    }
 }

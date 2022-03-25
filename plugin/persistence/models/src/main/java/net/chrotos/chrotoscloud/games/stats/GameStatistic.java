@@ -16,4 +16,8 @@ public interface GameStatistic {
     String getName();
     double getValue();
     void setValue(double value);
+    void increment();
+    void increment(double value);
+    void decrement();
+    void decrement(double value);
 }
