@@ -64,6 +64,12 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
                     // or this message has no object
                     || (body.length < 1)) {
 
+                    try {
+                        mqChannel.basicAck(envelope.getDeliveryTag(), false);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                     return;
                 }
 
@@ -73,7 +79,13 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
                     try {
                         listener.onReply(makeMessage(mqChannel, channel, properties.getReplyTo(),
                                 gson.fromJson(new String(body, StandardCharsets.UTF_8), listener.getReplyClass())), sender);
+                        mqChannel.basicAck(envelope.getDeliveryTag(), false);
                     } catch (Exception e) {
+                        try {
+                            mqChannel.basicNack(envelope.getDeliveryTag(), false, true);
+                        } catch (Exception e2) {
+                            e.printStackTrace();
+                        }
                         e.printStackTrace();
                     }
                 } else {
