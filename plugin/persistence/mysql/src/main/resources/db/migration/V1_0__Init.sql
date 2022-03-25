@@ -66,7 +66,7 @@ create table player_inventories (
                             unique_id varchar(36) not null,
                             game_mode varchar(100) not null,
                             player_unique_id varchar(36) not null,
-                            content longtext not null,
+                            content text not null,
                             created_at datetime not null,
                             updated_at datetime not null,
                             deleted_at datetime,
