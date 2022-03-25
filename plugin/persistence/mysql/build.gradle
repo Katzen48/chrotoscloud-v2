@@ -46,7 +46,7 @@ publishing {
     }
     publications {
         gpr(MavenPublication) {
-            artifactId = 'persistence-models'
+            artifactId = 'persistence-mysql'
             from(components.java)
         }
     }
