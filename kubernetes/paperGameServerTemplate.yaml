@@ -152,6 +152,8 @@ spec:
           volumeMounts:
             - name: workdir
               mountPath: /opt/paper
+            - name: podinfo
+              mountPath: /etc/podinfo
           livenessProbe:
             tcpSocket:
               port: 25565

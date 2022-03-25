@@ -15,6 +15,7 @@
         <mapping class="net.chrotos.chrotoscloud.economy.CloudTransaction" />
         <mapping class="net.chrotos.chrotoscloud.economy.CloudAccount" />
         <mapping class="net.chrotos.chrotoscloud.games.stats.CloudGameStatistic" />
+        <mapping class="net.chrotos.chrotoscloud.player.CloudPlayerInventory" />
 
         <mapping class="net.chrotos.chrotoscloud.permissions.CloudPermission" />
         <mapping class="net.chrotos.chrotoscloud.permissions.CloudRank" />
