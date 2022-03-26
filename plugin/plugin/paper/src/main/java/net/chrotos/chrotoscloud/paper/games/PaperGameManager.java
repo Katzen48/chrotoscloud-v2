@@ -32,14 +32,12 @@ public class PaperGameManager implements GameManager {
         try {
             Registration<Void, GameServerPingResponse> reg = cloud.getQueue().register(pingListener(gameServer ->
                     future.complete(gameServer.getGameServer())), "games.server.ping");
-
-            cloud.getLogger().info(String.format("Requesting a ping to %s", name)); // TODO remove
             reg.publish(new GameServerPingRequest(name));
         } catch (IOException e) {
             future.completeExceptionally(e);
         }
 
-        return future.orTimeout(5, TimeUnit.SECONDS);
+        return future;
     }
 
     @Override
@@ -51,14 +49,12 @@ public class PaperGameManager implements GameManager {
                 ArrayList<GameServer> gameServers = new ArrayList<>(gameServer.getGameServers());
                 future.complete(gameServers);
             }), "games.server.lookup");
-
-            cloud.getLogger().info("Requesting a lookup"); // TODO remove
             reg.publish(new GameServerLookupRequest());
         } catch (IOException e) {
             future.completeExceptionally(e);
         }
 
-        return future.orTimeout(5, TimeUnit.SECONDS);
+        return future;
     }
 
     @Override
@@ -70,14 +66,12 @@ public class PaperGameManager implements GameManager {
                 ArrayList<GameServer> gameServers = new ArrayList<>(gameServer.getGameServers());
                 future.complete(gameServers);
             }), "games.server.lookup");
-
-            cloud.getLogger().info(String.format("Requesting a lookup for game servers of gamemode %s", gameMode)); // TODO remove
             reg.publish(new GameServerLookupRequest(gameMode));
         } catch (IOException e) {
             future.completeExceptionally(e);
         }
 
-        return future.orTimeout(5, TimeUnit.SECONDS);
+        return future;
     }
 
 

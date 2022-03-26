@@ -92,8 +92,6 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
                     }
                 } else {
                     try {
-                        System.out.println("Message"); // TODO remove
-
                         listener.onMessage(makeMessage(mqChannel, wantedChannel, properties.getReplyTo(),
                                 gson.fromJson(new String(body, StandardCharsets.UTF_8), listener.getMessageClass())), sender);
                         mqChannel.basicAck(envelope.getDeliveryTag(), false);
