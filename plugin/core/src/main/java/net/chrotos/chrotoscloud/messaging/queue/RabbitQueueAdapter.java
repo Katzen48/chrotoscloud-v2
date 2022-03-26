@@ -77,12 +77,8 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
                     return;
                 }
 
-                System.out.println("Processing"); // TODO remove
-
                 if (envelope.getExchange().equals("")) {
                     try {
-                        System.out.println("Reply"); // TODO remove
-
                         listener.onReply(makeMessage(mqChannel, wantedChannel, properties.getReplyTo(),
                                 gson.fromJson(new String(body, StandardCharsets.UTF_8), listener.getReplyClass())), sender);
                         mqChannel.basicAck(envelope.getDeliveryTag(), false);
@@ -185,7 +181,7 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
 
             @Override
             public void replyTo(@NonNull Object object) throws IOException {
-                publish(mqChannel, channel, replyTo, object);
+                publish(mqChannel, "", channel, replyTo, object);
             }
         };
     }
