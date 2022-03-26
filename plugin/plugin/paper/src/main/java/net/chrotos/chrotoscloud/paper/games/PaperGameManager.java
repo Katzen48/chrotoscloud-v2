@@ -36,7 +36,7 @@ public class PaperGameManager implements GameManager {
             reg.publish(new GameServerPingRequest(name));
 
             Registration<Void, GameServerPingResponse> finalReg = reg;
-            return future.whenComplete((gameServers, throwable) -> finalReg.unsubscribe());
+            return future/*.whenComplete((gameServers, throwable) -> finalReg.unsubscribe())*/;
         } catch (IOException e) {
             future.completeExceptionally(e);
 
@@ -62,7 +62,7 @@ public class PaperGameManager implements GameManager {
             reg.publish(new GameServerLookupRequest());
 
             Registration<Void, GameServerLookupResponse> finalReg = reg;
-            return future.whenComplete((gameServers, throwable) -> finalReg.unsubscribe());
+            return future/*.whenComplete((gameServers, throwable) -> finalReg.unsubscribe())*/;
         } catch (IOException e) {
             future.completeExceptionally(e);
 
@@ -90,7 +90,7 @@ public class PaperGameManager implements GameManager {
             reg.publish(new GameServerLookupRequest(gameMode));
 
             Registration<Void, GameServerLookupResponse> finalReg = reg;
-            return future.whenComplete((gameServers, throwable) -> finalReg.unsubscribe());
+            return future/*.whenComplete((gameServers, throwable) -> finalReg.unsubscribe())*/;
         } catch (IOException e) {
             future.completeExceptionally(e);
 
