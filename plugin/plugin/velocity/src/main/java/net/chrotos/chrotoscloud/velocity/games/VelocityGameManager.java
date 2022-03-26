@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -73,8 +74,8 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
                     podGameMode = getPodGameMode(name);
                 }
 
-                return new CloudGameServer(name, maxPlayers, playerCount, podGameMode);
-            });
+                return (GameServer) new CloudGameServer(name, maxPlayers, playerCount, podGameMode);
+            }).orTimeout(5, TimeUnit.SECONDS);
         }
     }
 
@@ -116,8 +117,8 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
                 }
             }
 
-            return list;
-        });
+            return (List<GameServer>) list;
+        }).orTimeout(5, TimeUnit.SECONDS);
     }
 
     @Override

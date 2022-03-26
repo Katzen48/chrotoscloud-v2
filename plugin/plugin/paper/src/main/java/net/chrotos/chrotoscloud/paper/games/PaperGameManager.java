@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -39,7 +40,7 @@ public class PaperGameManager implements GameManager {
             future.completeExceptionally(e);
         }
 
-        return future;
+        return future.orTimeout(5, TimeUnit.SECONDS);
     }
 
     @Override
@@ -58,7 +59,7 @@ public class PaperGameManager implements GameManager {
             future.completeExceptionally(e);
         }
 
-        return future;
+        return future.orTimeout(5, TimeUnit.SECONDS);
     }
 
     @Override
@@ -77,7 +78,7 @@ public class PaperGameManager implements GameManager {
             future.completeExceptionally(e);
         }
 
-        return future;
+        return future.orTimeout(5, TimeUnit.SECONDS);
     }
 
     @Override

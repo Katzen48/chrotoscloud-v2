@@ -58,6 +58,9 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
         DefaultConsumer consumer = new DefaultConsumer(mqChannel) {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
+                System.out.println("Got message with length " + body.length + " and headers:"); // TODO remove
+                properties.getHeaders().forEach((key, value) -> System.out.println(key + ":" + value)); // TODO remove
+
                 // Channel header does not contain this channel
                 if (!(properties.getHeaders().containsKey("channel")
                         && properties.getHeaders().get("channel").equals(channel))
@@ -73,10 +76,14 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
                     return;
                 }
 
+                System.out.println("Processing"); // TODO remove
+
                 String sender = properties.getHeaders().containsKey("sender") ? (String) properties.getHeaders().get("sender") : null;
 
                 if (envelope.getExchange().equals("")) {
                     try {
+                        System.out.println("Reply"); // TODO remove
+
                         listener.onReply(makeMessage(mqChannel, channel, properties.getReplyTo(),
                                 gson.fromJson(new String(body, StandardCharsets.UTF_8), listener.getReplyClass())), sender);
                         mqChannel.basicAck(envelope.getDeliveryTag(), false);
@@ -90,6 +97,8 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
                     }
                 } else {
                     try {
+                        System.out.println("Message"); // TODO remove
+
                         listener.onMessage(makeMessage(mqChannel, channel, properties.getReplyTo(),
                                 gson.fromJson(new String(body, StandardCharsets.UTF_8), listener.getMessageClass())), sender);
                         mqChannel.basicAck(envelope.getDeliveryTag(), false);
