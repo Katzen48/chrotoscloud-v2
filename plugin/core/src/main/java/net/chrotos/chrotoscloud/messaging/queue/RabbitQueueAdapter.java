@@ -48,51 +48,39 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
 
     @Override
     public <E,T> Registration<E,T> register(@NonNull Listener<E,T> listener, @NonNull String channel) throws IOException {
+        if (listener.getReplyClass() == null && listener.getMessageClass() == null) {
+            throw new IllegalArgumentException("At least a message or a reply class has to be defined.");
+        }
+
         checkConnected();
 
         final String wantedChannel = channel;
         final Channel mqChannel = connection.createChannel();
-        final String queue = Cloud.getInstance().getHostname() + ":" + UUID.randomUUID();
-        mqChannel.queueDeclare(queue, false, true, true, null);
-        mqChannel.queueBind(queue, CLOUD_EXCHANGE, "");
 
-        DefaultConsumer consumer = new DefaultConsumer(mqChannel) {
-            @Override
-            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
-                String messageChannel = properties.getHeaders().get("channel").toString();
-                String sender = properties.getHeaders().get("sender").toString();
-                System.out.println(messageChannel + "(" + sender + "): " + new String(body, StandardCharsets.UTF_8)); // TODO remove
-                // Channel header does not contain this channel
-                if (!messageChannel.equals(wantedChannel)
-                    // or this message has no object
-                    || (body.length < 1)
-                    // or message came from this sender
-                    || sender.equals(Cloud.getInstance().getHostname())) {
+        if (listener.getMessageClass() != null) {
+            final String queue = Cloud.getInstance().getHostname() + ":" + UUID.randomUUID();
+            mqChannel.queueDeclare(queue, false, true, true, null);
+            mqChannel.queueBind(queue, CLOUD_EXCHANGE, "");
 
-                    try {
-                        mqChannel.basicAck(envelope.getDeliveryTag(), false);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+            DefaultConsumer messageConsumer = new DefaultConsumer(mqChannel) {
+                @Override
+                public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
+                    String messageChannel = properties.getHeaders().get("channel").toString();
+                    String sender = properties.getHeaders().get("sender").toString();
+                    System.out.println(messageChannel + "(" + sender + ";" + properties.getReplyTo() + "): " + new String(body, StandardCharsets.UTF_8)); // TODO remove
+                    // Channel header does not contain this channel
+                    if (!messageChannel.equals(wantedChannel)
+                            // or message came from this sender
+                            || sender.equals(Cloud.getInstance().getHostname())) {
 
-                    return;
-                }
-
-                if (envelope.getExchange().equals("")) {
-                    try {
-                        System.out.println("Reply"); // TODO remove
-                        listener.onReply(makeMessage(mqChannel, wantedChannel, properties.getReplyTo(),
-                                gson.fromJson(new String(body, StandardCharsets.UTF_8), listener.getReplyClass())), sender);
-                        mqChannel.basicAck(envelope.getDeliveryTag(), false);
-                    } catch (Exception e) {
                         try {
-                            mqChannel.basicNack(envelope.getDeliveryTag(), false, true);
-                        } catch (Exception e2) {
+                            mqChannel.basicAck(envelope.getDeliveryTag(), false);
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        e.printStackTrace();
+                        return;
                     }
-                } else {
+
                     try {
                         System.out.println("Message"); // TODO remove
                         listener.onMessage(makeMessage(mqChannel, wantedChannel, properties.getReplyTo(),
@@ -107,14 +95,33 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
                         e.printStackTrace();
                     }
                 }
-            }
-        };
+            };
 
-        try {
-            mqChannel.basicConsume(queue, consumer);
-            mqChannel.basicConsume("amq.rabbitmq.reply-to", true, consumer);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            mqChannel.basicConsume(queue, messageConsumer);
+        }
+
+        if (listener.getReplyClass() != null) {
+            DefaultConsumer replyConsumer = new DefaultConsumer(mqChannel) {
+                @Override
+                public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
+                    String messageChannel = properties.getHeaders().get("channel").toString();
+                    String sender = properties.getHeaders().get("sender").toString();
+                    // Channel header does not contain this channel
+                    if (!messageChannel.equals(wantedChannel)) {
+                        return;
+                    }
+
+                    try {
+                        System.out.println("Reply"); // TODO remove
+                        listener.onReply(makeMessage(mqChannel, wantedChannel, properties.getReplyTo(),
+                                gson.fromJson(new String(body, StandardCharsets.UTF_8), listener.getReplyClass())), sender);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+
+            mqChannel.basicConsume("amq.rabbitmq.reply-to", true, replyConsumer);
         }
 
         return new Registration<>() {
