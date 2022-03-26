@@ -57,7 +57,7 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
         final String wantedChannel = channel;
         final Channel mqChannel = connection.createChannel();
 
-        if (listener.getMessageClass() != null) {
+        if (listener.getMessageClass() != null && listener.getMessageClass() != Void.class) {
             final String queue = Cloud.getInstance().getHostname() + ":" + UUID.randomUUID();
             mqChannel.queueDeclare(queue, false, true, true, null);
             mqChannel.queueBind(queue, CLOUD_EXCHANGE, "");
@@ -100,7 +100,7 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
             mqChannel.basicConsume(queue, messageConsumer);
         }
 
-        if (listener.getReplyClass() != null) {
+        if (listener.getReplyClass() != null && listener.getMessageClass() != Void.class) {
             DefaultConsumer replyConsumer = new DefaultConsumer(mqChannel) {
                 @Override
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
@@ -167,7 +167,7 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
                     return false;
                 }
 
-                RabbitQueueAdapter.this.publish(mqChannel, CLOUD_EXCHANGE, channel, "", message);
+                RabbitQueueAdapter.this.publish(mqChannel, wantedChannel, "", message);
                 return true;
             }
         };
@@ -216,7 +216,7 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
     private <E> void publish(@NonNull Channel mqChannel, @NonNull String exchange, @NonNull String channel,
                              @NonNull String routingKey, @NonNull E object) throws IOException {
 
-        mqChannel.basicPublish(exchange, routingKey, getAMQPProperties(channel, exchange.equals("")),
+        mqChannel.basicPublish(exchange, routingKey, getAMQPProperties(channel, !exchange.isBlank()),
                 gson.toJson(object).getBytes(StandardCharsets.UTF_8));
     }
 
