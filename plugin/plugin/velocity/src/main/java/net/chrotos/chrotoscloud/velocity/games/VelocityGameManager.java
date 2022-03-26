@@ -16,6 +16,7 @@ import net.chrotos.chrotoscloud.messaging.queue.Listener;
 import net.chrotos.chrotoscloud.messaging.queue.Message;
 import net.chrotos.chrotoscloud.messaging.queue.Registration;
 import net.chrotos.chrotoscloud.velocity.VelocityCloud;
+import net.chrotos.chrotoscloud.velocity.player.VelocitySidedPlayer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -130,6 +131,12 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
 
             return null;
         });
+    }
+
+    @Override
+    public void requestTeleport(@NonNull GameServer server, net.chrotos.chrotoscloud.player.@NonNull Player player) {
+        ((VelocitySidedPlayer) player.getSidedPlayer()).getSidedObject()
+                .createConnectionRequest(cloud.getProxyServer().getServer(server.getName()).get()).fireAndForget();
     }
 
     @Override

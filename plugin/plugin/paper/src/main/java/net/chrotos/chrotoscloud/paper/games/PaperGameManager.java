@@ -2,17 +2,16 @@ package net.chrotos.chrotoscloud.paper.games;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.games.*;
-import net.chrotos.chrotoscloud.games.events.GameServerLookupRequest;
-import net.chrotos.chrotoscloud.games.events.GameServerLookupResponse;
-import net.chrotos.chrotoscloud.games.events.GameServerPingRequest;
-import net.chrotos.chrotoscloud.games.events.GameServerPingResponse;
+import net.chrotos.chrotoscloud.games.events.*;
 import net.chrotos.chrotoscloud.messaging.queue.Listener;
 import net.chrotos.chrotoscloud.messaging.queue.Message;
 import net.chrotos.chrotoscloud.messaging.queue.Registration;
 import net.chrotos.chrotoscloud.paper.PaperCloud;
 import net.chrotos.chrotoscloud.paper.games.queue.PaperLeastPlayersQueueManager;
 import net.chrotos.chrotoscloud.paper.games.queue.PaperRandomQueueManager;
+import net.chrotos.chrotoscloud.player.Player;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,55 +29,67 @@ public class PaperGameManager implements GameManager {
     public CompletableFuture<GameServer> getGameServer(@NonNull String name) {
         CompletableFuture<GameServer> future = new CompletableFuture<>();
 
-        try {
-            Registration<Void, GameServerPingResponse> reg = cloud.getQueue().register(pingListener(gameServer ->
-                    future.complete(gameServer.getGameServer())), "games.server.ping");
+        return future.completeAsync(() -> {
+            CompletableFuture<GameServer> serverFuture = new CompletableFuture<>();
 
-            cloud.getLogger().info(String.format("Requesting a ping to %s", name)); // TODO remove
-            reg.publish(new GameServerPingRequest(name));
-        } catch (IOException e) {
-            future.completeExceptionally(e);
-        }
+            try {
+                Registration<Void, GameServerPingResponse> reg = cloud.getQueue().register(pingListener(gameServer ->
+                        serverFuture.complete(gameServer.getGameServer())), "games.server.ping");
 
-        return future.orTimeout(5, TimeUnit.SECONDS);
+                cloud.getLogger().info(String.format("Requesting a ping to %s", name)); // TODO remove
+                reg.publish(new GameServerPingRequest(name));
+
+                return serverFuture.orTimeout(5, TimeUnit.SECONDS).join();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).orTimeout(5, TimeUnit.SECONDS);
     }
 
     @Override
     public CompletableFuture<List<GameServer>> getGameServers() {
-        CompletableFuture<List<GameServer>> future = new CompletableFuture<>();
+        final CompletableFuture<List<GameServer>> future = new CompletableFuture<>();
 
-        try {
-            Registration<Void, GameServerLookupResponse> reg = cloud.getQueue().register(lookupListener(gameServer -> {
-                ArrayList<GameServer> gameServers = new ArrayList<>(gameServer.getGameServers());
-                future.complete(gameServers);
-            }), "games.server.lookup");
+        return future.completeAsync(() -> {
+            try {
+                CompletableFuture<List<GameServer>> serverFuture = new CompletableFuture<>();
 
-            cloud.getLogger().info("Requesting a lookup"); // TODO remove
-            reg.publish(new GameServerLookupRequest());
-        } catch (IOException e) {
-            future.completeExceptionally(e);
-        }
+                Registration<Void, GameServerLookupResponse> reg = cloud.getQueue().register(lookupListener(gameServer -> {
+                    ArrayList<GameServer> gameServers = new ArrayList<>(gameServer.getGameServers());
+                    serverFuture.complete(gameServers);
+                }), "games.server.lookup");
 
-        return future.orTimeout(5, TimeUnit.SECONDS);
+                cloud.getLogger().info("Requesting a lookup"); // TODO remove
+                reg.publish(new GameServerLookupRequest());
+
+                return serverFuture.orTimeout(5, TimeUnit.SECONDS).join();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).orTimeout(5, TimeUnit.SECONDS);
     }
 
     @Override
     public CompletableFuture<List<GameServer>> getGameServers(@NonNull String gameMode) {
-        CompletableFuture<List<GameServer>> future = new CompletableFuture<>();
+        final CompletableFuture<List<GameServer>> future = new CompletableFuture<>();
 
-        try {
-            Registration<Void, GameServerLookupResponse> reg = cloud.getQueue().register(lookupListener(gameServer -> {
-                ArrayList<GameServer> gameServers = new ArrayList<>(gameServer.getGameServers());
-                future.complete(gameServers);
-            }), "games.server.lookup");
+        return future.completeAsync(() -> {
+            try {
+                CompletableFuture<List<GameServer>> serverFuture = new CompletableFuture<>();
 
-            cloud.getLogger().info(String.format("Requesting a lookup for game servers of gamemode %s", gameMode)); // TODO remove
-            reg.publish(new GameServerLookupRequest(gameMode));
-        } catch (IOException e) {
-            future.completeExceptionally(e);
-        }
+                Registration<Void, GameServerLookupResponse> reg = cloud.getQueue().register(lookupListener(gameServer -> {
+                    ArrayList<GameServer> gameServers = new ArrayList<>(gameServer.getGameServers());
+                    serverFuture.complete(gameServers);
+                }), "games.server.lookup");
 
-        return future.orTimeout(5, TimeUnit.SECONDS);
+                cloud.getLogger().info("Requesting a lookup"); // TODO remove
+                reg.publish(new GameServerLookupRequest(gameMode));
+
+                return serverFuture.orTimeout(5, TimeUnit.SECONDS).join();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).orTimeout(5, TimeUnit.SECONDS);
     }
 
     @Override
@@ -93,7 +104,13 @@ public class PaperGameManager implements GameManager {
             }
 
             return null;
-        });
+        }).orTimeout(5, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void requestTeleport(@NonNull GameServer server, @NonNull Player player) {
+        cloud.getQueue().publish("player.teleport.server",
+                new PlayerTeleportToServerRequest(player.getUniqueId(), server.getName()));
     }
 
     @Override

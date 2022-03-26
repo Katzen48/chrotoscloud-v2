@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.chrotos.chrotoscloud.Cloud;
-import net.chrotos.chrotoscloud.games.events.PlayerTeleportToServerRequest;
 import net.chrotos.chrotoscloud.player.Player;
 
 import java.util.Collection;
@@ -19,8 +18,7 @@ public class CloudGameServer implements GameServer {
 
     @Override
     public void teleport(@NonNull Player player) {
-        Cloud.getInstance().getQueue().publish("player.teleport.server",
-                new PlayerTeleportToServerRequest(player.getUniqueId(), name));
+        Cloud.getInstance().getGameManager().requestTeleport(this, player);
     }
 
     @Override
