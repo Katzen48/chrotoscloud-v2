@@ -65,7 +65,6 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
                     String messageChannel = properties.getHeaders().get("channel").toString();
                     String sender = properties.getHeaders().get("sender").toString();
-                    System.out.println(messageChannel + "(" + sender + ";" + properties.getReplyTo() + "): " + new String(body, StandardCharsets.UTF_8)); // TODO remove
                     // Channel header does not contain this channel
                     if (!messageChannel.equals(wantedChannel)
                             // or message came from this sender
@@ -80,7 +79,6 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
                     }
 
                     try {
-                        System.out.println("Message"); // TODO remove
                         listener.onMessage(makeMessage(mqChannel, wantedChannel, properties.getReplyTo(),
                                 gson.fromJson(new String(body, StandardCharsets.UTF_8), listener.getMessageClass())), sender);
                         mqChannel.basicAck(envelope.getDeliveryTag(), false);
@@ -110,7 +108,6 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
                     }
 
                     try {
-                        System.out.println("Reply"); // TODO remove
                         listener.onReply(makeMessage(mqChannel, wantedChannel, properties.getReplyTo(),
                                 gson.fromJson(new String(body, StandardCharsets.UTF_8), listener.getReplyClass())), sender);
                     } catch (Exception e) {

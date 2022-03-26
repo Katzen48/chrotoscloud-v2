@@ -82,11 +82,9 @@ public class PaperGameManager implements GameManager {
         try {
             reg = cloud.getQueue().register(lookupListener(gameServer -> {
                 ArrayList<GameServer> gameServers = new ArrayList<>(gameServer.getGameServers());
-                System.out.println("Processing server lookup response"); // TODO remove
                 future.complete(gameServers);
             }), "games.server.lookup");
 
-            System.out.println("Requested server lookup"); // TODO remove
             reg.publish(new GameServerLookupRequest(gameMode));
 
             Registration<Void, GameServerLookupResponse> finalReg = reg;
@@ -141,7 +139,6 @@ public class PaperGameManager implements GameManager {
 
             @Override
             public void onReply(@NonNull Message<GameServerLookupResponse> object, @NonNull String sender) {
-                System.out.println("Got server lookup response"); // TODO remove
                 callback.accept(object.getMessage());
             }
 
