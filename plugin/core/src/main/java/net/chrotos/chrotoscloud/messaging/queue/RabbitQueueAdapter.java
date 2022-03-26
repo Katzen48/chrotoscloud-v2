@@ -61,6 +61,7 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
                 String messageChannel = properties.getHeaders().get("channel").toString();
                 String sender = properties.getHeaders().get("sender").toString();
+                System.out.println(messageChannel + "(" + sender + "): " + new String(body, StandardCharsets.UTF_8)); // TODO remove
                 // Channel header does not contain this channel
                 if (!messageChannel.equals(wantedChannel)
                     // or this message has no object
@@ -79,6 +80,7 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
 
                 if (envelope.getExchange().equals("")) {
                     try {
+                        System.out.println("Reply"); // TODO remove
                         listener.onReply(makeMessage(mqChannel, wantedChannel, properties.getReplyTo(),
                                 gson.fromJson(new String(body, StandardCharsets.UTF_8), listener.getReplyClass())), sender);
                         mqChannel.basicAck(envelope.getDeliveryTag(), false);
@@ -92,6 +94,7 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
                     }
                 } else {
                     try {
+                        System.out.println("Message"); // TODO remove
                         listener.onMessage(makeMessage(mqChannel, wantedChannel, properties.getReplyTo(),
                                 gson.fromJson(new String(body, StandardCharsets.UTF_8), listener.getMessageClass())), sender);
                         mqChannel.basicAck(envelope.getDeliveryTag(), false);
@@ -131,7 +134,6 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
 
                     unsubscribed = true;
                     mqChannel.close();
-                    //mqChannel.basicCancel(consumer.getConsumerTag());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -164,7 +166,7 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
         };
     }
 
-    private <E> CloudMessage<E> makeMessage(Channel mqChannel, String channel, String replyTo, E object) {
+    private <E> CloudMessage<E> makeMessage(Channel mqChannel, String channel, String replyTo, E message) {
         return new CloudMessage<>() {
             @Override
             protected Channel getMQChannel() {
@@ -174,12 +176,12 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
             @Override
             @NonNull
             public E getMessage() {
-                return object;
+                return message;
             }
 
             @Override
-            public void replyTo(@NonNull Object object) throws IOException {
-                publish(mqChannel, "", channel, replyTo, object);
+            public void replyTo(@NonNull Object reply) throws IOException {
+                publish(mqChannel, "", channel, replyTo, reply);
             }
         };
     }
@@ -207,7 +209,7 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
     private <E> void publish(@NonNull Channel mqChannel, @NonNull String exchange, @NonNull String channel,
                              @NonNull String routingKey, @NonNull E object) throws IOException {
 
-        mqChannel.basicPublish(exchange, routingKey, getAMQPProperties(channel, channel.equals("")),
+        mqChannel.basicPublish(exchange, routingKey, getAMQPProperties(channel, exchange.equals("")),
                 gson.toJson(object).getBytes(StandardCharsets.UTF_8));
     }
 

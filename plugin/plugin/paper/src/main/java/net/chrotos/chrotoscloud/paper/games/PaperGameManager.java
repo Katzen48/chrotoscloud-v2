@@ -29,12 +29,20 @@ public class PaperGameManager implements GameManager {
     public CompletableFuture<GameServer> getGameServer(@NonNull String name) {
         CompletableFuture<GameServer> future = new CompletableFuture<>();
 
+        Registration<Void, GameServerPingResponse> reg = null;
         try {
-            Registration<Void, GameServerPingResponse> reg = cloud.getQueue().register(pingListener(gameServer ->
+            reg = cloud.getQueue().register(pingListener(gameServer ->
                     future.complete(gameServer.getGameServer())), "games.server.ping");
             reg.publish(new GameServerPingRequest(name));
+
+            Registration<Void, GameServerPingResponse> finalReg = reg;
+            return future.whenComplete((gameServers, throwable) -> finalReg.unsubscribe());
         } catch (IOException e) {
             future.completeExceptionally(e);
+
+            if (reg != null) {
+                reg.unsubscribe();
+            }
         }
 
         return future;
@@ -44,14 +52,23 @@ public class PaperGameManager implements GameManager {
     public CompletableFuture<List<GameServer>> getGameServers() {
         CompletableFuture<List<GameServer>> future = new CompletableFuture<>();
 
+        Registration<Void, GameServerLookupResponse> reg = null;
         try {
-            Registration<Void, GameServerLookupResponse> reg = cloud.getQueue().register(lookupListener(gameServer -> {
+            reg = cloud.getQueue().register(lookupListener(gameServer -> {
                 ArrayList<GameServer> gameServers = new ArrayList<>(gameServer.getGameServers());
                 future.complete(gameServers);
             }), "games.server.lookup");
+
             reg.publish(new GameServerLookupRequest());
+
+            Registration<Void, GameServerLookupResponse> finalReg = reg;
+            return future.whenComplete((gameServers, throwable) -> finalReg.unsubscribe());
         } catch (IOException e) {
             future.completeExceptionally(e);
+
+            if (reg != null) {
+                reg.unsubscribe();
+            }
         }
 
         return future;
@@ -61,14 +78,25 @@ public class PaperGameManager implements GameManager {
     public CompletableFuture<List<GameServer>> getGameServers(@NonNull String gameMode) {
         CompletableFuture<List<GameServer>> future = new CompletableFuture<>();
 
+        Registration<Void, GameServerLookupResponse> reg = null;
         try {
-            Registration<Void, GameServerLookupResponse> reg = cloud.getQueue().register(lookupListener(gameServer -> {
+            reg = cloud.getQueue().register(lookupListener(gameServer -> {
                 ArrayList<GameServer> gameServers = new ArrayList<>(gameServer.getGameServers());
+                System.out.println("Processing server lookup response"); // TODO remove
                 future.complete(gameServers);
             }), "games.server.lookup");
+
+            System.out.println("Requested server lookup"); // TODO remove
             reg.publish(new GameServerLookupRequest(gameMode));
+
+            Registration<Void, GameServerLookupResponse> finalReg = reg;
+            return future.whenComplete((gameServers, throwable) -> finalReg.unsubscribe());
         } catch (IOException e) {
             future.completeExceptionally(e);
+
+            if (reg != null) {
+                reg.unsubscribe();
+            }
         }
 
         return future;
@@ -113,6 +141,7 @@ public class PaperGameManager implements GameManager {
 
             @Override
             public void onReply(@NonNull Message<GameServerLookupResponse> object, @NonNull String sender) {
+                System.out.println("Got server lookup response"); // TODO remove
                 callback.accept(object.getMessage());
             }
 
