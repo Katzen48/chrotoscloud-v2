@@ -209,17 +209,17 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
     private <E> void publish(@NonNull Channel mqChannel, @NonNull String exchange, @NonNull String channel,
                              @NonNull String routingKey, @NonNull E object) throws IOException {
 
-        mqChannel.basicPublish(exchange, routingKey, getAMQPProperties(channel),
+        mqChannel.basicPublish(exchange, routingKey, getAMQPProperties(channel, channel.equals("")),
                 gson.toJson(object).getBytes(StandardCharsets.UTF_8));
     }
 
-    private AMQP.BasicProperties getAMQPProperties(String channel) {
+    private AMQP.BasicProperties getAMQPProperties(String channel, boolean fastReply) {
         HashMap<String, Object> headers = new HashMap<>();
         headers.put("channel", channel);
         headers.put("sender", Cloud.getInstance().getHostname());
 
         return new AMQP.BasicProperties.Builder()
-                    .replyTo("amq.rabbitmq.reply-to")
+                    .replyTo(fastReply ? "amq.rabbitmq.reply-to" : null)
                     .contentType("application/json")
                     .headers(headers)
                     .build();
