@@ -100,7 +100,7 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
             mqChannel.basicConsume(queue, messageConsumer);
         }
 
-        if (listener.getReplyClass() != null && listener.getMessageClass() != Void.class) {
+        if (listener.getReplyClass() != null && listener.getReplyClass() != Void.class) {
             DefaultConsumer replyConsumer = new DefaultConsumer(mqChannel) {
                 @Override
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
