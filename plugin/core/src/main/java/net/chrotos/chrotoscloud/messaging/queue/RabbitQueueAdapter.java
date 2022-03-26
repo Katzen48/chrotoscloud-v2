@@ -50,6 +50,7 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
     public <E,T> Registration<E,T> register(@NonNull Listener<E,T> listener, @NonNull String channel) throws IOException {
         checkConnected();
 
+        final String wantedChannel = channel;
         final Channel mqChannel = connection.createChannel();
         final String queue = Cloud.getInstance().getHostname() + ":" + UUID.randomUUID();
         mqChannel.queueDeclare(queue, false, true, true, null);
@@ -62,10 +63,11 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
                 properties.getHeaders().forEach((key, value) -> System.out.println(key + ":" + value)); // TODO remove
 
                 // Channel header does not contain this channel
-                if (!(properties.getHeaders().containsKey("channel")
-                        && properties.getHeaders().get("channel").equals(channel))
+                if (!properties.getHeaders().get("channel").equals(wantedChannel)
                     // or this message has no object
-                    || (body.length < 1)) {
+                    || (body.length < 1)
+                    // or message came from this sender
+                    || Cloud.getInstance().getHostname().equals(properties.getHeaders().get("sender"))) {
 
                     try {
                         mqChannel.basicAck(envelope.getDeliveryTag(), false);
@@ -78,13 +80,13 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
 
                 System.out.println("Processing"); // TODO remove
 
-                String sender = properties.getHeaders().containsKey("sender") ? (String) properties.getHeaders().get("sender") : null;
+                String sender = (String) properties.getHeaders().get("sender");
 
                 if (envelope.getExchange().equals("")) {
                     try {
                         System.out.println("Reply"); // TODO remove
 
-                        listener.onReply(makeMessage(mqChannel, channel, properties.getReplyTo(),
+                        listener.onReply(makeMessage(mqChannel, wantedChannel, properties.getReplyTo(),
                                 gson.fromJson(new String(body, StandardCharsets.UTF_8), listener.getReplyClass())), sender);
                         mqChannel.basicAck(envelope.getDeliveryTag(), false);
                     } catch (Exception e) {
@@ -99,7 +101,7 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
                     try {
                         System.out.println("Message"); // TODO remove
 
-                        listener.onMessage(makeMessage(mqChannel, channel, properties.getReplyTo(),
+                        listener.onMessage(makeMessage(mqChannel, wantedChannel, properties.getReplyTo(),
                                 gson.fromJson(new String(body, StandardCharsets.UTF_8), listener.getMessageClass())), sender);
                         mqChannel.basicAck(envelope.getDeliveryTag(), false);
                     } catch (Exception e) {
