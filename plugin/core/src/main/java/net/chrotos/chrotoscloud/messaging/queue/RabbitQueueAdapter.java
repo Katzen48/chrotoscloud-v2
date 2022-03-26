@@ -60,7 +60,7 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
                 StringBuilder stringBuilder = new StringBuilder();
-                properties.getHeaders().forEach((key, value) -> stringBuilder.append(key + ":" + value + "\n")); // TODO remove
+                properties.getHeaders().forEach((key, value) -> stringBuilder.append(String.format("%s:%s(%s)\n", key, value, value.getClass().getName()))); // TODO remove
                 System.out.format("Got message for channel %s with length %d and headers: %s", wantedChannel, body.length, stringBuilder); // TODO remove
 
                 // Channel header does not contain this channel
