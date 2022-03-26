@@ -75,8 +75,8 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
                     podGameMode = getPodGameMode(name);
                 }
 
-                return (GameServer) new CloudGameServer(name, maxPlayers, playerCount, podGameMode);
-            }).orTimeout(5, TimeUnit.SECONDS);
+                return new CloudGameServer(name, maxPlayers, playerCount, podGameMode);
+            });
         }
     }
 
@@ -101,16 +101,21 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
                                     .filter(Objects::nonNull).collect(Collectors.toList());
             }
 
+            System.out.println("Looking up"); // TODO remove
+
             CompletableFuture[] gameServers = new CompletableFuture[servers.size()];
 
             AtomicInteger i = new AtomicInteger();
             servers.forEach(server -> {
                 String name = server.getServerInfo().getName();
-                gameServers[i.getAndIncrement()] = gameMode != null ? getGameServer(name, gameMode) : getGameServer(name);
+                gameServers[i.getAndIncrement()] = getGameServer(name, gameMode);
             });
+
+            System.out.println("Finished lookup"); // TODO remove
 
             ArrayList<GameServer> list = new ArrayList<>();
             for (CompletableFuture<GameServer> gameServer : gameServers) {
+                System.out.println("DEBUG: Found server"); // TODO remove
                 GameServer server = gameServer.join();
 
                 if (server != null) {
@@ -118,8 +123,8 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
                 }
             }
 
-            return (List<GameServer>) list;
-        }).orTimeout(5, TimeUnit.SECONDS);
+            return list;
+        });
     }
 
     @Override
@@ -189,10 +194,13 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
             public void onMessage(@NonNull Message<GameServerLookupRequest> object, @NonNull String sender) {
                 String gameMode = object.getMessage().getGameMode();
                 CompletableFuture<List<GameServer>> gameServers;
+                System.out.println("Lookup request received"); // TODO remove
 
                 if (gameMode == null) {
+                    System.out.println("Looking up all servers"); // TODO remove
                     gameServers = getGameServers();
                 } else {
+                    System.out.println("Looking up all servers for game mode " + gameMode); // TODO remove
                     gameServers = getGameServers(gameMode);
                 }
 
@@ -201,6 +209,7 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
                     servers.forEach(server -> list.add((CloudGameServer) server));
 
                     try {
+                        System.out.println("Replying"); // TODO remove
                         object.replyTo(new GameServerLookupResponse(list));
                     } catch (IOException e) {
                         e.printStackTrace();
