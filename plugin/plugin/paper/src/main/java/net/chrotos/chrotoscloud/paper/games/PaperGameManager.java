@@ -79,7 +79,7 @@ public class PaperGameManager implements GameManager {
 
     @Override
     public CompletableFuture<GameServer> getRandom(@NonNull String gameMode) {
-        return getGameServers().thenApply(gameServers -> {
+        return getGameServers(gameMode).thenApply(gameServers -> {
             List<GameServer> servers = gameServers.stream()
                     .filter(server -> server.getMaxPlayers() == 0 || server.getPlayerCount() < server.getMaxPlayers())
                     .collect(Collectors.toList());
