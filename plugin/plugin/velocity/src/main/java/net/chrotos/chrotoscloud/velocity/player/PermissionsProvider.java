@@ -14,12 +14,12 @@ public class PermissionsProvider implements PermissionProvider {
 
     @Override
     public PermissionFunction createFunction(PermissionSubject subject) {
-        return permission -> {
-            Player player = (Player) subject;
+        Player player = (Player) subject;
 
-            return Tristate.fromBoolean(
-                cloud.getPlayerManager().getPlayer(player.getUniqueId()).hasPermission(permission)
-            );
-        };
+        final net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getPlayer(player.getUniqueId());
+
+        return permission -> Tristate.fromBoolean(
+                cloudPlayer.hasPermission(permission)
+        );
     }
 }

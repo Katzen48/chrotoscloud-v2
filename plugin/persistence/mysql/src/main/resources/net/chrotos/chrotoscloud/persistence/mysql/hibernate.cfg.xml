@@ -9,7 +9,9 @@
         <property name="hibernate.c3p0.max_size">10</property>
         <property name="hibernate.c3p0.acquire_increment">5</property>
         <property name="hibernate.c3p0.timeout">300</property>
-        <property name="c3p0.idle_test_period">5</property>
+        <property name="hibernate.c3p0.idle_test_period">5</property>
+        <property name="hibernate.c3p0.testConnectionOnCheckin">true</property>
+        <property name="hibernate.c3p0.preferredTestQuery">SELECT VERSION()</property>
 
         <mapping class="net.chrotos.chrotoscloud.player.CloudPlayer" />
         <mapping class="net.chrotos.chrotoscloud.economy.CloudTransaction" />

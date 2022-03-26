@@ -43,12 +43,11 @@ public class VelocityEventHandler {
             plugin.cloud.getPlayerManager().getOrCreatePlayer(sidedPlayer);
 
             event.setProvider(permissionsProvider);
+            continuation.resume();
         } catch (PlayerSoftDeletedException e) {
             player.disconnect(Component.text("Your account has been deleted!").color(NamedTextColor.RED)); //TODO translate
         } catch (Exception e) {
             continuation.resumeWithException(e);
-        } finally {
-            continuation.resume();
         }
     }
 
