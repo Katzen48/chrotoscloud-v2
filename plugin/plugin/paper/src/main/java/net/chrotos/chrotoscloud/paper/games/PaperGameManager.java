@@ -29,68 +29,57 @@ public class PaperGameManager implements GameManager {
     public CompletableFuture<GameServer> getGameServer(@NonNull String name) {
         CompletableFuture<GameServer> future = new CompletableFuture<>();
 
-        return future.completeAsync(() -> {
-            CompletableFuture<GameServer> serverFuture = new CompletableFuture<>();
+        try {
+            Registration<Void, GameServerPingResponse> reg = cloud.getQueue().register(pingListener(gameServer ->
+                    future.complete(gameServer.getGameServer())), "games.server.ping");
 
-            try {
-                Registration<Void, GameServerPingResponse> reg = cloud.getQueue().register(pingListener(gameServer ->
-                        serverFuture.complete(gameServer.getGameServer())), "games.server.ping");
+            cloud.getLogger().info(String.format("Requesting a ping to %s", name)); // TODO remove
+            reg.publish(new GameServerPingRequest(name));
+        } catch (IOException e) {
+            future.completeExceptionally(e);
+        }
 
-                cloud.getLogger().info(String.format("Requesting a ping to %s", name)); // TODO remove
-                reg.publish(new GameServerPingRequest(name));
-
-                return serverFuture.orTimeout(5, TimeUnit.SECONDS).join();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }).orTimeout(5, TimeUnit.SECONDS);
+        return future.orTimeout(5, TimeUnit.SECONDS);
     }
 
     @Override
     public CompletableFuture<List<GameServer>> getGameServers() {
-        final CompletableFuture<List<GameServer>> future = new CompletableFuture<>();
+        CompletableFuture<List<GameServer>> future = new CompletableFuture<>();
 
-        return future.completeAsync(() -> {
-            try {
-                CompletableFuture<List<GameServer>> serverFuture = new CompletableFuture<>();
+        try {
+            Registration<Void, GameServerLookupResponse> reg = cloud.getQueue().register(lookupListener(gameServer -> {
+                ArrayList<GameServer> gameServers = new ArrayList<>(gameServer.getGameServers());
+                future.complete(gameServers);
+            }), "games.server.lookup");
 
-                Registration<Void, GameServerLookupResponse> reg = cloud.getQueue().register(lookupListener(gameServer -> {
-                    ArrayList<GameServer> gameServers = new ArrayList<>(gameServer.getGameServers());
-                    serverFuture.complete(gameServers);
-                }), "games.server.lookup");
+            cloud.getLogger().info("Requesting a lookup"); // TODO remove
+            reg.publish(new GameServerLookupRequest());
+        } catch (IOException e) {
+            future.completeExceptionally(e);
+        }
 
-                cloud.getLogger().info("Requesting a lookup"); // TODO remove
-                reg.publish(new GameServerLookupRequest());
-
-                return serverFuture.orTimeout(5, TimeUnit.SECONDS).join();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }).orTimeout(5, TimeUnit.SECONDS);
+        return future.orTimeout(5, TimeUnit.SECONDS);
     }
 
     @Override
     public CompletableFuture<List<GameServer>> getGameServers(@NonNull String gameMode) {
-        final CompletableFuture<List<GameServer>> future = new CompletableFuture<>();
+        CompletableFuture<List<GameServer>> future = new CompletableFuture<>();
 
-        return future.completeAsync(() -> {
-            try {
-                CompletableFuture<List<GameServer>> serverFuture = new CompletableFuture<>();
+        try {
+            Registration<Void, GameServerLookupResponse> reg = cloud.getQueue().register(lookupListener(gameServer -> {
+                ArrayList<GameServer> gameServers = new ArrayList<>(gameServer.getGameServers());
+                future.complete(gameServers);
+            }), "games.server.lookup");
 
-                Registration<Void, GameServerLookupResponse> reg = cloud.getQueue().register(lookupListener(gameServer -> {
-                    ArrayList<GameServer> gameServers = new ArrayList<>(gameServer.getGameServers());
-                    serverFuture.complete(gameServers);
-                }), "games.server.lookup");
+            cloud.getLogger().info(String.format("Requesting a lookup for game servers of gamemode %s", gameMode)); // TODO remove
+            reg.publish(new GameServerLookupRequest(gameMode));
+        } catch (IOException e) {
+            future.completeExceptionally(e);
+        }
 
-                cloud.getLogger().info("Requesting a lookup"); // TODO remove
-                reg.publish(new GameServerLookupRequest(gameMode));
-
-                return serverFuture.orTimeout(5, TimeUnit.SECONDS).join();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }).orTimeout(5, TimeUnit.SECONDS);
+        return future.orTimeout(5, TimeUnit.SECONDS);
     }
+
 
     @Override
     public CompletableFuture<GameServer> getRandom(@NonNull String gameMode) {
@@ -104,7 +93,7 @@ public class PaperGameManager implements GameManager {
             }
 
             return null;
-        }).orTimeout(5, TimeUnit.SECONDS);
+        });
     }
 
     @Override
