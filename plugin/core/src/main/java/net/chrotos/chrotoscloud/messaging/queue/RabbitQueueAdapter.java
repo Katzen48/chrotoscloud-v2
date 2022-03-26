@@ -59,16 +59,14 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
         DefaultConsumer consumer = new DefaultConsumer(mqChannel) {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
-                StringBuilder stringBuilder = new StringBuilder();
-                properties.getHeaders().forEach((key, value) -> stringBuilder.append(String.format("%s:%s(%s)\n", key, value, value.getClass().getName()))); // TODO remove
-                System.out.format("Got message for channel %s with length %d and headers: %s", wantedChannel, body.length, stringBuilder); // TODO remove
-
+                String messageChannel = properties.getHeaders().get("channel").toString();
+                String sender = properties.getHeaders().get("sender").toString();
                 // Channel header does not contain this channel
-                if (!properties.getHeaders().get("channel").equals(wantedChannel)
+                if (!messageChannel.equals(wantedChannel)
                     // or this message has no object
                     || (body.length < 1)
                     // or message came from this sender
-                    || Cloud.getInstance().getHostname().equals(properties.getHeaders().get("sender"))) {
+                    || sender.equals(Cloud.getInstance().getHostname())) {
 
                     try {
                         mqChannel.basicAck(envelope.getDeliveryTag(), false);
@@ -80,8 +78,6 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
                 }
 
                 System.out.println("Processing"); // TODO remove
-
-                String sender = (String) properties.getHeaders().get("sender");
 
                 if (envelope.getExchange().equals("")) {
                     try {
