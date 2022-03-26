@@ -26,6 +26,7 @@ public class CloudPlugin {
         Cloud.setServiceClassLoader(getClass().getClassLoader());
         this.cloud = (VelocityCloud) Cloud.getInstance();
         this.cloud.setProxyServer(proxyServer);
+        this.cloud.setLogger(logger);
     }
 
     @Subscribe(async = false)

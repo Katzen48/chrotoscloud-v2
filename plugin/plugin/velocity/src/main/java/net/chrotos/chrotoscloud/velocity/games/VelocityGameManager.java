@@ -183,8 +183,10 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
                 CompletableFuture<List<GameServer>> gameServers;
 
                 if (gameMode == null) {
+                    cloud.getLogger().info("Got request from {} to lookup servers", sender); // TODO remove
                     gameServers = getGameServers();
                 } else {
+                    cloud.getLogger().info("Got request from {} to lookup servers of gamemode {}", sender, gameMode); // TODO remove
                     gameServers = getGameServers(gameMode);
                 }
 
@@ -193,6 +195,7 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
                     servers.forEach(server -> list.add((CloudGameServer) server));
 
                     try {
+                        cloud.getLogger().info("Replying"); // TODO remove
                         object.replyTo(new GameServerLookupResponse(list));
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -220,9 +223,11 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
             @Override
             public void onMessage(@NonNull Message<GameServerPingRequest> object, @NonNull String sender) {
                 String name = object.getMessage().getName();
+                cloud.getLogger().info("Got request from {} to ping server {}", sender, name); // TODO remove
 
                 getGameServer(name).thenAccept(server -> {
                     try {
+                        cloud.getLogger().info("Replying"); // TODO remove
                         object.replyTo(new GameServerPingResponse((CloudGameServer) server));
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -256,6 +261,7 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
                     return;
                 }
 
+                cloud.getLogger().info("Got request from {} to teleport player {} to server {}", sender, player.getUsername(), object.getMessage().getServerName()); // TODO remove
                 player.createConnectionRequest(server).fireAndForget();
             }
 

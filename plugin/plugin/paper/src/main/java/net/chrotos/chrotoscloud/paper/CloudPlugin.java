@@ -30,6 +30,7 @@ public class CloudPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
         cloud.load();
+        this.cloud.setLogger(getLogger());
     }
 
     @Override

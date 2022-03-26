@@ -6,6 +6,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.chrotos.chrotoscloud.CoreCloud;
 import net.chrotos.chrotoscloud.velocity.games.VelocityGameManager;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 
@@ -13,6 +14,8 @@ import java.io.IOException;
 public class VelocityCloud extends CoreCloud {
     @Setter
     private ProxyServer proxyServer;
+    @Setter
+    private Logger logger;
     private final VelocityGameManager gameManager;
 
     public VelocityCloud() {
