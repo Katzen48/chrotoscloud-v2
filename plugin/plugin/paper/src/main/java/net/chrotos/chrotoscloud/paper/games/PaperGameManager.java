@@ -2,17 +2,16 @@ package net.chrotos.chrotoscloud.paper.games;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.games.*;
-import net.chrotos.chrotoscloud.games.events.GameServerLookupRequest;
-import net.chrotos.chrotoscloud.games.events.GameServerLookupResponse;
-import net.chrotos.chrotoscloud.games.events.GameServerPingRequest;
-import net.chrotos.chrotoscloud.games.events.GameServerPingResponse;
+import net.chrotos.chrotoscloud.games.events.*;
 import net.chrotos.chrotoscloud.messaging.queue.Listener;
 import net.chrotos.chrotoscloud.messaging.queue.Message;
 import net.chrotos.chrotoscloud.messaging.queue.Registration;
 import net.chrotos.chrotoscloud.paper.PaperCloud;
 import net.chrotos.chrotoscloud.paper.games.queue.PaperLeastPlayersQueueManager;
 import net.chrotos.chrotoscloud.paper.games.queue.PaperRandomQueueManager;
+import net.chrotos.chrotoscloud.player.Player;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -106,6 +105,12 @@ public class PaperGameManager implements GameManager {
 
             return null;
         }).orTimeout(5, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void requestTeleport(@NonNull GameServer server, @NonNull Player player) {
+        cloud.getQueue().publish("player.teleport.server",
+                new PlayerTeleportToServerRequest(player.getUniqueId(), server.getName()));
     }
 
     @Override
