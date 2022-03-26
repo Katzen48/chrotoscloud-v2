@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.rabbitmq.client.*;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.CloudConfig;
 
@@ -18,7 +19,7 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
     private Gson gson;
     private ConnectionFactory factory;
     private Connection connection;
-    private Channel publishOnlyChannel;
+    private final ThreadLocal<Channel> publishOnlyChannel = new ThreadLocal<>();
 
     public void configure(CloudConfig config) {
         gson = new GsonBuilder().create();
@@ -28,7 +29,6 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
         factory.setPort(config.getQueuePort());
         factory.setUsername(config.getQueueUser());
         factory.setPassword(config.getQueuePassword());
-        factory.setAutomaticRecoveryEnabled(true);
     }
 
     public void initialize() {
@@ -38,9 +38,7 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
 
         try {
             connection = factory.newConnection();
-            publishOnlyChannel = connection.createChannel();
-
-            publishOnlyChannel.exchangeDeclare(CLOUD_EXCHANGE, "fanout", true);
+            getChannel().exchangeDeclare(CLOUD_EXCHANGE, "fanout", true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -167,7 +165,8 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
                     return false;
                 }
 
-                RabbitQueueAdapter.this.publish(mqChannel, wantedChannel, "", message);
+                boolean fastReply = getListener().getReplyClass() != null && getListener().getReplyClass() != Void.class;
+                RabbitQueueAdapter.this.publish(mqChannel, wantedChannel, "", fastReply, message);
                 return true;
             }
         };
@@ -203,7 +202,7 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
         checkConnected();
 
         try {
-            publish(publishOnlyChannel, channel, "", object);
+            publish(getChannel(), channel, "", object);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -213,10 +212,21 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
         publish(mqChannel, CLOUD_EXCHANGE, channel, routingKey, object);
     }
 
+    private <E> void publish(@NonNull Channel mqChannel, @NonNull String channel, @NonNull String routingKey, boolean fastReply,
+                             @NonNull E object) throws IOException {
+        publish(mqChannel, CLOUD_EXCHANGE, channel, routingKey, fastReply, object);
+    }
+
     private <E> void publish(@NonNull Channel mqChannel, @NonNull String exchange, @NonNull String channel,
                              @NonNull String routingKey, @NonNull E object) throws IOException {
 
-        mqChannel.basicPublish(exchange, routingKey, getAMQPProperties(channel, !exchange.isBlank()),
+        publish(mqChannel, exchange, channel, routingKey, false, object);
+    }
+
+    private <E> void publish(@NonNull Channel mqChannel, @NonNull String exchange, @NonNull String channel,
+                             @NonNull String routingKey, boolean fastReply, @NonNull E object) throws IOException {
+
+        mqChannel.basicPublish(exchange, routingKey, getAMQPProperties(channel, fastReply),
                 gson.toJson(object).getBytes(StandardCharsets.UTF_8));
     }
 
@@ -232,6 +242,15 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
                     .build();
     }
 
+    @SneakyThrows
+    private Channel getChannel() {
+        if (publishOnlyChannel.get() == null) {
+            publishOnlyChannel.set(connection.createChannel());
+        }
+
+        return publishOnlyChannel.get();
+    }
+
     private void checkConnected() {
         if (connection == null || !connection.isOpen()) {
             throw new QueueUnconnectedException();
@@ -240,7 +259,6 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
 
     @Override
     public void close() throws Exception {
-        publishOnlyChannel.close();
         connection.close();
     }
 }
