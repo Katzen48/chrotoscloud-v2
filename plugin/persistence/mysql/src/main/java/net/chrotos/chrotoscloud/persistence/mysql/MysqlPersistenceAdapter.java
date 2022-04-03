@@ -17,6 +17,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MysqlPersistenceAdapter implements PersistenceAdapter {
@@ -136,6 +137,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
             transaction.begin();
         }
 
+        final AtomicBoolean noCommit = new AtomicBoolean();
         try {
             runnable.run(new DatabaseTransaction() {
                 @Override
@@ -148,9 +150,19 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
                 public void rollback() {
                     transaction.rollback();
                 }
+
+                @Override
+                public void setSuppressCommit(boolean suppressCommit) {
+                    noCommit.set(suppressCommit);
+                }
+
+                @Override
+                public void suppressCommit() {
+                    setSuppressCommit(true);
+                }
             });
 
-            if (!insideTransaction) {
+            if (!insideTransaction && !noCommit.get()) {
                 transaction.commit();
             }
         } catch (Exception e) {

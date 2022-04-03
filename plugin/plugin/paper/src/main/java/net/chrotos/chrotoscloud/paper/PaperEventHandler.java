@@ -100,6 +100,7 @@ public class PaperEventHandler implements Listener {
         AtomicReference<PlayerInventory> inventory = new AtomicReference<>();
         cloud.getPersistence().runInTransaction(databaseTransaction -> {
             inventory.set(cloudPlayer.getInventory(cloud.getGameMode()));
+            databaseTransaction.suppressCommit();
         });
 
         if (inventory.get() != null) {
