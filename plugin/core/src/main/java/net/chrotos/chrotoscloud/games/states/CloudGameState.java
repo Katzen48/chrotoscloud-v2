@@ -44,6 +44,7 @@ public class CloudGameState implements GameState, SoftDeletable {
     private Player player;
 
     @NonNull
+    @Type(type = "text")
     private String state;
 
     @Temporal(TemporalType.TIMESTAMP)
