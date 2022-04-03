@@ -6,7 +6,6 @@ import net.chrotos.chrotoscloud.persistence.DatabaseTransaction;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 import net.chrotos.chrotoscloud.persistence.TransactionRunnable;
 import org.flywaydb.core.Flyway;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
 import org.hibernate.cfg.Configuration;
@@ -18,6 +17,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class MysqlPersistenceAdapter implements PersistenceAdapter {
     private SessionFactory sessionFactory;
@@ -170,14 +170,17 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     }
 
     @Override
-    public void merge(Object object) {
+    public <E> E merge(E object) {
         EntityManager entityManager = getEntityManager();
 
+        AtomicReference<E> managed = new AtomicReference<>();
         if (entityManager.getTransaction().isActive()) {
-            entityManager.merge(object);
+            managed.set(entityManager.merge(object));
         } else {
-            runInTransaction((databaseTransaction) -> entityManager.merge(object));
+            runInTransaction((databaseTransaction) -> managed.set(entityManager.merge(object)));
         }
+
+        return managed.get();
     }
 
     private EntityManager getEntityManager() {

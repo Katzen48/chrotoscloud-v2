@@ -14,5 +14,5 @@ public interface PersistenceAdapter {
     void removeFromContext(Object object);
     void runInTransaction(TransactionRunnable runnable);
     void refresh(Object object);
-    void merge(Object object);
+    <E> E merge(E object);
 }
