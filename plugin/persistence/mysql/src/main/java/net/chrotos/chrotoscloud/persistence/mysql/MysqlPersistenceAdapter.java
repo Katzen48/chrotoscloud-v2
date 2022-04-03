@@ -166,6 +166,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
         EntityManager entityManager = getEntityManager();
 
         if (entityManager.contains(object)) {
+            entityManager.unwrap(Session.class).evict(object);
             entityManager.refresh(object);
         }
     }
