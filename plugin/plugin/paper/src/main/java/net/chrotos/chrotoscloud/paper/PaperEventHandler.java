@@ -28,7 +28,7 @@ public class PaperEventHandler implements Listener {
     private final PaperCloud cloud;
     private final PaperChatRenderer renderer = new PaperChatRenderer();
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
 
@@ -50,7 +50,7 @@ public class PaperEventHandler implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onProfileWhitelistVerify(ProfileWhitelistVerifyEvent event) {
         if (event.getPlayerProfile().getId() == null) {
             return;
@@ -72,7 +72,7 @@ public class PaperEventHandler implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
         try {
             net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getPlayer(event.getPlayer().getUniqueId());
@@ -90,7 +90,7 @@ public class PaperEventHandler implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerChat(AsyncChatEvent event) {
         event.renderer(renderer);
     }

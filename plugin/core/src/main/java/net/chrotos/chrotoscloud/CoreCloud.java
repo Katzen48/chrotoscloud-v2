@@ -63,13 +63,14 @@ public abstract class CoreCloud extends Cloud {
 
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
-        Thread.currentThread().setContextClassLoader(getServiceClassLoader());
-        this.persistence.configure(getCloudConfig());
-
         RedisCacheAdapter redisAdapter = new RedisCacheAdapter();
         this.cache = redisAdapter;
         this.cache.configure(getCloudConfig());
         this.pubSub = redisAdapter.getPubSub();
+
+        Thread.currentThread().setContextClassLoader(getServiceClassLoader());
+        this.persistence.configure(getCloudConfig());
+
         queue.initialize();
 
         Thread.currentThread().setContextClassLoader(loader);
