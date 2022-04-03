@@ -21,7 +21,7 @@ import java.util.List;
 
 public class MysqlPersistenceAdapter implements PersistenceAdapter {
     private SessionFactory sessionFactory;
-    private ThreadLocal<EntityManager> entityManager = new ThreadLocal<>();
+    private final ThreadLocal<EntityManager> entityManagerThreaded = ThreadLocal.withInitial(this::entityManagerSupplier);
 
     @Override
     public boolean isConnected() {
@@ -49,7 +49,6 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
                     .setProperty("hibernate.connection.password", config.getPersistencePassword());
 
             dbConfig.setPhysicalNamingStrategy(new CamelCaseToUnderscoresNamingStrategy());
-
 
             sessionFactory = dbConfig.buildSessionFactory();
         } catch (Exception e) {
@@ -166,7 +165,6 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
         EntityManager entityManager = getEntityManager();
 
         if (entityManager.contains(object)) {
-            entityManager.unwrap(Session.class).evict(object);
             entityManager.refresh(object);
         }
     }
@@ -183,10 +181,19 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     }
 
     private EntityManager getEntityManager() {
-        if (entityManager.get() == null) {
-            entityManager.set(sessionFactory.createEntityManager());
+        EntityManager entityManager = entityManagerThreaded.get();
+        if (!entityManager.isOpen()) {
+            entityManagerThreaded.remove();
+
+            return getEntityManager();
         }
 
-        return entityManager.get();
+        entityManager.setFlushMode(FlushModeType.COMMIT);
+
+        return entityManager;
+    }
+
+    private EntityManager entityManagerSupplier() {
+        return sessionFactory.createEntityManager();
     }
 }
