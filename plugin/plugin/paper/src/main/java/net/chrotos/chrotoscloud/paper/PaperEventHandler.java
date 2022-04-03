@@ -21,6 +21,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 @RequiredArgsConstructor
 public class PaperEventHandler implements Listener {
@@ -96,10 +97,14 @@ public class PaperEventHandler implements Listener {
     }
 
     private void loadInventory(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, Player player) throws InvalidConfigurationException {
-        PlayerInventory inventory = cloudPlayer.getInventory(cloud.getGameMode());
-        if (inventory != null) {
+        AtomicReference<PlayerInventory> inventory = new AtomicReference<>();
+        cloud.getPersistence().runInTransaction(databaseTransaction -> {
+            inventory.set(cloudPlayer.getInventory(cloud.getGameMode()));
+        });
+
+        if (inventory.get() != null) {
             YamlConfiguration inventoryContent = new YamlConfiguration();
-            inventoryContent.loadFromString(inventory.getContent());
+            inventoryContent.loadFromString(inventory.get().getContent());
 
             ItemStack[] contents = new ItemStack[player.getInventory().getSize()];
             for (int i = 0; i < contents.length; i++) {
