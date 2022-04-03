@@ -62,6 +62,20 @@ create table game_stats (
                             index (player_unique_id, game_mode, name)
 ) engine=InnoDB;
 
+create table game_states (
+                            unique_id varchar(36) not null,
+                            name varchar(100) not null,
+                            game_mode varchar(100) not null,
+                            player_unique_id varchar(36) not null,
+                            state text not null,
+                            created_at datetime not null,
+                            updated_at datetime not null,
+                            deleted_at datetime,
+
+                            primary key (unique_id),
+                            index (player_unique_id, game_mode, name)
+) engine=InnoDB;
+
 create table player_inventories (
                             unique_id varchar(36) not null,
                             game_mode varchar(100) not null,
