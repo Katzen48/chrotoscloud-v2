@@ -4,6 +4,7 @@
         <property name="hibernate.connection.driver_class">org.mariadb.jdbc.Driver</property>
         <property name="hibernate.connection.autocommit">true</property>
         <property name="hbm2ddl.auto">validate</property>
+        <property name="hibernate.current_session_context_class">thread</property>
 
         <property name="hibernate.c3p0.min_size">5</property>
         <property name="hibernate.c3p0.max_size">10</property>

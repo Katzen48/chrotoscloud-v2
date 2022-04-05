@@ -19,11 +19,9 @@ import javax.persistence.criteria.Root;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class MysqlPersistenceAdapter implements PersistenceAdapter {
     private SessionFactory sessionFactory;
-    private final ThreadLocal<EntityManager> entityManagerThreaded = ThreadLocal.withInitial(this::entityManagerSupplier);
 
     @Override
     public boolean isConnected() {
@@ -63,12 +61,12 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
     @Override
     public <E> List<E> getAll(Class<E> clazz) {
-        EntityManager entityManager = getEntityManager();
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        Session session = getSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
         CriteriaQuery<E> cq = cb.createQuery(clazz);
         Root<E> rootEntry = cq.from(clazz);
         CriteriaQuery<E> all = cq.select(rootEntry);
-        TypedQuery<E> allQuery = entityManager.createQuery(all);
+        TypedQuery<E> allQuery = session.createQuery(all);
 
         // TODO apply order
 
@@ -89,7 +87,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
             throw new IllegalArgumentException("A primary Key Value needs to be defined");
         }
 
-        E entity = getEntityManager().find(clazz, filter.getPrimaryKeyValue());
+        E entity = getSession().find(clazz, filter.getPrimaryKeyValue());
         refresh(entity);
 
         return entity;
@@ -97,17 +95,13 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
     @Override
     public <E> void save(E entity) throws net.chrotos.chrotoscloud.persistence.EntityExistsException {
-        EntityManager entityManager = getEntityManager();
-
-        if (entityManager.contains(entity)) {
-            return;
-        }
+        Session session = getSession();
 
         try {
-            if (entityManager.getTransaction().isActive()) {
-                entityManager.persist(entity);
+            if (session.getTransaction().isActive()) {
+                session.saveOrUpdate(entity);
             } else {
-                runInTransaction((databaseTransaction) -> entityManager.persist(entity));
+                runInTransaction((databaseTransaction) -> session.saveOrUpdate(entity));
             }
         } catch (PersistenceException e) {
             if (e.getCause() instanceof ConstraintViolationException) {
@@ -120,25 +114,25 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
     @Override
     public void removeFromContext(Object object) {
-        EntityManager entityManager = getEntityManager();
+        Session session = getSession();
 
-        if (entityManager.contains(object)) {
-            entityManager.detach(object);
+        if (session.contains(object)) {
+            session.detach(object);
         }
     }
 
     @Override
     public void runInTransaction(TransactionRunnable runnable) {
-        EntityManager entityManager = getEntityManager();
+        Session session = getSession();
 
-        EntityTransaction transaction = entityManager.getTransaction();
+        EntityTransaction transaction = session.getTransaction();
         boolean insideTransaction = transaction.isActive();
 
         if (!insideTransaction) {
             transaction.begin();
         }
 
-        final AtomicBoolean noCommit = new AtomicBoolean();
+        final AtomicBoolean noCommit = new AtomicBoolean(false);
         try {
             runnable.run(new DatabaseTransaction() {
                 @Override
@@ -175,42 +169,25 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
     @Override
     public void refresh(Object object) {
-        EntityManager entityManager = getEntityManager();
+        Session session = getSession();
 
-        if (entityManager.contains(object)) {
-            entityManager.refresh(object);
+        if (session.contains(object)) {
+            session.refresh(object);
         }
     }
 
     @Override
-    public <E> E merge(E object) {
-        EntityManager entityManager = getEntityManager();
+    public void merge(Object object) {
+        Session session = getSession();
 
-        AtomicReference<E> managed = new AtomicReference<>();
-        if (entityManager.getTransaction().isActive()) {
-            managed.set(entityManager.merge(object));
+        if (session.getTransaction().isActive()) {
+            session.saveOrUpdate(object);
         } else {
-            runInTransaction((databaseTransaction) -> managed.set(entityManager.merge(object)));
+            runInTransaction((databaseTransaction) -> session.saveOrUpdate(object));
         }
-
-        return managed.get();
     }
 
-    private EntityManager getEntityManager() {
-        EntityManager entityManager = entityManagerThreaded.get();
-        Session session = entityManager.unwrap(Session.class);
-        if (!session.isOpen() || !session.isConnected()) {
-            entityManagerThreaded.remove();
-
-            return getEntityManager();
-        }
-
-        entityManager.setFlushMode(FlushModeType.COMMIT);
-
-        return entityManager;
-    }
-
-    private EntityManager entityManagerSupplier() {
-        return sessionFactory.createEntityManager();
+    private Session getSession() {
+        return sessionFactory.getCurrentSession();
     }
 }
