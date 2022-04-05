@@ -8,6 +8,7 @@ import net.chrotos.chrotoscloud.persistence.TransactionRunnable;
 import org.flywaydb.core.Flyway;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.exception.ConstraintViolationException;
@@ -62,6 +63,10 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     @Override
     public <E> List<E> getAll(Class<E> clazz) {
         Session session = getSession();
+        if (!session.getTransaction().isActive()) {
+            session.beginTransaction();
+        }
+
         CriteriaBuilder cb = session.getCriteriaBuilder();
         CriteriaQuery<E> cq = cb.createQuery(clazz);
         Root<E> rootEntry = cq.from(clazz);
@@ -87,7 +92,12 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
             throw new IllegalArgumentException("A primary Key Value needs to be defined");
         }
 
-        E entity = getSession().find(clazz, filter.getPrimaryKeyValue());
+        Session session = getSession();
+        if (!session.getTransaction().isActive()) {
+            session.beginTransaction();
+        }
+
+        E entity = session.find(clazz, filter.getPrimaryKeyValue());
         refresh(entity);
 
         return entity;
@@ -170,6 +180,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     @Override
     public void refresh(Object object) {
         Session session = getSession();
+        session.beginTransaction();
 
         if (session.contains(object)) {
             session.refresh(object);
@@ -179,6 +190,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     @Override
     public void merge(Object object) {
         Session session = getSession();
+        session.beginTransaction();
 
         if (session.getTransaction().isActive()) {
             session.saveOrUpdate(object);
