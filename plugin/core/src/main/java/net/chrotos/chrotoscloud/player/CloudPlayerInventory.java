@@ -1,6 +1,7 @@
 package net.chrotos.chrotoscloud.player;
 
 import lombok.*;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Type;
 
@@ -13,6 +14,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @DynamicUpdate
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CloudPlayerInventory implements PlayerInventory {
     @Id
     @Column(updatable = false, nullable = false)
