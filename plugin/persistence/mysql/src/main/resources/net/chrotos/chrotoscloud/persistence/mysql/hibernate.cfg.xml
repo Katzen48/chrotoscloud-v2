@@ -14,6 +14,11 @@
         <property name="hibernate.c3p0.preferredTestQuery">SELECT VERSION()</property>
         <property name="hibernate.c3p0.acquireRetryAttempts ">0</property>
 
+        <property name = "hibernate.cache.provider_class">
+            net.chrotos.chrotoscloud.persistence.mysql.cache.CloudRegionFactoryTemplate
+        </property>
+        <property name="hibernate.cache.use_second_level_cache">true</property>
+
         <mapping class="net.chrotos.chrotoscloud.player.CloudPlayer" />
         <mapping class="net.chrotos.chrotoscloud.economy.CloudTransaction" />
         <mapping class="net.chrotos.chrotoscloud.economy.CloudAccount" />
