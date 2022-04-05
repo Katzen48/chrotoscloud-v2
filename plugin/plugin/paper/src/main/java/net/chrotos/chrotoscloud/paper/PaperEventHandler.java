@@ -4,6 +4,7 @@ import com.destroystokyo.paper.event.profile.ProfileWhitelistVerifyEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.paper.chat.PaperChatRenderer;
 import net.chrotos.chrotoscloud.paper.permissions.PermissibleInjector;
 import net.chrotos.chrotoscloud.player.CloudPlayerInventory;
@@ -134,6 +135,8 @@ public class PaperEventHandler implements Listener {
             } else {
                 inventory.setContent(inventoryContent.saveToString());
             }
+
+            Cloud.getInstance().getPersistence().merge(cloudPlayer);
         });
     }
 }
