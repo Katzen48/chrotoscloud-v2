@@ -130,10 +130,9 @@ public class PaperEventHandler implements Listener {
 
             if (inventory == null) {
                 inventory = new CloudPlayerInventory(UUID.randomUUID(), cloud.getGameMode(), cloudPlayer, inventoryContent.saveToString());
-                cloud.getPersistence().save(inventory);
+                cloudPlayer.getInventories().add(inventory);
             } else {
                 inventory.setContent(inventoryContent.saveToString());
-                cloud.getPersistence().merge(inventory);
             }
         });
     }
