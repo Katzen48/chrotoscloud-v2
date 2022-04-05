@@ -8,7 +8,6 @@ import net.chrotos.chrotoscloud.persistence.TransactionRunnable;
 import org.flywaydb.core.Flyway;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.exception.ConstraintViolationException;
@@ -63,7 +62,8 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     @Override
     public <E> List<E> getAll(Class<E> clazz) {
         Session session = getSession();
-        if (!session.getTransaction().isActive()) {
+        boolean insideTransation = session.getTransaction().isActive();
+        if (!insideTransation) {
             session.beginTransaction();
         }
 
@@ -77,6 +77,10 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
         List<E> list = allQuery.getResultList();
         list.forEach(this::refresh);
+
+        if (!insideTransation) {
+            session.getTransaction().commit();
+        }
 
         return list;
     }
@@ -93,12 +97,17 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
         }
 
         Session session = getSession();
-        if (!session.getTransaction().isActive()) {
+        boolean insideTransaction = session.getTransaction().isActive();
+        if (!insideTransaction) {
             session.beginTransaction();
         }
 
         E entity = session.find(clazz, filter.getPrimaryKeyValue());
         refresh(entity);
+
+        if (!insideTransaction) {
+            session.getTransaction().commit();
+        }
 
         return entity;
     }
@@ -108,11 +117,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
         Session session = getSession();
 
         try {
-            if (session.getTransaction().isActive()) {
-                session.saveOrUpdate(entity);
-            } else {
-                runInTransaction((databaseTransaction) -> session.saveOrUpdate(entity));
-            }
+            runInTransaction((databaseTransaction) -> session.saveOrUpdate(entity));
         } catch (PersistenceException e) {
             if (e.getCause() instanceof ConstraintViolationException) {
                 throw new net.chrotos.chrotoscloud.persistence.EntityExistsException(entity);
@@ -180,23 +185,13 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     @Override
     public void refresh(Object object) {
         Session session = getSession();
-        session.beginTransaction();
-
-        if (session.contains(object)) {
-            session.refresh(object);
-        }
+        runInTransaction((databaseTransaction -> session.refresh(object)));
     }
 
     @Override
     public void merge(Object object) {
         Session session = getSession();
-        session.beginTransaction();
-
-        if (session.getTransaction().isActive()) {
-            session.saveOrUpdate(object);
-        } else {
-            runInTransaction((databaseTransaction) -> session.saveOrUpdate(object));
-        }
+        runInTransaction((databaseTransaction) -> session.saveOrUpdate(object));
     }
 
     private Session getSession() {
