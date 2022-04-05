@@ -1,6 +1,7 @@
 package net.chrotos.chrotoscloud.economy;
 
 import lombok.*;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;
@@ -15,6 +16,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @DynamicUpdate
 @Immutable
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CloudTransaction implements Transaction {
     @Id
     @NonNull
