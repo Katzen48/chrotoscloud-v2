@@ -2,8 +2,8 @@ package net.chrotos.chrotoscloud.permissions;
 
 import lombok.NonNull;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public interface Permissible {
@@ -11,7 +11,7 @@ public interface Permissible {
     boolean hasPermission(@NonNull String permission, boolean ignoreCache);
     void clearPermissionsCache();
     @NonNull
-    List<Permission> getPermissions();
+    Set<Permission> getPermissions();
     @NonNull
     UUID getUniqueId();
     @NonNull

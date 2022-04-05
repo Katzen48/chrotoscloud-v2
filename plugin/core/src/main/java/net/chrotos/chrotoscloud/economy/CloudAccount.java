@@ -2,7 +2,6 @@ package net.chrotos.chrotoscloud.economy;
 
 import lombok.*;
 import net.chrotos.chrotoscloud.Cloud;
-import net.chrotos.chrotoscloud.permissions.CloudPermission;
 import net.chrotos.chrotoscloud.persistence.SoftDeletable;
 import net.chrotos.chrotoscloud.player.CloudPlayer;
 import org.hibernate.annotations.*;
@@ -11,10 +10,7 @@ import javax.persistence.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity(name = "accounts")
 @Data
@@ -50,7 +46,7 @@ public class CloudAccount implements Account, SoftDeletable {
     private transient long lastRefreshed;
 
     @OneToMany(targetEntity = CloudTransaction.class, cascade = CascadeType.ALL, mappedBy = "account", orphanRemoval = true)
-    private List<Transaction> transactions;
+    private Set<Transaction> transactions = new HashSet<>();
 
     public CloudAccount(AccountHolder owner, AccountType accountType) {
         super();
