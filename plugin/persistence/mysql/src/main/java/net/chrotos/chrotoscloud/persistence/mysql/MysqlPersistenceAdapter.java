@@ -6,6 +6,7 @@ import net.chrotos.chrotoscloud.persistence.DatabaseTransaction;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 import net.chrotos.chrotoscloud.persistence.TransactionRunnable;
 import org.flywaydb.core.Flyway;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
 import org.hibernate.cfg.Configuration;
@@ -197,7 +198,8 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
     private EntityManager getEntityManager() {
         EntityManager entityManager = entityManagerThreaded.get();
-        if (!entityManager.isOpen()) {
+        Session session = entityManager.unwrap(Session.class);
+        if (!session.isOpen() || !session.isConnected()) {
             entityManagerThreaded.remove();
 
             return getEntityManager();
