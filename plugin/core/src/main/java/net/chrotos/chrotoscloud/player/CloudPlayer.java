@@ -77,9 +77,6 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar deletedAt = null;
 
-    @Setter(AccessLevel.PACKAGE)
-    private transient long lastRefreshed;
-
     @Override
     public Set<Account> getAccounts(AccountType type) {
         return getAccounts().stream().filter(

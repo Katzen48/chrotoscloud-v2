@@ -51,6 +51,7 @@ public class VelocityEventHandler {
         }
     }
 
+    /*
     @Subscribe(order = PostOrder.LAST)
     public void onDisconnect(DisconnectEvent event, Continuation continuation) {
         if (event.getPlayer() == null || event.getLoginStatus() != DisconnectEvent.LoginStatus.SUCCESSFUL_LOGIN) {
@@ -63,4 +64,5 @@ public class VelocityEventHandler {
             continuation.resumeWithException(e);
         }
     }
+     */
 }
