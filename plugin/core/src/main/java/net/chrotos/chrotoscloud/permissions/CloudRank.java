@@ -31,7 +31,7 @@ public class CloudRank extends CloudPermissible implements Rank, SoftDeletable {
     @NonNull
     private String name;
 
-    @OneToMany(targetEntity = CloudPermission.class, cascade = CascadeType.ALL)
+    @OneToMany(targetEntity = CloudPermission.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "permissible_unique_id")
     @Where(clause = "permissible_type='rank'")
     private List<Permission> permissions = new ArrayList<>();
@@ -45,7 +45,7 @@ public class CloudRank extends CloudPermissible implements Rank, SoftDeletable {
     private String prefix;
 
     @Setter
-    @OneToOne(cascade = CascadeType.ALL, targetEntity = CloudRank.class, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, targetEntity = CloudRank.class)
     @JoinColumn(name = "parent_unique_id")
     private Rank parent;
 

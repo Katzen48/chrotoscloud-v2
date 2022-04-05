@@ -49,7 +49,7 @@ public class CloudAccount implements Account, SoftDeletable {
     @Setter
     private transient long lastRefreshed;
 
-    @OneToMany(targetEntity = CloudTransaction.class, cascade = CascadeType.ALL, mappedBy = "account")
+    @OneToMany(targetEntity = CloudTransaction.class, cascade = CascadeType.ALL, mappedBy = "account", orphanRemoval = true)
     private List<Transaction> transactions;
 
     public CloudAccount(AccountHolder owner, AccountType accountType) {
