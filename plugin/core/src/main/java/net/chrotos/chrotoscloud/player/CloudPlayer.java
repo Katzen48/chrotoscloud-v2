@@ -42,30 +42,30 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @Setter
     private transient SidedPlayer sidedPlayer;
 
-    @OneToMany(mappedBy = "owner", targetEntity = CloudAccount.class, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "owner", targetEntity = CloudAccount.class, cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @NonNull
     private List<Account> accounts = new ArrayList<>();
 
-    @OneToMany(targetEntity = CloudPermission.class, cascade = CascadeType.ALL)
+    @OneToMany(targetEntity = CloudPermission.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "permissible_unique_id")
     @Where(clause = "permissible_type='player'")
     @NonNull
     private List<Permission> permissions = new ArrayList<>();
 
     @Setter
-    @ManyToOne(targetEntity = CloudRank.class, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = CloudRank.class)
     @JoinColumn(name = "rank_unique_id")
     private Rank rank;
 
-    @OneToMany(mappedBy = "player", targetEntity = CloudGameStatistic.class, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "player", targetEntity = CloudGameStatistic.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @NonNull
     private List<GameStatistic> stats = new ArrayList<>();
 
-    @OneToMany(mappedBy = "player", targetEntity = CloudGameState.class, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "player", targetEntity = CloudGameState.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @NonNull
     private List<GameState> states = new ArrayList<>();
 
-    @OneToMany(mappedBy = "player", targetEntity = CloudPlayerInventory.class, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "player", targetEntity = CloudPlayerInventory.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @NonNull
     private List<PlayerInventory> inventories = new ArrayList<>();
 
