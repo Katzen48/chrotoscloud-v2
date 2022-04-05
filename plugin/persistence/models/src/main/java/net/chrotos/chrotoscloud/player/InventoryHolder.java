@@ -2,13 +2,13 @@ package net.chrotos.chrotoscloud.player;
 
 import lombok.NonNull;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface InventoryHolder {
     @NonNull
     UUID getUniqueId();
     @NonNull
-    List<PlayerInventory> getInventories();
+    Set<PlayerInventory> getInventories();
     PlayerInventory getInventory(@NonNull String gameMode);
 }

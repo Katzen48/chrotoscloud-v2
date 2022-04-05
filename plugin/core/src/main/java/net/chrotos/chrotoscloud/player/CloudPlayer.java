@@ -44,13 +44,13 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
 
     @OneToMany(mappedBy = "owner", targetEntity = CloudAccount.class, cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @NonNull
-    private List<Account> accounts = new ArrayList<>();
+    private Set<Account> accounts = new HashSet<>();
 
     @OneToMany(targetEntity = CloudPermission.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "permissible_unique_id")
     @Where(clause = "permissible_type='player'")
     @NonNull
-    private List<Permission> permissions = new ArrayList<>();
+    private Set<Permission> permissions = new HashSet<>();
 
     @Setter
     @ManyToOne(targetEntity = CloudRank.class)
@@ -59,15 +59,15 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
 
     @OneToMany(mappedBy = "player", targetEntity = CloudGameStatistic.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @NonNull
-    private List<GameStatistic> stats = new ArrayList<>();
+    private Set<GameStatistic> stats = new HashSet<>();
 
     @OneToMany(mappedBy = "player", targetEntity = CloudGameState.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @NonNull
-    private List<GameState> states = new ArrayList<>();
+    private Set<GameState> states = new HashSet<>();
 
     @OneToMany(mappedBy = "player", targetEntity = CloudPlayerInventory.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @NonNull
-    private List<PlayerInventory> inventories = new ArrayList<>();
+    private Set<PlayerInventory> inventories = new HashSet<>();
 
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar createdAt = Calendar.getInstance();
@@ -81,10 +81,10 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     private transient long lastRefreshed;
 
     @Override
-    public List<Account> getAccounts(AccountType type) {
+    public Set<Account> getAccounts(AccountType type) {
         return getAccounts().stream().filter(
                 account -> account.getAccountType() == type
-        ).collect(Collectors.toList());
+        ).collect(Collectors.toSet());
     }
 
     @Override
@@ -110,17 +110,17 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
 
     @Override
     @NonNull
-    public List<GameStatistic> getStats(@NonNull String gameMode) {
+    public Set<GameStatistic> getStats(@NonNull String gameMode) {
         return getStats().stream().filter(
                 gameStatistic -> gameStatistic.getGameMode().equals(gameMode)
-        ).collect(Collectors.toList());
+        ).collect(Collectors.toSet());
     }
 
     @Override
-    public @NonNull List<GameState> getStates(@NonNull String gameMode) {
+    public @NonNull Set<GameState> getStates(@NonNull String gameMode) {
         return getStates().stream().filter(
                 gameState -> gameState.getGameMode().equals(gameMode)
-        ).collect(Collectors.toList());
+        ).collect(Collectors.toSet());
     }
 
     @Override

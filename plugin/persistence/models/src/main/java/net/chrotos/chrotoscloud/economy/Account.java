@@ -1,14 +1,14 @@
 package net.chrotos.chrotoscloud.economy;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface Account {
     UUID getUniqueId();
     AccountHolder getOwner();
     AccountType getAccountType();
-    List<Transaction> getTransactions();
+    Set<Transaction> getTransactions();
     float getBalance();
     float getBalanceLimit();
     float getCreditLimit();
