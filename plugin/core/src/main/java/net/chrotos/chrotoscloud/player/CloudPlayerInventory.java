@@ -17,8 +17,7 @@ import java.util.UUID;
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SelectBeforeUpdate
-@FilterDef(name = "inventoryGamemode", parameters = {
-        @ParamDef(name = "game_mode", type = "java.lang.String")})
+@Filter(name = "gameMode")
 public class CloudPlayerInventory implements PlayerInventory {
     @Id
     @Column(updatable = false, nullable = false)
