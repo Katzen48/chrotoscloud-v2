@@ -26,7 +26,7 @@ import java.util.UUID;
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @FilterDef(name = "statesGamemode", parameters = {
-        @ParamDef(name = "gameMode", type = "java.lang.String")})
+        @ParamDef(name = "game_mode", type = "java.lang.String")})
 public class CloudGameState implements GameState, SoftDeletable {
     @Id
     @Column(updatable = false, nullable = false)
