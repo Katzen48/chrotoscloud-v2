@@ -1,23 +1,23 @@
 package net.chrotos.chrotoscloud.persistence.mysql;
 
 import net.chrotos.chrotoscloud.CloudConfig;
-import net.chrotos.chrotoscloud.persistence.DataSelectFilter;
-import net.chrotos.chrotoscloud.persistence.DatabaseTransaction;
-import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
-import net.chrotos.chrotoscloud.persistence.TransactionRunnable;
+import net.chrotos.chrotoscloud.persistence.*;
 import org.flywaydb.core.Flyway;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.ConstraintViolationException;
 
 import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Root;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MysqlPersistenceAdapter implements PersistenceAdapter {
@@ -62,6 +62,11 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
     @Override
     public <E> List<E> getAll(Class<E> clazz) {
+        return getAll(clazz, DataSelectFilter.builder().build());
+    }
+
+    @Override
+    public <E> List<E> getAll(Class<E> clazz, DataSelectFilter filter) {
         Session session = getSession();
         boolean insideTransation = session.getTransaction().isActive();
         if (!insideTransation) {
@@ -72,23 +77,31 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
         CriteriaQuery<E> cq = cb.createQuery(clazz);
         Root<E> rootEntry = cq.from(clazz);
         CriteriaQuery<E> all = cq.select(rootEntry);
+
+        for (Map.Entry<String, Object> entry : filter.getColumnFilters().entrySet()) {
+            all = all.where(cb.equal(rootEntry.get(entry.getKey()), entry.getValue()));
+        }
+
+        if (filter.getOrderKey() != null) {
+            Order order;
+            if (filter.getOrdering() == Ordering.ASCENDING) {
+                order = cb.asc(rootEntry.get(filter.getOrderKey()));
+            } else {
+                order = cb.desc(rootEntry.get(filter.getOrderKey()));
+            }
+
+            all = all.orderBy(order);
+        }
+
         TypedQuery<E> allQuery = session.createQuery(all);
 
-        // TODO apply order
-
         List<E> list = allQuery.getResultList();
-        list.forEach(this::refresh);
 
         if (!insideTransation) {
             session.getTransaction().commit();
         }
 
         return list;
-    }
-
-    @Override
-    public <E> List<E> getAll(Class<E> clazz, DataSelectFilter filter) {
-        return Collections.emptyList(); // TODO
     }
 
     @Override
@@ -104,7 +117,10 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
         }
 
         E entity = session.find(clazz, filter.getPrimaryKeyValue());
-        refresh(entity);
+
+        if (entity != null) {
+            refresh(entity);
+        }
 
         if (!insideTransaction) {
             session.getTransaction().commit();
