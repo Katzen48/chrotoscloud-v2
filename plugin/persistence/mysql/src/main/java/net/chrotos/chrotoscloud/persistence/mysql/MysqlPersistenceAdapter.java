@@ -145,6 +145,8 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
         Session session = getSession();
         Filter filter = session.enableFilter(predefinedFilter);
 
+        parameters.forEach(filter::setParameter);
+
         E result;
         try {
             result = supplier.get();
