@@ -3,11 +3,11 @@ package net.chrotos.chrotoscloud.persistence.mysql;
 import net.chrotos.chrotoscloud.CloudConfig;
 import net.chrotos.chrotoscloud.persistence.*;
 import org.flywaydb.core.Flyway;
+import org.hibernate.Filter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.ConstraintViolationException;
 
 import javax.persistence.*;
@@ -96,6 +96,35 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
         TypedQuery<E> allQuery = session.createQuery(all);
 
         List<E> list = allQuery.getResultList();
+
+        if (!insideTransation) {
+            session.getTransaction().commit();
+        }
+
+        return list;
+    }
+
+    @Override
+    public <E> List<E> getFiltered(Class<E> clazz, String predefinedFilter, Map<String, Object> parameters) {
+        Session session = getSession();
+        boolean insideTransation = session.getTransaction().isActive();
+        if (!insideTransation) {
+            session.beginTransaction();
+        }
+
+        List<E> list;
+
+        Filter filter = session.enableFilter(predefinedFilter);
+
+        try {
+            parameters.forEach(filter::setParameter);
+            list = getAll(clazz);
+        } catch (Exception e) {
+            e.printStackTrace();
+            list = Collections.emptyList();
+        }
+
+        session.disableFilter(predefinedFilter);
 
         if (!insideTransation) {
             session.getTransaction().commit();

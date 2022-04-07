@@ -2,6 +2,7 @@ package net.chrotos.chrotoscloud.games.states;
 
 import lombok.NonNull;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
@@ -11,5 +12,5 @@ public interface StateHolder {
     @NonNull
     Set<GameState> getStates();
     @NonNull
-    Set<GameState> getStates(@NonNull String gameMode);
+    Collection<? extends GameState> getStates(@NonNull String gameMode);
 }

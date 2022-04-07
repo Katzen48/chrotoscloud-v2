@@ -20,6 +20,8 @@ import java.util.UUID;
 @SelectBeforeUpdate
 @SQLDelete(sql = "UPDATE game_stats SET deleted_at=now() WHERE unique_id = ?")
 @Where(clause = "deleted_at IS NUlL")
+@FilterDef(name = "statsGamemode", parameters = {
+        @ParamDef(name = "gameMode", type = "java.lang.String")})
 public class CloudGameStatistic implements GameStatistic, SoftDeletable {
     @Id
     @Column(updatable = false, nullable = false)
