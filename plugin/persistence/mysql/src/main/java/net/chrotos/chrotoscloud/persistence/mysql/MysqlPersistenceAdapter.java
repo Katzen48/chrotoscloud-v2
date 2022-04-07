@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MysqlPersistenceAdapter implements PersistenceAdapter {
     private SessionFactory sessionFactory;
+    private final ThreadLocal<Session> sessionThreadLocal = ThreadLocal.withInitial(this::supplySession);
 
     @Override
     public boolean isConnected() {
@@ -195,6 +196,17 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     }
 
     private Session getSession() {
-        return sessionFactory.getCurrentSession();
+        Session session = sessionThreadLocal.get();
+
+        if (!session.isOpen() || !session.isConnected()) {
+            sessionThreadLocal.remove();
+            return getSession();
+        }
+
+        return session;
+    }
+
+    private Session supplySession() {
+        return sessionFactory.openSession();
     }
 }

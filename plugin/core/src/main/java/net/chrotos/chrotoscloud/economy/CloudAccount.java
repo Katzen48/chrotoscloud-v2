@@ -18,6 +18,7 @@ import java.util.*;
 @DynamicUpdate
 @SQLDelete(sql = "UPDATE accounts SET deleted_at=now() WHERE unique_id = ?")
 @Where(clause = "deleted_at IS NUlL")
+@SelectBeforeUpdate
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CloudAccount implements Account, SoftDeletable {

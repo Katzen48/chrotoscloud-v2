@@ -14,16 +14,8 @@ public class CloudPlayerManager implements PlayerManager {
 
     @Override
     public Player getPlayer(@NonNull UUID uniqueId) {
-        CloudPlayer player = cloud.getPersistence().getOne(CloudPlayer.class, DataSelectFilter.builder()
-                                                                                .primaryKeyValue(uniqueId).build());
-
-        //if (player != null &&
-        //       player.getLastRefreshed() > 0 && (System.currentTimeMillis() - player.getLastRefreshed()) > 60000) {
-        //    cloud.getPersistence().merge(player);
-        //    player.setLastRefreshed(System.currentTimeMillis());
-        //}
-
-        return player;
+        return cloud.getPersistence().getOne(CloudPlayer.class, DataSelectFilter.builder()
+                .primaryKeyValue(uniqueId).build());
     }
 
     @Override
@@ -63,7 +55,7 @@ public class CloudPlayerManager implements PlayerManager {
 
     @Override
     public void logoutPlayer(@NonNull Player player) {
-        cloud.getPersistence().merge(player);
+        cloud.getPersistence().save(player);
         cloud.getPersistence().removeFromContext(player);
     }
 
