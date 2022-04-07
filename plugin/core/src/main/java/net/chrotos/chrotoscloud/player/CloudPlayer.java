@@ -89,7 +89,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @Override
     public Account getAccount(UUID uniqueId) {
         return Cloud.getInstance().getPersistence()
-                .getFiltered(CloudAccount.class, "accountUuid", Collections.singletonMap("uniqueid", uniqueId),
+                .getFiltered(CloudAccount.class, "uniqueId", Collections.singletonMap("uniqueid", uniqueId),
                         DataSelectFilter.builder().columnFilters(Collections.singletonMap("ownerUniqueId", getUniqueId()))
                                 .build())
                 .stream().findFirst().orElse(null);
@@ -113,7 +113,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @NonNull
     public Collection<? extends GameStatistic> getStats(@NonNull String gameMode) {
         return Cloud.getInstance().getPersistence()
-                .getFiltered(CloudGameStatistic.class, "statsGamemode",
+                .getFiltered(CloudGameStatistic.class, "gameMode",
                         Collections.singletonMap("gameMode", gameMode),
                         DataSelectFilter.builder().columnFilters(Collections.singletonMap("playerUniqueId", getUniqueId()))
                                 .build());
@@ -123,7 +123,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @NonNull
     public Collection<? extends GameState> getStates(@NonNull String gameMode) {
         return Cloud.getInstance().getPersistence()
-                .getFiltered(CloudGameState.class, "statesGamemode",
+                .getFiltered(CloudGameState.class, "gameMode",
                         Collections.singletonMap("gameMode", gameMode),
                         DataSelectFilter.builder().columnFilters(Collections.singletonMap("playerUniqueId", getUniqueId()))
                                 .build());
@@ -132,7 +132,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @Override
     public PlayerInventory getInventory(@NonNull String gameMode) {
         return Cloud.getInstance().getPersistence()
-                .getFiltered(CloudPlayerInventory.class, "inventoryGamemode",
+                .getFiltered(CloudPlayerInventory.class, "gameMode",
                         Collections.singletonMap("gameMode", gameMode),
                         DataSelectFilter.builder().columnFilters(Collections.singletonMap("playerUniqueId", getUniqueId()))
                                 .build())
