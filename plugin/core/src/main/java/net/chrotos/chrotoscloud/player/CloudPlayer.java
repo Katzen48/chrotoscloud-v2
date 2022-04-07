@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 @Where(clause = "deleted_at IS NUlL")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@SelectBeforeUpdate
 public class CloudPlayer extends CloudPermissible implements Player, SoftDeletable {
     @Id
     @Column(updatable = false, nullable = false)
@@ -42,7 +43,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @Setter
     private transient SidedPlayer sidedPlayer;
 
-    @OneToMany(mappedBy = "owner", targetEntity = CloudAccount.class, cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "owner", targetEntity = CloudAccount.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @NonNull
     private Set<Account> accounts = new HashSet<>();
 

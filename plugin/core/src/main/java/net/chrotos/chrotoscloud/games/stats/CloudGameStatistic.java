@@ -4,12 +4,11 @@ import lombok.*;
 import net.chrotos.chrotoscloud.persistence.SoftDeletable;
 import net.chrotos.chrotoscloud.player.CloudPlayer;
 import net.chrotos.chrotoscloud.player.Player;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
 import java.util.Calendar;
 import java.util.UUID;
 
@@ -18,6 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @DynamicUpdate
+@SelectBeforeUpdate
 @SQLDelete(sql = "UPDATE game_stats SET deleted_at=now() WHERE unique_id = ?")
 @Where(clause = "deleted_at IS NUlL")
 public class CloudGameStatistic implements GameStatistic, SoftDeletable {

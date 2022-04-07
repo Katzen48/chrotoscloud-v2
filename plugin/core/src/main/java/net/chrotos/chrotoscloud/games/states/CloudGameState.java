@@ -22,6 +22,7 @@ import java.util.UUID;
 @DynamicUpdate
 @SQLDelete(sql = "UPDATE game_states SET deleted_at=now() WHERE unique_id = ?")
 @Where(clause = "deleted_at IS NUlL")
+@SelectBeforeUpdate
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CloudGameState implements GameState, SoftDeletable {

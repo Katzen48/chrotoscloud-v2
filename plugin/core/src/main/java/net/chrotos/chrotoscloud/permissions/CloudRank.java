@@ -18,6 +18,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @DynamicUpdate
 @SQLDelete(sql = "UPDATE ranks SET deleted_at=now() WHERE unique_id = ?")
+@Immutable
 @Where(clause = "deleted_at IS NUlL")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
