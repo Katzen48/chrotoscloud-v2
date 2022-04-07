@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 public class MysqlPersistenceAdapter implements PersistenceAdapter {
     private SessionFactory sessionFactory;
@@ -137,6 +138,23 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
         }
 
         return list;
+    }
+
+    @Override
+    public <E> E executeFiltered(String predefinedFilter, Map<String, Object> parameters, Supplier<E> supplier) {
+        Session session = getSession();
+        Filter filter = session.enableFilter(predefinedFilter);
+
+        E result;
+        try {
+            result = supplier.get();
+        } catch (Exception e) {
+            session.disableFilter(predefinedFilter);
+            throw e;
+        }
+        session.disableFilter(predefinedFilter);
+
+        return result;
     }
 
     @Override
