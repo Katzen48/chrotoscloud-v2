@@ -44,6 +44,8 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     private transient SidedPlayer sidedPlayer;
 
     @OneToMany(mappedBy = "owner", targetEntity = CloudAccount.class, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Filter(name = "accountType")
+    @Filter(name = "uniqueId")
     @NonNull
     private Set<Account> accounts = new HashSet<>();
 
@@ -59,14 +61,17 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     private Rank rank;
 
     @OneToMany(mappedBy = "player", targetEntity = CloudGameStatistic.class, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Filter(name = "gameMode")
     @NonNull
     private Set<GameStatistic> stats = new HashSet<>();
 
     @OneToMany(mappedBy = "player", targetEntity = CloudGameState.class, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Filter(name = "gameMode")
     @NonNull
     private Set<GameState> states = new HashSet<>();
 
     @OneToMany(mappedBy = "player", targetEntity = CloudPlayerInventory.class, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Filter(name = "gameMode")
     @NonNull
     private Set<PlayerInventory> inventories = new HashSet<>();
 
@@ -79,19 +84,16 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     private Calendar deletedAt = null;
 
     @Override
-    public Collection<? extends Account> getAccounts(AccountType type) {
+    public Collection<Account> getAccounts(AccountType type) {
         return Cloud.getInstance().getPersistence()
-                .getFiltered(CloudAccount.class, "accountType", Collections.singletonMap("type", type),
-                        DataSelectFilter.builder().columnFilters(Collections.singletonMap("ownerUniqueId", getUniqueId()))
-                                .build());
+                .executeFiltered("accountType", Collections.singletonMap("type", type), this::getAccounts);
     }
 
     @Override
     public Account getAccount(UUID uniqueId) {
         return Cloud.getInstance().getPersistence()
-                .getFiltered(CloudAccount.class, "uniqueId", Collections.singletonMap("uniqueid", uniqueId),
-                        DataSelectFilter.builder().columnFilters(Collections.singletonMap("ownerUniqueId", getUniqueId()))
-                                .build())
+                .executeFiltered("uniqueId", Collections.singletonMap("uniqueid", uniqueId),
+                        this::getAccounts)
                 .stream().findFirst().orElse(null);
     }
 
@@ -113,29 +115,24 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @NonNull
     public Collection<? extends GameStatistic> getStats(@NonNull String gameMode) {
         return Cloud.getInstance().getPersistence()
-                .getFiltered(CloudGameStatistic.class, "gameMode",
-                        Collections.singletonMap("gameMode", gameMode),
-                        DataSelectFilter.builder().columnFilters(Collections.singletonMap("playerUniqueId", getUniqueId()))
-                                .build());
+                .executeFiltered("gameMode",
+                        Collections.singletonMap("gameMode", gameMode), this::getStats);
     }
 
     @Override
     @NonNull
     public Collection<? extends GameState> getStates(@NonNull String gameMode) {
         return Cloud.getInstance().getPersistence()
-                .getFiltered(CloudGameState.class, "gameMode",
-                        Collections.singletonMap("gameMode", gameMode),
-                        DataSelectFilter.builder().columnFilters(Collections.singletonMap("playerUniqueId", getUniqueId()))
-                                .build());
+                .executeFiltered("gameMode",
+                        Collections.singletonMap("gameMode", gameMode), this::getStates);
     }
 
     @Override
     public PlayerInventory getInventory(@NonNull String gameMode) {
         return Cloud.getInstance().getPersistence()
-                .getFiltered(CloudPlayerInventory.class, "gameMode",
+                .executeFiltered("gameMode",
                         Collections.singletonMap("gameMode", gameMode),
-                        DataSelectFilter.builder().columnFilters(Collections.singletonMap("playerUniqueId", getUniqueId()))
-                                .build())
+                        this::getInventories)
                 .stream().findFirst().orElse(null);
     }
 }
