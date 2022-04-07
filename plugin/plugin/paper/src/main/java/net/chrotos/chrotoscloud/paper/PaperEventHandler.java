@@ -36,7 +36,7 @@ public class PaperEventHandler implements Listener {
         cloud.getPersistence().runInTransaction(databaseTransaction -> {
             try {
                 net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getOrCreatePlayer(new PaperSidedPlayer(player));
-                PermissibleInjector.inject(player, cloud);
+                PermissibleInjector.inject(player, cloudPlayer);
 
                 player.sendOpLevel(player.hasPermission("minecraft.command.op") ? opLevel : (byte) 0);
 
