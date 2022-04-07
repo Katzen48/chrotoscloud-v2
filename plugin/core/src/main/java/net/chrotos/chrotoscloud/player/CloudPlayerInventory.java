@@ -1,12 +1,11 @@
 package net.chrotos.chrotoscloud.player;
 
 import lombok.*;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.SelectBeforeUpdate;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
 import java.util.Calendar;
 import java.util.UUID;
 
@@ -18,6 +17,8 @@ import java.util.UUID;
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SelectBeforeUpdate
+@FilterDef(name = "inventoryGamemode", parameters = {
+        @ParamDef(name = "gameMode", type = "java.lang.String")})
 public class CloudPlayerInventory implements PlayerInventory {
     @Id
     @Column(updatable = false, nullable = false)

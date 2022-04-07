@@ -21,6 +21,10 @@ import java.util.*;
 @SelectBeforeUpdate
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@FilterDef(name = "accountType", parameters = {
+        @ParamDef(name = "accountType", type = "net.chrotos.chrotoscloud.economy.AccountType")})
+@FilterDef(name = "accountUuid", parameters = {
+        @ParamDef(name = "uniqueId", type = "java.util.UUID")})
 public class CloudAccount implements Account, SoftDeletable {
     @EmbeddedId
     private AccountKey key;

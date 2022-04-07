@@ -18,7 +18,6 @@ import javax.persistence.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Entity(name = "players")
 @Getter
@@ -79,17 +78,16 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     private Calendar deletedAt = null;
 
     @Override
-    public Set<Account> getAccounts(AccountType type) {
-        return getAccounts().stream().filter(
-                account -> account.getAccountType() == type
-        ).collect(Collectors.toSet());
+    public Collection<? extends Account> getAccounts(AccountType type) {
+        return Cloud.getInstance().getPersistence()
+                .getFiltered(CloudAccount.class, "accountType", Collections.singletonMap("type", type));
     }
 
     @Override
     public Account getAccount(UUID uniqueId) {
-        return getAccounts().stream().filter(
-                account -> account.getUniqueId().equals(uniqueId)
-        ).findFirst().orElse(null);
+        return Cloud.getInstance().getPersistence()
+                .getFiltered(CloudAccount.class, "accountUuid", Collections.singletonMap("uniqueid", uniqueId))
+                .stream().findFirst().orElse(null);
     }
 
     @Override
@@ -108,23 +106,25 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
 
     @Override
     @NonNull
-    public Set<GameStatistic> getStats(@NonNull String gameMode) {
-        return getStats().stream().filter(
-                gameStatistic -> gameStatistic.getGameMode().equals(gameMode)
-        ).collect(Collectors.toSet());
+    public Collection<? extends GameStatistic> getStats(@NonNull String gameMode) {
+        return Cloud.getInstance().getPersistence()
+                .getFiltered(CloudGameStatistic.class, "statsGamemode",
+                        Collections.singletonMap("gameMode", gameMode));
     }
 
     @Override
-    public @NonNull Set<GameState> getStates(@NonNull String gameMode) {
-        return getStates().stream().filter(
-                gameState -> gameState.getGameMode().equals(gameMode)
-        ).collect(Collectors.toSet());
+    @NonNull
+    public Collection<? extends GameState> getStates(@NonNull String gameMode) {
+        return Cloud.getInstance().getPersistence()
+                .getFiltered(CloudGameState.class, "statesGamemode",
+                        Collections.singletonMap("gameMode", gameMode));
     }
 
     @Override
     public PlayerInventory getInventory(@NonNull String gameMode) {
-        return getInventories().stream().filter(
-                playerInventory -> playerInventory.getGameMode().equals(gameMode)
-        ).findFirst().orElse(null);
+        return Cloud.getInstance().getPersistence()
+                .getFiltered(CloudPlayerInventory.class, "inventoryGamemode",
+                        Collections.singletonMap("gameMode", gameMode))
+                .stream().findFirst().orElse(null);
     }
 }

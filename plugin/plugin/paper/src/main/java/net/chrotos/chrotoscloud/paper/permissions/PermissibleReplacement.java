@@ -13,19 +13,17 @@ import java.util.Collections;
 import java.util.Set;
 
 public class PermissibleReplacement extends PermissibleBase {
-    private final Player player;
-    private final PaperCloud cloud;
+    private final net.chrotos.chrotoscloud.player.Player cloudPlayer;
 
-    public PermissibleReplacement(@Nullable ServerOperator opable, @NonNull Player player, @NonNull PaperCloud cloud) {
+    public PermissibleReplacement(@Nullable ServerOperator opable, @NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer) {
         super(opable);
 
-        this.player = player;
-        this.cloud = cloud;
+        this.cloudPlayer = cloudPlayer;
     }
 
     @Override
     public boolean hasPermission(@NotNull String inName) {
-        return cloud.getPlayerManager().getPlayer(player.getUniqueId()).hasPermission(inName);
+        return cloudPlayer.hasPermission(inName);
     }
 
     @Override
@@ -45,8 +43,8 @@ public class PermissibleReplacement extends PermissibleBase {
 
     @Override
     public synchronized void recalculatePermissions() {
-        if (cloud != null) {
-            cloud.getPlayerManager().getPlayer(player.getUniqueId()).clearPermissionsCache();
+        if (cloudPlayer != null) {
+            cloudPlayer.clearPermissionsCache();
         }
     }
 }

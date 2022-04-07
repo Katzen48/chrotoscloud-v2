@@ -1,5 +1,6 @@
 package net.chrotos.chrotoscloud.paper.permissions;
 
+import lombok.NonNull;
 import net.chrotos.chrotoscloud.paper.PaperCloud;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -12,10 +13,10 @@ public class PermissibleInjector {
     private static final Field HUMAN_ENTITY_PERMISSIBLE_FIELD;
     private static final Field PERMISSIBLE_BASE_OPABLE_FIELD;
 
-    public static void inject(Player player, PaperCloud cloud) throws ReflectiveOperationException {
+    public static void inject(@NonNull Player player, @NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer) throws ReflectiveOperationException {
         PermissibleBase oldPermissible = (PermissibleBase) HUMAN_ENTITY_PERMISSIBLE_FIELD.get(player);
         ServerOperator opable = (ServerOperator) PERMISSIBLE_BASE_OPABLE_FIELD.get(oldPermissible);
-        HUMAN_ENTITY_PERMISSIBLE_FIELD.set(player, new PermissibleReplacement(opable, player, cloud));
+        HUMAN_ENTITY_PERMISSIBLE_FIELD.set(player, new PermissibleReplacement(opable, cloudPlayer));
     }
 
     static {
