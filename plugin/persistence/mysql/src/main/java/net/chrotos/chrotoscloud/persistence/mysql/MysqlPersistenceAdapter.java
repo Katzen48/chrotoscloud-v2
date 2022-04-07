@@ -106,6 +106,12 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
     @Override
     public <E> List<E> getFiltered(Class<E> clazz, String predefinedFilter, Map<String, Object> parameters) {
+        return getFiltered(clazz, predefinedFilter, parameters, DataSelectFilter.builder().build());
+    }
+
+    @Override
+    public <E> List<E> getFiltered(Class<E> clazz, String predefinedFilter, Map<String, Object> parameters,
+                                   DataSelectFilter dataSelectFilter) {
         Session session = getSession();
         boolean insideTransation = session.getTransaction().isActive();
         if (!insideTransation) {
@@ -118,7 +124,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
         try {
             parameters.forEach(filter::setParameter);
-            list = getAll(clazz);
+            list = getAll(clazz, dataSelectFilter);
         } catch (Exception e) {
             e.printStackTrace();
             list = Collections.emptyList();
