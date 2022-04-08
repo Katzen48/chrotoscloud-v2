@@ -19,8 +19,6 @@ import java.util.*;
 @SQLDelete(sql = "UPDATE accounts SET deleted_at=now() WHERE unique_id = ?")
 @Where(clause = "deleted_at IS NUlL")
 @SelectBeforeUpdate
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Filter(name = "accountType")
 @Filter(name = "uniqueId")
 public class CloudAccount implements Account, SoftDeletable {

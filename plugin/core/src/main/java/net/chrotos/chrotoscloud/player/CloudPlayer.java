@@ -27,8 +27,6 @@ import java.util.*;
 @DynamicUpdate
 @SQLDelete(sql = "UPDATE players SET deleted_at=now() WHERE unique_id = ?")
 @Where(clause = "deleted_at IS NUlL")
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SelectBeforeUpdate
 public class CloudPlayer extends CloudPermissible implements Player, SoftDeletable {
     @Id
@@ -86,15 +84,15 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @Override
     public Collection<Account> getAccounts(AccountType type) {
         return Cloud.getInstance().getPersistence()
-                .executeFiltered("accountType", Collections.singletonMap("type", type), this::getAccounts);
+                .executeFiltered("accountType", Collections.singletonMap("type", type),
+                        () -> getAccounts().stream().toList());
     }
 
     @Override
     public Account getAccount(UUID uniqueId) {
         return Cloud.getInstance().getPersistence()
                 .executeFiltered("uniqueId", Collections.singletonMap("uniqueid", uniqueId),
-                        this::getAccounts)
-                .stream().findFirst().orElse(null);
+                        () -> getAccounts().stream().findFirst().orElse(null));
     }
 
     @Override
@@ -116,7 +114,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     public Collection<? extends GameStatistic> getStats(@NonNull String gameMode) {
         return Cloud.getInstance().getPersistence()
                 .executeFiltered("gameMode",
-                        Collections.singletonMap("gameMode", gameMode), this::getStats);
+                        Collections.singletonMap("gameMode", gameMode), () -> getStats().stream().toList());
     }
 
     @Override
@@ -124,7 +122,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     public Collection<? extends GameState> getStates(@NonNull String gameMode) {
         return Cloud.getInstance().getPersistence()
                 .executeFiltered("gameMode",
-                        Collections.singletonMap("gameMode", gameMode), this::getStates);
+                        Collections.singletonMap("gameMode", gameMode), () -> getStates().stream().toList());
     }
 
     @Override
@@ -132,7 +130,6 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
         return Cloud.getInstance().getPersistence()
                 .executeFiltered("gameMode",
                         Collections.singletonMap("gameMode", gameMode),
-                        this::getInventories)
-                .stream().findFirst().orElse(null);
+                        () -> getInventories().stream().findFirst().orElse(null));
     }
 }

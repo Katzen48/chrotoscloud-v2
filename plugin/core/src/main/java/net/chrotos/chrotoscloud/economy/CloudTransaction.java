@@ -16,8 +16,6 @@ import java.util.UUID;
 @DynamicUpdate
 @Immutable
 @SelectBeforeUpdate
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CloudTransaction implements Transaction {
     @Id
     @NonNull

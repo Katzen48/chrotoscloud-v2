@@ -14,8 +14,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @DynamicUpdate
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SelectBeforeUpdate
 @Filter(name = "gameMode")
 public class CloudPlayerInventory implements PlayerInventory {
