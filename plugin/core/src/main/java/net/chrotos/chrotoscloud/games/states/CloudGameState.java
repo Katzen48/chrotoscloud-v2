@@ -23,8 +23,6 @@ import java.util.UUID;
 @SQLDelete(sql = "UPDATE game_states SET deleted_at=now() WHERE unique_id = ?")
 @Where(clause = "deleted_at IS NUlL")
 @SelectBeforeUpdate
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Filter(name = "gameMode")
 public class CloudGameState implements GameState, SoftDeletable {
     @Id
