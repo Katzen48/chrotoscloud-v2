@@ -48,7 +48,7 @@ public class PaperEventHandler implements Listener {
             } catch (Exception e) {
                 e.printStackTrace();
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("An error occured!")); // TODO: Translate
-                //cloud.getPlayerManager().logoutPlayer(event.getPlayer().getUniqueId());
+                cloud.getPlayerManager().logoutPlayer(event.getPlayer().getUniqueId());
             }
         });
     }
@@ -71,7 +71,7 @@ public class PaperEventHandler implements Listener {
             e.printStackTrace();
             event.setWhitelisted(false);
             event.kickMessage(Component.text("An error occured!")); // TODO: Translate
-            //cloud.getPlayerManager().logoutPlayer(event.getPlayerProfile().getId());
+            cloud.getPlayerManager().logoutPlayer(event.getPlayerProfile().getId());
         }
     }
 
@@ -88,7 +88,7 @@ public class PaperEventHandler implements Listener {
                     saveInventory(cloudPlayer, event.getPlayer());
                 }
 
-                //cloud.getPlayerManager().logoutPlayer(cloudPlayer);
+                cloud.getPlayerManager().logoutPlayer(cloudPlayer);
             } catch (Exception e) {
                 e.printStackTrace();
             }
