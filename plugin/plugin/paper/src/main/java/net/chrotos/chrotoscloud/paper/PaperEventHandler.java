@@ -77,15 +77,24 @@ public class PaperEventHandler implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
+        onPlayerLeave(event.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerChat(AsyncChatEvent event) {
+        event.renderer(renderer);
+    }
+
+    protected void onPlayerLeave(@NonNull Player player) {
         cloud.getPersistence().runInTransaction(databaseTransaction -> {
             try {
-                net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getPlayer(event.getPlayer().getUniqueId());
+                net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getPlayer(player.getUniqueId());
                 if (cloudPlayer == null) {
                     return;
                 }
 
                 if (cloud.isInventorySavingEnabled()) {
-                    saveInventory(cloudPlayer, event.getPlayer());
+                    saveInventory(cloudPlayer, player);
                 }
 
                 cloud.getPlayerManager().logoutPlayer(cloudPlayer);
@@ -93,11 +102,6 @@ public class PaperEventHandler implements Listener {
                 e.printStackTrace();
             }
         });
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerChat(AsyncChatEvent event) {
-        event.renderer(renderer);
     }
 
     private void loadInventory(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, Player player) throws InvalidConfigurationException {

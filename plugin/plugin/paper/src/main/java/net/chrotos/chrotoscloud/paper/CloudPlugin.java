@@ -1,6 +1,7 @@
 package net.chrotos.chrotoscloud.paper;
 
 import net.chrotos.chrotoscloud.Cloud;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.plugin.PluginLoadOrder;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -21,6 +22,7 @@ import java.util.Properties;
 @ApiVersion(ApiVersion.Target.v1_18)
 public class CloudPlugin extends JavaPlugin {
     private final PaperCloud cloud;
+    private PaperEventHandler eventHandler;
 
     public CloudPlugin() {
         Cloud.setServiceClassLoader(getClassLoader());
@@ -48,9 +50,15 @@ public class CloudPlugin extends JavaPlugin {
             e.printStackTrace();
         }
 
-        getServer().getPluginManager().registerEvents(new PaperEventHandler(opLevel, cloud), this);
+        eventHandler = new PaperEventHandler(opLevel, cloud);
+        getServer().getPluginManager().registerEvents(eventHandler, this);
 
         tryUnregisterReloadCommands();
+    }
+
+    @Override
+    public void onDisable() {
+        Bukkit.getOnlinePlayers().forEach(eventHandler::onPlayerLeave);
     }
 
     private void tryUnregisterReloadCommands() {
