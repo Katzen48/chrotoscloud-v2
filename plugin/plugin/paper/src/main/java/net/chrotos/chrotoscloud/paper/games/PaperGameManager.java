@@ -2,7 +2,6 @@ package net.chrotos.chrotoscloud.paper.games;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.games.*;
 import net.chrotos.chrotoscloud.games.events.*;
 import net.chrotos.chrotoscloud.messaging.queue.Listener;
@@ -10,6 +9,7 @@ import net.chrotos.chrotoscloud.messaging.queue.Message;
 import net.chrotos.chrotoscloud.messaging.queue.Registration;
 import net.chrotos.chrotoscloud.paper.PaperCloud;
 import net.chrotos.chrotoscloud.paper.games.queue.PaperLeastPlayersQueueManager;
+import net.chrotos.chrotoscloud.paper.games.queue.PaperMostPlayersQueueManager;
 import net.chrotos.chrotoscloud.paper.games.queue.PaperRandomQueueManager;
 import net.chrotos.chrotoscloud.player.Player;
 
@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -105,7 +104,7 @@ public class PaperGameManager implements GameManager {
     public CompletableFuture<GameServer> getRandom(@NonNull String gameMode) {
         return getGameServers(gameMode).thenApply(gameServers -> {
             List<GameServer> servers = gameServers.stream()
-                    .filter(server -> server.getMaxPlayers() == 0 || server.getPlayerCount() < server.getMaxPlayers())
+                    .filter(server -> server.getMaxPlayers() == 0 || server.getPlayerCount() < server.getMaxPlayers() - 2)
                     .collect(Collectors.toList());
 
             if (servers.size() > 0) {
@@ -127,6 +126,7 @@ public class PaperGameManager implements GameManager {
         return switch (queueMode) {
             case RANDOM -> new PaperRandomQueueManager(gameMode, this);
             case LEAST_PLAYERS -> new PaperLeastPlayersQueueManager(gameMode, this);
+            case MOST_PLAYERS -> new PaperMostPlayersQueueManager(gameMode, this);
             default -> throw new IllegalArgumentException("Not implemented");
         };
     }

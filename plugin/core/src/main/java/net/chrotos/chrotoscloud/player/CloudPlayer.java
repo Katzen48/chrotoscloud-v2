@@ -73,13 +73,13 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @NonNull
     private Set<PlayerInventory> inventories = new HashSet<>();
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Calendar createdAt = Calendar.getInstance();
+    @CreationTimestamp
+    private Calendar createdAt;
     @Temporal(TemporalType.TIMESTAMP)
     @Version
     private Calendar updatedAt;
     @Temporal(TemporalType.TIMESTAMP)
-    private Calendar deletedAt = null;
+    private Calendar deletedAt;
 
     @Override
     public Collection<Account> getAccounts(AccountType type) {

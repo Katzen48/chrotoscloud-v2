@@ -38,8 +38,8 @@ public class CloudPlayerInventory implements PlayerInventory {
     private String content;
 
     @Setter(AccessLevel.NONE)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Calendar createdAt = Calendar.getInstance();
+    @CreationTimestamp
+    private Calendar createdAt;
     @Setter(AccessLevel.NONE)
     @Temporal(TemporalType.TIMESTAMP)
     @Version
