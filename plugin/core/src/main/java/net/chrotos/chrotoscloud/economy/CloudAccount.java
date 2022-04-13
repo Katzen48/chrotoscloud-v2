@@ -35,8 +35,8 @@ public class CloudAccount implements Account, SoftDeletable {
     private float creditLimit;
     private boolean sharedAccount = false;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Calendar createdAt = Calendar.getInstance();
+    @CreationTimestamp
+    private Calendar createdAt;
     @Temporal(TemporalType.TIMESTAMP)
     @Version
     private Calendar updatedAt;

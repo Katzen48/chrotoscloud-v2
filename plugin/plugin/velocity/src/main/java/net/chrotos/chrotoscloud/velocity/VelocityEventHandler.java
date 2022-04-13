@@ -3,6 +3,7 @@ package net.chrotos.chrotoscloud.velocity;
 import com.velocitypowered.api.event.Continuation;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.proxy.Player;
@@ -48,7 +49,6 @@ public class VelocityEventHandler {
         }
     }
 
-    /*
     @Subscribe(order = PostOrder.LAST)
     public void onDisconnect(DisconnectEvent event, Continuation continuation) {
         if (event.getPlayer() == null || event.getLoginStatus() != DisconnectEvent.LoginStatus.SUCCESSFUL_LOGIN) {
@@ -61,5 +61,4 @@ public class VelocityEventHandler {
             continuation.resumeWithException(e);
         }
     }
-     */
 }
