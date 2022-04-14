@@ -27,7 +27,7 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
 
     implementation 'org.hibernate:hibernate-core:5.6.8.Final'
-    implementation 'org.hibernate:hibernate-entitymanager:5.6.7.Final'
+    implementation 'org.hibernate:hibernate-entitymanager:5.6.8.Final'
 
     implementation 'redis.clients:jedis:4.2.2'
 
