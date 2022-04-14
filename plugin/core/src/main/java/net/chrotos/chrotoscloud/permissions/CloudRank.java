@@ -38,6 +38,7 @@ public class CloudRank extends CloudPermissible implements Rank, SoftDeletable {
     private Set<Permission> permissions = new HashSet<>();
 
     @OneToMany(targetEntity = CloudPlayer.class, cascade = CascadeType.ALL, mappedBy = "rank")
+    @NotFound(action = NotFoundAction.IGNORE)
     private Set<Player> players = new HashSet<>();
 
     private boolean team = false;
