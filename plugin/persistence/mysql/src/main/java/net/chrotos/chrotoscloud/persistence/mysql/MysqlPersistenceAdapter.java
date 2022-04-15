@@ -261,6 +261,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     }
 
     @Override
+    @Deprecated
     public void merge(Object object) {
         Session session = getSession();
         runInTransaction((databaseTransaction) -> session.saveOrUpdate(object));
