@@ -45,6 +45,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @Filter(name = "accountType")
     @Filter(name = "uniqueId")
     @NonNull
+    @NotFound(action = NotFoundAction.IGNORE)
     private Set<Account> accounts = new HashSet<>();
 
     @OneToMany(targetEntity = CloudPermission.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
@@ -61,16 +62,19 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @OneToMany(mappedBy = "player", targetEntity = CloudGameStatistic.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @Filter(name = "gameMode")
     @NonNull
+    @NotFound(action = NotFoundAction.IGNORE)
     private Set<GameStatistic> stats = new HashSet<>();
 
     @OneToMany(mappedBy = "player", targetEntity = CloudGameState.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @Filter(name = "gameMode")
     @NonNull
+    @NotFound(action = NotFoundAction.IGNORE)
     private Set<GameState> states = new HashSet<>();
 
     @OneToMany(mappedBy = "player", targetEntity = CloudPlayerInventory.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @Filter(name = "gameMode")
     @NonNull
+    @NotFound(action = NotFoundAction.IGNORE)
     private Set<PlayerInventory> inventories = new HashSet<>();
 
     @CreationTimestamp
