@@ -19,5 +19,6 @@ public interface PersistenceAdapter {
     void removeFromContext(Object object);
     void runInTransaction(TransactionRunnable runnable);
     void refresh(Object object);
+    @Deprecated
     void merge(Object object);
 }
