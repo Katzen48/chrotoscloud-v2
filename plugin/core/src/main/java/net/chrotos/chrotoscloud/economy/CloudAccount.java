@@ -140,7 +140,7 @@ public class CloudAccount implements Account, SoftDeletable {
 
             Cloud.getInstance().getPersistence().save(transaction);
             balance += transaction.getAmount();
-            Cloud.getInstance().getPersistence().merge(this);
+            Cloud.getInstance().getPersistence().save(this);
         });
     }
 
@@ -156,7 +156,7 @@ public class CloudAccount implements Account, SoftDeletable {
 
     private void checkTransaction(Transaction transaction) {
         if (transaction.getAccount() != this) {
-            throw new AssertionError("Transaction account must be this");
+            throw new AssertionError("Transaction account must be the current instance");
         }
 
         if (transaction.getAccountId() != getUniqueId()) {

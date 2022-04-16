@@ -10,6 +10,7 @@ import net.chrotos.chrotoscloud.games.states.GameState;
 import net.chrotos.chrotoscloud.games.stats.CloudGameStatistic;
 import net.chrotos.chrotoscloud.games.stats.GameStatistic;
 import net.chrotos.chrotoscloud.permissions.*;
+import net.chrotos.chrotoscloud.persistence.DataSelectFilter;
 import net.chrotos.chrotoscloud.persistence.SoftDeletable;
 import net.kyori.adventure.text.Component;
 import org.hibernate.annotations.*;
@@ -81,17 +82,17 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     private Calendar deletedAt;
 
     @Override
-    public Collection<Account> getAccounts(AccountType type) {
-        return Cloud.getInstance().getPersistence()
-                .executeFiltered("accountType", Collections.singletonMap("type", type),
-                        () -> getAccounts().stream().toList());
+    public Collection<? extends Account> getAccounts(AccountType type) {
+        return Cloud.getInstance().getPersistence().getAll(CloudAccount.class, DataSelectFilter.builder()
+                .columnFilters(Collections.singletonMap("accountType", type))
+                .build());
     }
 
     @Override
     public Account getAccount(UUID uniqueId) {
-        return Cloud.getInstance().getPersistence()
-                .executeFiltered("uniqueId", Collections.singletonMap("uniqueid", uniqueId),
-                        () -> getAccounts().stream().findFirst().orElse(null));
+        return Cloud.getInstance().getPersistence().getOne(CloudAccount.class, DataSelectFilter.builder()
+                .columnFilters(Collections.singletonMap("uniqueId", uniqueId))
+                .build());
     }
 
     @Override
@@ -111,24 +112,23 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @Override
     @NonNull
     public Collection<? extends GameStatistic> getStats(@NonNull String gameMode) {
-        return Cloud.getInstance().getPersistence()
-                .executeFiltered("gameMode",
-                        Collections.singletonMap("gameMode", gameMode), () -> getStats().stream().toList());
+        return Cloud.getInstance().getPersistence().getAll(CloudGameStatistic.class, DataSelectFilter.builder()
+                .columnFilters(Collections.singletonMap("gameMode", gameMode))
+                .build());
     }
 
     @Override
     @NonNull
     public Collection<? extends GameState> getStates(@NonNull String gameMode) {
-        return Cloud.getInstance().getPersistence()
-                .executeFiltered("gameMode",
-                        Collections.singletonMap("gameMode", gameMode), () -> getStates().stream().toList());
+        return Cloud.getInstance().getPersistence().getAll(CloudGameState.class, DataSelectFilter.builder()
+                .columnFilters(Collections.singletonMap("gameMode", gameMode))
+                .build());
     }
 
     @Override
     public PlayerInventory getInventory(@NonNull String gameMode) {
-        return Cloud.getInstance().getPersistence()
-                .executeFiltered("gameMode",
-                        Collections.singletonMap("gameMode", gameMode),
-                        () -> getInventories().stream().findFirst().orElse(null));
+        return Cloud.getInstance().getPersistence().getOne(CloudPlayerInventory.class, DataSelectFilter.builder()
+                .columnFilters(Collections.singletonMap("gameMode", gameMode))
+                .build());
     }
 }
