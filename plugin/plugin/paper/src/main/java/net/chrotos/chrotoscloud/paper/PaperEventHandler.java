@@ -26,6 +26,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
 @RequiredArgsConstructor
@@ -49,10 +50,12 @@ public class PaperEventHandler implements Listener {
                 player.sendOpLevel(player.hasPermission("minecraft.command.op") ? opLevel : (byte) 0);
 
                 if (cloud.isInventorySavingEnabled()) {
-                    cloud.getLogger().log(Level.INFO, "Load Inventory of Player {0}", cloudPlayer.getUniqueId());
+                    cloud.getLogger().log(Level.INFO, "Loading Inventory of Player {0} for GameMode {1}",
+                            new Object[] {cloudPlayer.getUniqueId(), cloud.getGameMode()});
                     loadInventory(cloudPlayer, player);
                 }
 
+                cloud.getLogger().log(Level.INFO, "Loading Scoreboard Tags of Player {0} for GameMode {1}", cloudPlayer.getUniqueId());
                 loadScoreboardTags(cloudPlayer, player);
             } catch (PlayerSoftDeletedException e) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("Your account has been deleted!")); // TODO: Translate
@@ -97,27 +100,34 @@ public class PaperEventHandler implements Listener {
     }
 
     protected void onPlayerLeave(@NonNull Player player) {
+        AtomicReference<net.chrotos.chrotoscloud.player.Player> cloudPlayer = new AtomicReference<>();
+
         cloud.getPersistence().runInTransaction(databaseTransaction -> {
             try {
-                net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getPlayer(player.getUniqueId());
-                if (cloudPlayer == null) {
+                cloudPlayer.set(cloud.getPlayerManager().getPlayer(player.getUniqueId()));
+                if (cloudPlayer.get() == null) {
                     return;
                 }
-                cloud.getLogger().log(Level.INFO, "Saving Player {0}", cloudPlayer.getUniqueId());
+                cloud.getLogger().log(Level.INFO, "Saving Player {0} for GameMode {1}",
+                        new Object[] {cloudPlayer.get().getUniqueId(), cloud.getGameMode()});
 
                 if (cloud.isInventorySavingEnabled()) {
-                    cloud.getLogger().log(Level.INFO, "Saving inventory of Player {0}", cloudPlayer.getUniqueId());
-                    saveInventory(cloudPlayer, player);
+                    cloud.getLogger().log(Level.INFO, "Saving Inventory of Player {0} for GameMode {1}",
+                            new Object[] {cloudPlayer.get().getUniqueId(), cloud.getGameMode()});
+                    saveInventory(cloudPlayer.get(), player);
                 }
 
-                cloud.getLogger().log(Level.INFO, "Saving Scoreboard Tags of Player {0}", cloudPlayer.getUniqueId());
-                saveScoreboardTags(cloudPlayer, player);
-
-                cloud.getPlayerManager().logoutPlayer(cloudPlayer);
+                cloud.getLogger().log(Level.INFO, "Saving Scoreboard Tags of Player {0} for GameMode {1}",
+                        new Object[] {cloudPlayer.get().getUniqueId(), cloud.getGameMode()});
+                saveScoreboardTags(cloudPlayer.get(), player);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
+
+        if (cloudPlayer.get() != null) {
+            cloud.getPlayerManager().logoutPlayer(cloudPlayer.get());
+        }
     }
 
     private void saveScoreboardTags(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull Player player) {
