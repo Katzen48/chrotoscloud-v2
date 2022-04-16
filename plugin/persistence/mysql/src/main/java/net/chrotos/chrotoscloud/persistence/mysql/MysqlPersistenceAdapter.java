@@ -223,7 +223,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     public void runInTransaction(TransactionRunnable runnable) {
         Session session = getSession();
 
-        EntityTransaction transaction = session.getTransaction();
+        final EntityTransaction transaction = session.getTransaction();
         boolean insideTransaction = transaction.isActive();
 
         if (!insideTransaction) {
@@ -255,8 +255,12 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
                 }
             });
 
-            if (!insideTransaction && !noCommit.get()) {
-                transaction.commit();
+            if (!insideTransaction) {
+                if (!noCommit.get()) {
+                    transaction.commit();
+                } else {
+                    transaction.rollback();
+                }
             }
         } catch (Exception e) {
             transaction.rollback();

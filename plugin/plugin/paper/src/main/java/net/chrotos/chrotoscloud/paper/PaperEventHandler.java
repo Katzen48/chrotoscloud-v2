@@ -26,6 +26,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
+import java.util.logging.Level;
 
 @RequiredArgsConstructor
 public class PaperEventHandler implements Listener {
@@ -40,12 +41,15 @@ public class PaperEventHandler implements Listener {
 
         cloud.getPersistence().runInTransaction(databaseTransaction -> {
             try {
+                databaseTransaction.suppressCommit();
+
                 net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getOrCreatePlayer(new PaperSidedPlayer(player));
                 PermissibleInjector.inject(player, cloudPlayer);
 
                 player.sendOpLevel(player.hasPermission("minecraft.command.op") ? opLevel : (byte) 0);
 
                 if (cloud.isInventorySavingEnabled()) {
+                    cloud.getLogger().log(Level.INFO, "Load Inventory of Player {0}", cloudPlayer.getUniqueId());
                     loadInventory(cloudPlayer, player);
                 }
 
@@ -99,10 +103,14 @@ public class PaperEventHandler implements Listener {
                 if (cloudPlayer == null) {
                     return;
                 }
+                cloud.getLogger().log(Level.INFO, "Saving Player {0}", cloudPlayer.getUniqueId());
 
                 if (cloud.isInventorySavingEnabled()) {
+                    cloud.getLogger().log(Level.INFO, "Saving inventory of Player {0}", cloudPlayer.getUniqueId());
                     saveInventory(cloudPlayer, player);
                 }
+
+                cloud.getLogger().log(Level.INFO, "Saving Scoreboard Tags of Player {0}", cloudPlayer.getUniqueId());
                 saveScoreboardTags(cloudPlayer, player);
 
                 cloud.getPlayerManager().logoutPlayer(cloudPlayer);
