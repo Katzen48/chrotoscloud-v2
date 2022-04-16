@@ -74,6 +74,17 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
             session.beginTransaction();
         }
 
+        TypedQuery<E> allQuery = getFilteredQuery(session, clazz, filter);
+        List<E> list = allQuery.getResultList();
+
+        if (!insideTransation) {
+            session.getTransaction().commit();
+        }
+
+        return list;
+    }
+
+    private <E> TypedQuery<E> getFilteredQuery(Session session, Class<E> clazz, DataSelectFilter filter) {
         CriteriaBuilder cb = session.getCriteriaBuilder();
         CriteriaQuery<E> cq = cb.createQuery(clazz);
         Root<E> rootEntry = cq.from(clazz);
@@ -94,15 +105,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
             all = all.orderBy(order);
         }
 
-        TypedQuery<E> allQuery = session.createQuery(all);
-
-        List<E> list = allQuery.getResultList();
-
-        if (!insideTransation) {
-            session.getTransaction().commit();
-        }
-
-        return list;
+        return session.createQuery(all);
     }
 
     @Override
@@ -161,17 +164,25 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
     @Override
     public <E> E getOne(Class<E> clazz, DataSelectFilter filter) {
-        if (filter.getPrimaryKeyValue() == null) {
-            throw new IllegalArgumentException("A primary Key Value needs to be defined");
-        }
-
         Session session = getSession();
         boolean insideTransaction = session.getTransaction().isActive();
         if (!insideTransaction) {
             session.beginTransaction();
         }
 
-        E entity = session.find(clazz, filter.getPrimaryKeyValue());
+        E entity = null;
+        if (filter.getPrimaryKeyValue() != null) {
+            entity = session.find(clazz, filter.getPrimaryKeyValue());
+        } else {
+            try {
+                TypedQuery<E> query = getFilteredQuery(session, clazz, filter).setMaxResults(1);
+
+                List<E> list = query.getResultList();
+                if (list.size() > 0) {
+                    entity = list.get(0);
+                }
+            } catch (NoResultException ignored) {}
+        }
 
         if (entity != null) {
             refresh(entity);
