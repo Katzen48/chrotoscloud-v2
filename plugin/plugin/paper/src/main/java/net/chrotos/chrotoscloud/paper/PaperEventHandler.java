@@ -55,7 +55,8 @@ public class PaperEventHandler implements Listener {
                     loadInventory(cloudPlayer, player);
                 }
 
-                cloud.getLogger().log(Level.INFO, "Loading Scoreboard Tags of Player {0} for GameMode {1}", cloudPlayer.getUniqueId());
+                cloud.getLogger().log(Level.INFO, "Loading Scoreboard Tags of Player {0} for GameMode {1}",
+                        new Object[] {cloudPlayer.getUniqueId(), cloud.getGameMode()});
                 loadScoreboardTags(cloudPlayer, player);
             } catch (PlayerSoftDeletedException e) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("Your account has been deleted!")); // TODO: Translate
