@@ -1,10 +1,14 @@
 package net.chrotos.chrotoscloud.paper;
 
 import com.destroystokyo.paper.event.profile.ProfileWhitelistVerifyEvent;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.chrotos.chrotoscloud.Cloud;
+import net.chrotos.chrotoscloud.games.states.CloudGameState;
+import net.chrotos.chrotoscloud.games.states.GameState;
 import net.chrotos.chrotoscloud.paper.chat.PaperChatRenderer;
 import net.chrotos.chrotoscloud.paper.permissions.PermissibleInjector;
 import net.chrotos.chrotoscloud.player.CloudPlayerInventory;
@@ -25,6 +29,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 public class PaperEventHandler implements Listener {
+    private final Gson gson = new Gson();
     private final byte opLevel;
     private final PaperCloud cloud;
     private final PaperChatRenderer renderer = new PaperChatRenderer();
@@ -43,6 +48,8 @@ public class PaperEventHandler implements Listener {
                 if (cloud.isInventorySavingEnabled()) {
                     loadInventory(cloudPlayer, player);
                 }
+
+                loadScoreboardTags(cloudPlayer, player);
             } catch (PlayerSoftDeletedException e) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("Your account has been deleted!")); // TODO: Translate
             } catch (Exception e) {
@@ -96,6 +103,7 @@ public class PaperEventHandler implements Listener {
                 if (cloud.isInventorySavingEnabled()) {
                     saveInventory(cloudPlayer, player);
                 }
+                saveScoreboardTags(cloudPlayer, player);
 
                 cloud.getPlayerManager().logoutPlayer(cloudPlayer);
             } catch (Exception e) {
@@ -104,7 +112,39 @@ public class PaperEventHandler implements Listener {
         });
     }
 
-    private void loadInventory(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, Player player) throws InvalidConfigurationException {
+    private void saveScoreboardTags(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull Player player) {
+        GameState state = cloudPlayer.getStates(cloud.getGameMode()).stream()
+                .filter(gameState -> gameState != null && gameState.getName().equals("cloud:tags"))
+                .findFirst().orElse(null);
+
+        JsonArray jsonArray = new JsonArray();
+        player.getScoreboardTags().forEach(jsonArray::add);
+        String json = gson.toJson(jsonArray);
+
+        if (state == null) {
+            GameState gameState = new CloudGameState(UUID.randomUUID(), "cloud:tags", cloud.getGameMode(),
+                    cloudPlayer, json);
+            cloudPlayer.getStates().add(gameState);
+        } else {
+            state.setState(json);
+        }
+
+        cloud.getPersistence().save(cloudPlayer);
+    }
+
+    private void loadScoreboardTags(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull Player player) {
+        GameState state = cloudPlayer.getStates(cloud.getGameMode()).stream()
+                .filter(gameState -> gameState != null && gameState.getName().equals("cloud:tags"))
+                .findFirst().orElse(null);
+
+        if (state != null) {
+            JsonArray jsonArray = gson.fromJson(state.getState(), JsonArray.class);
+
+            jsonArray.forEach(jsonElement -> player.addScoreboardTag(jsonElement.getAsString()));
+        }
+    }
+
+    private void loadInventory(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull Player player) throws InvalidConfigurationException {
         PlayerInventory inventory = cloudPlayer.getInventory(cloud.getGameMode());
 
         if (inventory != null) {
@@ -138,6 +178,6 @@ public class PaperEventHandler implements Listener {
             inventory.setContent(inventoryContent.saveToString());
         }
 
-        Cloud.getInstance().getPersistence().merge(cloudPlayer);
+        Cloud.getInstance().getPersistence().save(cloudPlayer);
     }
 }
