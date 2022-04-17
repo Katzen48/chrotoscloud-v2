@@ -32,11 +32,16 @@ public class VelocityEventHandler {
     public void onPostConnect(ServerPostConnectEvent event) {
         event.getPlayer().sendPlayerListHeaderAndFooter(plugin.proxyServer.getConfiguration().getMotd(), Component.empty());
 
-        CloudGameServer previousServer = event.getPreviousServer() != null ?
-                plugin.cloud.getGameManager().getGameServer(event.getPreviousServer().getServerInfo().getName()).join() : null;
-        plugin.cloud.getQueue().publish("games.server.connect:" + event.getPlayer().getCurrentServer().get()
-                        .getServerInfo().getName(),
-                new GameServerConnectedEvent(previousServer, event.getPlayer().getUniqueId()));
+        CompletableFuture.supplyAsync(() -> {
+            CloudGameServer previousServer = event.getPreviousServer() != null ?
+                    plugin.cloud.getGameManager().getGameServer(event.getPreviousServer().getServerInfo().getName()).join() : null;
+
+            plugin.cloud.getQueue().publish("games.server.connect:" + event.getPlayer().getCurrentServer().get()
+                            .getServerInfo().getName(),
+                    new GameServerConnectedEvent(previousServer, event.getPlayer().getUniqueId()));
+
+            return true;
+        });
     }
 
     @Subscribe(order = PostOrder.FIRST)

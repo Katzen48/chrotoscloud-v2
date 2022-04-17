@@ -16,6 +16,8 @@ public class PaperCloud extends CoreCloud {
     private Logger logger;
     private final PaperGameManager gameManager;
     private final boolean inventorySavingEnabled;
+    @Setter
+    private CloudPlugin plugin;
 
     public PaperCloud() throws IOException {
         setCloudConfig(new PaperConfig());
