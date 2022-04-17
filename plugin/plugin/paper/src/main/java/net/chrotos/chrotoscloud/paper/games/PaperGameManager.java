@@ -126,9 +126,8 @@ public class PaperGameManager implements GameManager, AutoCloseable {
 
     public void initialize() throws IOException {
         connectedEventRegistration = cloud.getQueue().register(connectedListener(event ->
-                Bukkit.getScheduler().runTask(cloud.getPlugin(), () ->
                         Bukkit.getPluginManager().callEvent(new CloudPlayerConnectEvent(
-                            event.getFrom(), cloud.getPlayerManager().getPlayer(event.getPlayerId()))))),
+                            event.getFrom(), cloud.getPlayerManager().getPlayer(event.getPlayerId())))),
             "games.server.connect:" + cloud.getHostname());
     }
 
