@@ -27,4 +27,8 @@ public class CloudPlayerConnectEvent extends Event {
     public @NotNull HandlerList getHandlers() {
         return HANDLERS;
     }
+
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
 }
