@@ -8,12 +8,16 @@ import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import lombok.NonNull;
+import net.chrotos.chrotoscloud.games.CloudGameServer;
+import net.chrotos.chrotoscloud.games.events.GameServerConnectedEvent;
 import net.chrotos.chrotoscloud.player.PlayerSoftDeletedException;
 import net.chrotos.chrotoscloud.player.SidedPlayer;
 import net.chrotos.chrotoscloud.velocity.player.PermissionsProvider;
 import net.chrotos.chrotoscloud.velocity.player.VelocitySidedPlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+
+import java.util.concurrent.CompletableFuture;
 
 public class VelocityEventHandler {
     private final CloudPlugin plugin;
@@ -27,6 +31,17 @@ public class VelocityEventHandler {
     @Subscribe
     public void onPostConnect(ServerPostConnectEvent event) {
         event.getPlayer().sendPlayerListHeaderAndFooter(plugin.proxyServer.getConfiguration().getMotd(), Component.empty());
+
+        CompletableFuture.supplyAsync(() -> {
+            CloudGameServer previousServer = event.getPreviousServer() != null ?
+                    plugin.cloud.getGameManager().getGameServer(event.getPreviousServer().getServerInfo().getName()).join() : null;
+
+            plugin.cloud.getQueue().publish("games.server.connect:" + event.getPlayer().getCurrentServer().get()
+                            .getServerInfo().getName(),
+                    new GameServerConnectedEvent(previousServer, event.getPlayer().getUniqueId()));
+
+            return true;
+        });
     }
 
     @Subscribe(order = PostOrder.FIRST)

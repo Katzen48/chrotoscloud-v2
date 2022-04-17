@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -48,14 +47,14 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
     }
 
     @Override
-    public CompletableFuture<GameServer> getGameServer(@NonNull String name) {
+    public CompletableFuture<CloudGameServer> getGameServer(@NonNull String name) {
         return getGameServer(name, null);
     }
 
-    private CompletableFuture<GameServer> getGameServer(@NonNull String name, String gameMode) {
+    private CompletableFuture<CloudGameServer> getGameServer(@NonNull String name, String gameMode) {
         RegisteredServer server = cloud.getProxyServer().getServer(name).orElse(null);
 
-        CompletableFuture<GameServer> future = new CompletableFuture<>();
+        CompletableFuture<CloudGameServer> future = new CompletableFuture<>();
         if (server == null) {
             future.complete(null);
 
@@ -81,16 +80,16 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
     }
 
     @Override
-    public CompletableFuture<List<GameServer>> getGameServers() {
+    public CompletableFuture<List<? extends GameServer>> getGameServers() {
         return getGameServersByGameMode(null);
     }
 
     @Override
-    public CompletableFuture<List<GameServer>> getGameServers(@NonNull String gameMode) {
+    public CompletableFuture<List<? extends GameServer>> getGameServers(@NonNull String gameMode) {
         return getGameServersByGameMode(gameMode);
     }
 
-    public CompletableFuture<List<GameServer>> getGameServersByGameMode(String gameMode) {
+    public CompletableFuture<List<? extends GameServer>> getGameServersByGameMode(String gameMode) {
         return CompletableFuture.supplyAsync(() -> {
                 Collection<RegisteredServer> servers;
             if (gameMode == null) {
@@ -135,8 +134,9 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
 
     @Override
     public void requestTeleport(@NonNull GameServer server, net.chrotos.chrotoscloud.player.@NonNull Player player) {
-        ((VelocitySidedPlayer) player.getSidedPlayer()).getSidedObject()
-                .createConnectionRequest(cloud.getProxyServer().getServer(server.getName()).get()).fireAndForget();
+        VelocitySidedPlayer sidedPlayer = (VelocitySidedPlayer) player.getSidedPlayer();
+        sidedPlayer.getSidedObject().createConnectionRequest(cloud.getProxyServer().getServer(server.getName()).get())
+                    .fireAndForget();
     }
 
     @Override
@@ -188,7 +188,7 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
             @Override
             public void onMessage(@NonNull Message<GameServerLookupRequest> object, @NonNull String sender) {
                 String gameMode = object.getMessage().getGameMode();
-                CompletableFuture<List<GameServer>> gameServers;
+                CompletableFuture<List<? extends GameServer>> gameServers;
 
                 if (gameMode == null) {
                     gameServers = getGameServers();
@@ -231,7 +231,7 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
 
                 getGameServer(name).thenAccept(server -> {
                     try {
-                        object.replyTo(new GameServerPingResponse((CloudGameServer) server));
+                        object.replyTo(new GameServerPingResponse(server));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

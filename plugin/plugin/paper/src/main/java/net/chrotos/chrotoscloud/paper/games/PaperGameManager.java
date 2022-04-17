@@ -8,10 +8,12 @@ import net.chrotos.chrotoscloud.messaging.queue.Listener;
 import net.chrotos.chrotoscloud.messaging.queue.Message;
 import net.chrotos.chrotoscloud.messaging.queue.Registration;
 import net.chrotos.chrotoscloud.paper.PaperCloud;
+import net.chrotos.chrotoscloud.paper.games.events.CloudPlayerConnectEvent;
 import net.chrotos.chrotoscloud.paper.games.queue.PaperLeastPlayersQueueManager;
 import net.chrotos.chrotoscloud.paper.games.queue.PaperMostPlayersQueueManager;
 import net.chrotos.chrotoscloud.paper.games.queue.PaperRandomQueueManager;
 import net.chrotos.chrotoscloud.player.Player;
+import org.bukkit.Bukkit;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,8 +23,9 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class PaperGameManager implements GameManager {
+public class PaperGameManager implements GameManager, AutoCloseable {
     private final PaperCloud cloud;
+    private Registration<GameServerConnectedEvent, Void> connectedEventRegistration;
 
     @Override
     public CompletableFuture<GameServer> getGameServer(@NonNull String name) {
@@ -48,13 +51,13 @@ public class PaperGameManager implements GameManager {
     }
 
     @Override
-    public CompletableFuture<List<GameServer>> getGameServers() {
-        CompletableFuture<List<GameServer>> future = new CompletableFuture<>();
+    public CompletableFuture<List<? extends GameServer>> getGameServers() {
+        CompletableFuture<List<? extends GameServer>> future = new CompletableFuture<>();
 
         Registration<Void, GameServerLookupResponse> reg = null;
         try {
             reg = cloud.getQueue().register(lookupListener(gameServer -> {
-                ArrayList<GameServer> gameServers = new ArrayList<>(gameServer.getGameServers());
+                ArrayList<? extends GameServer> gameServers = new ArrayList<>(gameServer.getGameServers());
                 future.complete(gameServers);
             }), "games.server.lookup");
 
@@ -74,13 +77,13 @@ public class PaperGameManager implements GameManager {
     }
 
     @Override
-    public CompletableFuture<List<GameServer>> getGameServers(@NonNull String gameMode) {
-        CompletableFuture<List<GameServer>> future = new CompletableFuture<>();
+    public CompletableFuture<List<? extends GameServer>> getGameServers(@NonNull String gameMode) {
+        CompletableFuture<List<? extends GameServer>> future = new CompletableFuture<>();
 
         Registration<Void, GameServerLookupResponse> reg = null;
         try {
             reg = cloud.getQueue().register(lookupListener(gameServer -> {
-                ArrayList<GameServer> gameServers = new ArrayList<>(gameServer.getGameServers());
+                ArrayList<? extends GameServer> gameServers = new ArrayList<>(gameServer.getGameServers());
                 future.complete(gameServers);
             }), "games.server.lookup");
 
@@ -119,6 +122,13 @@ public class PaperGameManager implements GameManager {
     public void requestTeleport(@NonNull GameServer server, @NonNull Player player) {
         cloud.getQueue().publish("player.teleport.server",
                 new PlayerTeleportToServerRequest(player.getUniqueId(), server.getName()));
+    }
+
+    public void initialize() throws IOException {
+        connectedEventRegistration = cloud.getQueue().register(connectedListener(event ->
+                        Bukkit.getPluginManager().callEvent(new CloudPlayerConnectEvent(
+                                event.getFrom(), cloud.getPlayerManager().getPlayer(event.getPlayerId())))),
+                "games.server.connect:" + cloud.getHostname());
     }
 
     @Override
@@ -175,5 +185,34 @@ public class PaperGameManager implements GameManager {
                 return Void.class;
             }
         };
+    }
+
+    private Listener<GameServerConnectedEvent, Void> connectedListener(Consumer<GameServerConnectedEvent> callback) {
+        return new Listener<>() {
+            @Override
+            public void onMessage(@NonNull Message<GameServerConnectedEvent> object, @NonNull String sender) {
+                callback.accept(object.getMessage());
+            }
+
+            @Override
+            public void onReply(@NonNull Message<Void> object, @NonNull String sender) {}
+
+            @Override
+            public Class<Void> getReplyClass() {
+                return Void.class;
+            }
+
+            @Override
+            public @NonNull Class<GameServerConnectedEvent> getMessageClass() {
+                return GameServerConnectedEvent.class;
+            }
+        };
+    }
+
+    @Override
+    public void close() {
+        if (connectedEventRegistration != null && connectedEventRegistration.isSubscribed()) {
+            connectedEventRegistration.unsubscribe();
+        }
     }
 }

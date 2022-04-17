@@ -27,7 +27,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
 
 @RequiredArgsConstructor
 public class PaperEventHandler implements Listener {
@@ -50,13 +49,9 @@ public class PaperEventHandler implements Listener {
                 player.sendOpLevel(player.hasPermission("minecraft.command.op") ? opLevel : (byte) 0);
 
                 if (cloud.isInventorySavingEnabled()) {
-                    cloud.getLogger().log(Level.INFO, "Loading Inventory of Player {0} for GameMode {1}",
-                            new Object[] {cloudPlayer.getUniqueId(), cloud.getGameMode()});
                     loadInventory(cloudPlayer, player);
                 }
 
-                cloud.getLogger().log(Level.INFO, "Loading Scoreboard Tags of Player {0} for GameMode {1}",
-                        new Object[] {cloudPlayer.getUniqueId(), cloud.getGameMode()});
                 loadScoreboardTags(cloudPlayer, player);
             } catch (PlayerSoftDeletedException e) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("Your account has been deleted!")); // TODO: Translate
@@ -109,17 +104,11 @@ public class PaperEventHandler implements Listener {
                 if (cloudPlayer.get() == null) {
                     return;
                 }
-                cloud.getLogger().log(Level.INFO, "Saving Player {0} for GameMode {1}",
-                        new Object[] {cloudPlayer.get().getUniqueId(), cloud.getGameMode()});
 
                 if (cloud.isInventorySavingEnabled()) {
-                    cloud.getLogger().log(Level.INFO, "Saving Inventory of Player {0} for GameMode {1}",
-                            new Object[] {cloudPlayer.get().getUniqueId(), cloud.getGameMode()});
                     saveInventory(cloudPlayer.get(), player);
                 }
 
-                cloud.getLogger().log(Level.INFO, "Saving Scoreboard Tags of Player {0} for GameMode {1}",
-                        new Object[] {cloudPlayer.get().getUniqueId(), cloud.getGameMode()});
                 saveScoreboardTags(cloudPlayer.get(), player);
             } catch (Exception e) {
                 e.printStackTrace();

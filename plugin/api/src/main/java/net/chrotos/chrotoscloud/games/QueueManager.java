@@ -10,6 +10,6 @@ public interface QueueManager {
     QueueMode getQueueMode();
     @NonNull
     String getGameMode();
-    CompletableFuture<GameServer> getServer(@NonNull Player player);
+    CompletableFuture<? extends GameServer> getServer(@NonNull Player player);
     // TODO multi queue
 }
