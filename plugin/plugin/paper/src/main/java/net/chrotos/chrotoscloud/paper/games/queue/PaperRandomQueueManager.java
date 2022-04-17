@@ -25,7 +25,7 @@ public class PaperRandomQueueManager implements QueueManager {
     }
 
     @Override
-    public CompletableFuture<GameServer> getServer(@NonNull Player player) {
+    public CompletableFuture<? extends GameServer> getServer(@NonNull Player player) {
         return gameManager.getRandom(getGameMode());
     }
 }
