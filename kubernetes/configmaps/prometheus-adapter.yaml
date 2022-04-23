@@ -1,0 +1,19 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: prometheus-adapter
+  namespace: monitoring
+data:
+  config.yaml: |-
+    rules:  
+    - seriesQuery: 'mc_players_online_total'
+      resources:
+        overrides:
+          kubernetes_namespace:
+            resource: namespace
+          kubernetes_pod_name:
+            resource: pod
+      name:
+        matches: "^(.*)_total"
+        as: "${1}_total"
+      metricsQuery: (sum(<<.Series>>{world="world",<<.LabelMatchers>>}) by (<<.GroupBy>>))
