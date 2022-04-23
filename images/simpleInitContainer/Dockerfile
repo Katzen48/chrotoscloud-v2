@@ -1,4 +1,4 @@
-FROM node:17-bullseye
+FROM node:18-bullseye
 
 RUN apt-get update && apt-get install -y gettext-base
 
