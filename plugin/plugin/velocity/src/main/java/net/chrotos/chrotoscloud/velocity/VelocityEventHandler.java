@@ -5,6 +5,7 @@ import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
+import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import lombok.NonNull;
@@ -29,12 +30,12 @@ public class VelocityEventHandler {
     }
 
     @Subscribe
-    public void onPostConnect(ServerPostConnectEvent event) {
+    public void onServerConnected(ServerConnectedEvent event) {
         event.getPlayer().sendPlayerListHeaderAndFooter(plugin.proxyServer.getConfiguration().getMotd(), Component.empty());
 
         CompletableFuture.supplyAsync(() -> {
-            CloudGameServer previousServer = event.getPreviousServer() != null ?
-                    plugin.cloud.getGameManager().getGameServer(event.getPreviousServer().getServerInfo().getName()).join() : null;
+            CloudGameServer previousServer = event.getPreviousServer().isPresent() ?
+                    plugin.cloud.getGameManager().getGameServer(event.getPreviousServer().get().getServerInfo().getName()).join() : null;
 
             plugin.cloud.getQueue().publish("games.server.connect:" + event.getPlayer().getCurrentServer().get()
                             .getServerInfo().getName(),
