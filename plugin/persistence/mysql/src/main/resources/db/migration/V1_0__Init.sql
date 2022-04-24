@@ -8,7 +8,8 @@ create table players (
 
     primary key (unique_id),
     index (name),
-    index (rank_unique_id)
+    index (rank_unique_id),
+    index (deleted_at)
 ) engine=InnoDB;
 
 create table transactions (
@@ -45,7 +46,8 @@ create table accounts (
 
                           primary key (unique_id),
                           index (account_type),
-                          index (owner_unique_id)
+                          index (owner_unique_id),
+                          index (deleted_at)
 ) engine=InnoDB;
 
 create table game_stats (
@@ -59,7 +61,8 @@ create table game_stats (
                             deleted_at datetime,
 
                             primary key (unique_id),
-                            index (player_unique_id, game_mode, name)
+                            index (player_unique_id, game_mode, name),
+                            index (deleted_at)
 ) engine=InnoDB;
 
 create table game_states (
@@ -73,7 +76,8 @@ create table game_states (
                             deleted_at datetime,
 
                             primary key (unique_id),
-                            index (player_unique_id, game_mode, name)
+                            index (player_unique_id, game_mode, name),
+                            index (deleted_at)
 ) engine=InnoDB;
 
 create table player_inventories (
@@ -86,7 +90,8 @@ create table player_inventories (
                             deleted_at datetime,
 
                             primary key (unique_id),
-                            index (player_unique_id, game_mode)
+                            index (player_unique_id, game_mode),
+                            index (deleted_at)
 ) engine=InnoDB;
 
 create table permissions (
@@ -116,5 +121,6 @@ create table ranks (
                        index (parent_unique_id),
                        index (team),
                        index (default_rank),
-                       index (name)
+                       index (name),
+                       index (deleted_at)
 ) engine=InnoDB;
