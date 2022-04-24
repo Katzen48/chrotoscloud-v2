@@ -105,6 +105,7 @@ create table ranks (
                        unique_id varchar(36) not null,
                        name varchar(100) not null,
                        team bit not null,
+                       default_rank bit not null,
                        prefix varchar(20) not null,
                        parent_unique_id varchar(36),
                        created_at datetime not null,
@@ -114,5 +115,6 @@ create table ranks (
                        primary key (unique_id),
                        index (parent_unique_id),
                        index (team),
+                       index (default_rank),
                        index (name)
 ) engine=InnoDB;

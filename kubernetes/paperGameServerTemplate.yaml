@@ -24,6 +24,10 @@ spec:
       app: paper-template
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9225'
+        prometheus.io/path: '/metrics'
       labels:
         app: paper-template
         net.chrotos.ingress.minecraft/discover: 'true'

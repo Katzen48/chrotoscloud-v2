@@ -50,6 +50,8 @@ public class CloudRank extends CloudPermissible implements Rank, SoftDeletable {
     @JoinColumn(name = "parent_unique_id")
     private Rank parent;
 
+    private boolean defaultRank = false;
+
     @CreationTimestamp
     private Calendar createdAt;
     @Temporal(TemporalType.TIMESTAMP)

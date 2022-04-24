@@ -13,4 +13,5 @@ public interface Rank extends Permissible {
     boolean isTeam();
     @NonNull
     Set<Player> getPlayers();
+    boolean isDefaultRank();
 }

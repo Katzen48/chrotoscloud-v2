@@ -5,9 +5,15 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import com.velocitypowered.api.proxy.server.ServerPing;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 
+import java.util.Comparator;
+import java.util.Objects;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -35,18 +41,38 @@ public class HubCommand implements SimpleCommand {
             return;
         }
 
-        int randomIndex = (int) Math.floor(Math.random() *
-                                        ((double) proxyServer.getConfiguration().getAttemptConnectionOrder().size()));
-        String requestedServer;
-        if ((requestedServer = proxyServer.getConfiguration().getAttemptConnectionOrder().get(randomIndex)) == null) {
+        HubCandidate candidate = proxyServer.getConfiguration().getAttemptConnectionOrder().stream().map(serverName -> {
+            RegisteredServer lobbyServer = proxyServer.getServer(serverName).orElse(null);
+
+            if (lobbyServer == null) {
+                return null;
+            }
+
+            ServerPing.Players players = lobbyServer.ping().join().getPlayers().orElse(null);
+
+            if (players == null) {
+                return null;
+            }
+
+            if ((players.getMax() - 2) >= players.getOnline()) {
+                return new HubCandidate(lobbyServer, players.getOnline());
+            }
+
+            return null;
+        }).filter(Objects::nonNull).findFirst().orElse(null);
+
+        if (candidate == null) {
             return;
         }
 
-        Optional<RegisteredServer> serverOptional;
-        if ((serverOptional = proxyServer.getServer(requestedServer)).isEmpty()) {
-            return;
-        }
+        player.createConnectionRequest(candidate.getServer()).fireAndForget();
+    }
 
-        player.createConnectionRequest(serverOptional.get()).fireAndForget();
+    @RequiredArgsConstructor
+    @Getter
+    private static class HubCandidate {
+        @NonNull
+        private final RegisteredServer server;
+        private final int playerCount;
     }
 }
