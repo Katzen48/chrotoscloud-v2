@@ -3,9 +3,11 @@ package net.chrotos.chrotoscloud.player;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.chrotos.chrotoscloud.Cloud;
+import net.chrotos.chrotoscloud.permissions.CloudRank;
 import net.chrotos.chrotoscloud.persistence.DataSelectFilter;
 import net.chrotos.chrotoscloud.persistence.EntityExistsException;
 
+import java.util.Collections;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -77,6 +79,12 @@ public class CloudPlayerManager implements PlayerManager {
 
     private CloudPlayer createPlayer(@NonNull UUID uniqueId, @NonNull String name) {
         CloudPlayer player = new CloudPlayer(uniqueId, name);
+
+        CloudRank defaultRank = cloud.getPersistence().getOne(CloudRank.class, DataSelectFilter.builder()
+                .columnFilters(Collections.singletonMap("defaultRank", true))
+                .build());
+        player.setRank(defaultRank);
+
         cloud.getPersistence().save(player);
 
         return player;
