@@ -20,7 +20,7 @@ dependencies {
     implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.5'
 
     implementation 'org.flywaydb:flyway-core:8.5.10'
-    implementation "org.flywaydb:flyway-mysql:8.5.9"
+    implementation "org.flywaydb:flyway-mysql:8.5.10"
 
     implementation 'org.hibernate:hibernate-core:5.6.8.Final'
     implementation 'org.hibernate:hibernate-entitymanager:5.6.8.Final'
