@@ -18,7 +18,9 @@ import java.util.UUID;
 @SelectBeforeUpdate
 public class CloudTransaction implements Transaction {
     @Id
-    @NonNull
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long entryNo;
+
     private String transactionCode;
 
     @Enumerated(EnumType.STRING)
