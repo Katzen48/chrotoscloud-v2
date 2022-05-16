@@ -24,7 +24,7 @@ dependencies {
 
     implementation 'org.hibernate:hibernate-core:5.6.9.Final'
     implementation 'org.hibernate:hibernate-entitymanager:5.6.9.Final'
-    implementation 'org.hibernate:hibernate-c3p0:5.6.8.Final'
+    implementation 'org.hibernate:hibernate-c3p0:5.6.9.Final'
 
     implementation 'com.vladmihalcea:hibernate-types-55:2.16.2'
 }
