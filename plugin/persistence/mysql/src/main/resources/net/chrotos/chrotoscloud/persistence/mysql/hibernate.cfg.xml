@@ -4,9 +4,9 @@
         <property name="hibernate.connection.driver_class">org.mariadb.jdbc.Driver</property>
         <property name="hibernate.connection.autocommit">true</property>
         <property name="hbm2ddl.auto">validate</property>
+        <property name="hibernate.connection.release_mode">after_transaction</property>
 
         <property name="hibernate.c3p0.min_size">5</property>
-        <property name="hibernate.c3p0.max_size">10</property>
         <property name="hibernate.c3p0.acquire_increment">5</property>
         <property name="hibernate.c3p0.timeout">300</property>
         <property name="hibernate.c3p0.idle_test_period">5</property>
