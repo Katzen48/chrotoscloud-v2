@@ -13,7 +13,7 @@ create table players (
 ) engine=InnoDB;
 
 create table transactions (
-                          entry_no bigint(20) not null,
+                          entry_no bigint(20) not null auto_increment,
                           transaction_code varchar(36) not null,
                           account_type varchar(30) not null,
                           account_id varchar(36) not null,
