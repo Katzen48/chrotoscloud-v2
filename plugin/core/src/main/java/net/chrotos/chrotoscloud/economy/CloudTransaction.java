@@ -19,6 +19,8 @@ import java.util.UUID;
 public class CloudTransaction implements Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
+    @GenericGenerator(name = "native", strategy = "native")
+    @Column(updatable = false, nullable = false)
     private Long entryNo;
 
     private String transactionCode;
