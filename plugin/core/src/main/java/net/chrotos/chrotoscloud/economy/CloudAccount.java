@@ -49,9 +49,10 @@ public class CloudAccount implements Account, SoftDeletable {
     @OneToMany(targetEntity = CloudTransaction.class, cascade = CascadeType.ALL, mappedBy = "account", orphanRemoval = true)
     private Set<Transaction> transactions = new HashSet<>();
 
-    public CloudAccount(AccountHolder owner, AccountType accountType) {
+    public CloudAccount(@NonNull AccountHolder owner, @NonNull AccountType accountType) {
         super();
         key = new AccountKey(UUID.randomUUID(), accountType);
+        this.owner = owner;
     }
 
     @Override

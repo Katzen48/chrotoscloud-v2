@@ -14,6 +14,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @DynamicUpdate
+@SQLDelete(sql = "UPDATE players SET deleted_at=now() WHERE unique_id = ?")
+@Where(clause = "deleted_at IS NUlL")
 @SelectBeforeUpdate
 @Filter(name = "gameMode")
 public class CloudPlayerInventory implements PlayerInventory {
