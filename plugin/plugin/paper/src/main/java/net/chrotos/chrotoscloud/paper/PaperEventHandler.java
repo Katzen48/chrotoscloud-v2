@@ -55,6 +55,7 @@ public class PaperEventHandler implements Listener {
                 }
 
                 loadScoreboardTags(cloudPlayer, player);
+                ((PaperSidedPlayer)cloudPlayer.getSidedPlayer()).setSentResourcePackHash(Bukkit.getResourcePackHash());
             } catch (PlayerSoftDeletedException e) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("Your account has been deleted!")); // TODO: Translate
             } catch (Exception e) {
@@ -76,7 +77,6 @@ public class PaperEventHandler implements Listener {
                     event.getPlayerProfile().getName());
 
             event.setWhitelisted(event.isWhitelisted() || event.isOp() || player.hasPermission("minecraft.command.op")); // TODO: remove op?
-            ((PaperSidedPlayer)player.getSidedPlayer()).setSentResourcePackHash(Bukkit.getResourcePackHash());
         } catch (PlayerSoftDeletedException e) {
             event.setWhitelisted(false);
             event.kickMessage(Component.text("Your account has been deleted!")); // TODO: Translate
