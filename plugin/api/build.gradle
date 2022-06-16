@@ -16,7 +16,7 @@ dependencies {
 
     compileOnly project(':persistence:models')
 
-    implementation "net.kyori:adventure-api:4.10.1"
+    implementation "net.kyori:adventure-api:4.11.0"
 
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'

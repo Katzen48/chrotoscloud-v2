@@ -131,4 +131,34 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
                         Collections.singletonMap("gameMode", gameMode),
                         () -> getInventories().stream().findFirst().orElse(null));
     }
+
+    @Override
+    public String getResourcePackHash() {
+        return sidedPlayer.getResourcePackHash();
+    }
+
+    @Override
+    public void setResourcePack(@NonNull String url) {
+        sidedPlayer.setResourcePack(url);
+    }
+
+    @Override
+    public void setResourcePack(@NonNull String url, @NonNull String hash) {
+        sidedPlayer.setResourcePack(url, hash);
+    }
+
+    @Override
+    public void setResourcePack(@NonNull String url, @NonNull String hash, boolean required) {
+        sidedPlayer.setResourcePack(url, hash, required);
+    }
+
+    @Override
+    public void setResourcePack(@NonNull String url, @NonNull String hash, boolean required, @NonNull Component prompt) {
+        sidedPlayer.setResourcePack(url, hash, required, prompt);
+    }
+
+    @Override
+    public boolean hasResourcePackApplied(@NonNull String hash) {
+        return sidedPlayer.hasResourcePackApplied(hash);
+    }
 }

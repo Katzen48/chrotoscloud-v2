@@ -20,4 +20,10 @@ public interface Player extends AccountHolder, InventoryHolder, Permissible, Sta
     void setRank(Rank rank);
     @NonNull
     Component getPrefixes();
+    String getResourcePackHash();
+    void setResourcePack(@NonNull String url);
+    void setResourcePack(@NonNull String url, @NonNull String hash);
+    void setResourcePack(@NonNull String url, @NonNull String hash, boolean required);
+    void setResourcePack(@NonNull String url, @NonNull String hash, boolean required, @NonNull Component prompt);
+    boolean hasResourcePackApplied(@NonNull String hash);
 }
