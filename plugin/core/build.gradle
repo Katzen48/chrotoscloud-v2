@@ -18,8 +18,8 @@ dependencies {
     implementation project(':api')
     implementation project(':persistence:models')
 
-    compileOnly "net.kyori:adventure-api:4.10.1"
-    compileOnly "net.kyori:adventure-text-serializer-legacy:4.10.1"
+    compileOnly "net.kyori:adventure-api:4.11.0"
+    compileOnly "net.kyori:adventure-text-serializer-legacy:4.11.0"
 
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
@@ -31,7 +31,7 @@ dependencies {
 
     implementation 'redis.clients:jedis:4.2.3'
 
-    implementation 'com.rabbitmq:amqp-client:5.14.2'
+    implementation 'com.rabbitmq:amqp-client:5.15.0'
 }
 
 test {
