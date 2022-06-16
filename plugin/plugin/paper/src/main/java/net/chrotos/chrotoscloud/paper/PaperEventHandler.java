@@ -48,7 +48,7 @@ public class PaperEventHandler implements Listener {
                 net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getOrCreatePlayer(new PaperSidedPlayer(player));
                 PermissibleInjector.inject(player, cloudPlayer);
 
-                player.sendOpLevel(player.hasPermission("minecraft.command.op") ? opLevel : (byte) 0);
+                player.setOp(player.hasPermission("minecraft.command.op"));
 
                 if (cloud.isInventorySavingEnabled()) {
                     loadInventory(cloudPlayer, player);
