@@ -15,6 +15,7 @@ import net.chrotos.chrotoscloud.player.CloudPlayerInventory;
 import net.chrotos.chrotoscloud.player.PlayerInventory;
 import net.chrotos.chrotoscloud.player.PlayerSoftDeletedException;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -23,6 +24,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
@@ -74,6 +76,7 @@ public class PaperEventHandler implements Listener {
                     event.getPlayerProfile().getName());
 
             event.setWhitelisted(event.isWhitelisted() || event.isOp() || player.hasPermission("minecraft.command.op")); // TODO: remove op?
+            ((PaperSidedPlayer)player.getSidedPlayer()).setSentResourcePackHash(Bukkit.getResourcePackHash());
         } catch (PlayerSoftDeletedException e) {
             event.setWhitelisted(false);
             event.kickMessage(Component.text("Your account has been deleted!")); // TODO: Translate
@@ -93,6 +96,12 @@ public class PaperEventHandler implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerChat(AsyncChatEvent event) {
         event.renderer(renderer);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPlayerResourcePack(PlayerResourcePackStatusEvent event) {
+        net.chrotos.chrotoscloud.player.Player player = cloud.getPlayerManager().getPlayer(event.getPlayer().getUniqueId());
+        ((PaperSidedPlayer)player.getSidedPlayer()).onResourcePackStatus(event);
     }
 
     protected void onPlayerLeave(@NonNull Player player) {
