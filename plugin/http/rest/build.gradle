@@ -1,0 +1,76 @@
+plugins {
+    id 'idea'
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.1'
+    id 'maven-publish'
+    id 'application'
+}
+
+group 'net.chrotos.chrotoscloud'
+version '3.0-SNAPSHOT'
+
+mainClassName = 'net.chrotos.chrotoscloud.rest.Main'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://papermc.io/repo/repository/maven-public/"
+    }
+}
+
+dependencies {
+    implementation project(':api')
+    implementation project(':persistence:models')
+    implementation project(':core')
+    implementation project(':persistence:mysql')
+
+    compileOnly 'io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT'
+
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    testCompileOnly 'org.projectlombok:lombok:1.18.22'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+
+    implementation "net.kyori:adventure-api:4.11.0"
+    implementation "net.kyori:adventure-text-serializer-legacy:4.11.0"
+
+    // HTTP Server
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.3'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
+    implementation 'com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-json-provider:2.13.3'
+    implementation 'org.glassfish.grizzly:grizzly-http-server:3.0.1'
+    implementation 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.0.5'
+    implementation 'org.glassfish.jersey.containers:jersey-container-grizzly2-servlet:3.0.5'
+    implementation 'org.glassfish.jersey.inject:jersey-hk2:3.0.5'
+
+    implementation 'javax.validation:validation-api:2.0.1.Final'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/Katzen48/chrotoscloud-v2")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) { publication ->
+            artifactId = 'rest'
+            from shadow.component(publication)
+        }
+    }
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "$mainClassName"
+    }
+}

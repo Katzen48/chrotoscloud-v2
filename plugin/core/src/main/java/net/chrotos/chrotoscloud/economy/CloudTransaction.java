@@ -1,5 +1,6 @@
 package net.chrotos.chrotoscloud.economy;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.*;
 
@@ -28,11 +29,13 @@ public class CloudTransaction implements Transaction {
     @Enumerated(EnumType.STRING)
     @NonNull
     @Column(insertable = false, updatable = false, nullable = false)
+    @JsonIgnore
     private AccountType accountType;
 
     @ManyToOne(targetEntity = CloudAccount.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "accountId", referencedColumnName = "uniqueId", nullable = false)
     @JoinColumn(name = "accountType", referencedColumnName = "accountType", nullable = false)
+    @JsonIgnore
     private Account account = null;
 
     @NonNull

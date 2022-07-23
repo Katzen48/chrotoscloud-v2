@@ -1,5 +1,7 @@
 package net.chrotos.chrotoscloud.games.states;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonRawValue;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -42,10 +44,12 @@ public class CloudGameState implements GameState, SoftDeletable {
     @ManyToOne(targetEntity = CloudPlayer.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "player_unique_id", updatable = false)
     @NonNull
+    @JsonIgnore
     private Player player;
 
     @NonNull
     @Type(type = "text")
+    @JsonRawValue
     private String state;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -54,5 +58,6 @@ public class CloudGameState implements GameState, SoftDeletable {
     @Version
     private Calendar updatedAt;
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonIgnore
     private Calendar deletedAt;
 }

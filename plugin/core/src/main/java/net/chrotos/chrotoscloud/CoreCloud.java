@@ -5,7 +5,6 @@ import lombok.NonNull;
 import net.chrotos.chrotoscloud.cache.RedisCacheAdapter;
 import net.chrotos.chrotoscloud.chat.ChatManager;
 import net.chrotos.chrotoscloud.chat.CoreChatManager;
-import net.chrotos.chrotoscloud.messaging.pubsub.RedisPubSubAdapter;
 import net.chrotos.chrotoscloud.messaging.queue.RabbitQueueAdapter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 import net.chrotos.chrotoscloud.player.CloudPlayerManager;
@@ -45,9 +44,11 @@ public abstract class CoreCloud extends Cloud {
 
         loadServices();
 
-        RabbitQueueAdapter queueAdapter = new RabbitQueueAdapter();
-        this.queue = queueAdapter;
-        queueAdapter.configure(getCloudConfig());
+        if (shouldLoadQueue()) {
+            RabbitQueueAdapter queueAdapter = new RabbitQueueAdapter();
+            this.queue = queueAdapter;
+            queueAdapter.configure(getCloudConfig());
+        }
 
         loaded = true;
     }
@@ -63,15 +64,23 @@ public abstract class CoreCloud extends Cloud {
 
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
-        RedisCacheAdapter redisAdapter = new RedisCacheAdapter();
-        this.cache = redisAdapter;
-        this.cache.configure(getCloudConfig());
-        this.pubSub = redisAdapter.getPubSub();
+        RedisCacheAdapter redisAdapter = null;
+        if (shouldLoadCache()) {
+            redisAdapter = new RedisCacheAdapter();
+            this.cache = redisAdapter;
+            this.cache.configure(getCloudConfig());
+        }
+
+        if (shouldLoadPubSub()) {
+            this.pubSub = redisAdapter.getPubSub();
+        }
 
         Thread.currentThread().setContextClassLoader(getServiceClassLoader());
         this.persistence.configure(getCloudConfig());
 
-        queue.initialize();
+        if (shouldLoadQueue()) {
+            queue.initialize();
+        }
 
         Thread.currentThread().setContextClassLoader(loader);
 
@@ -99,6 +108,18 @@ public abstract class CoreCloud extends Cloud {
         }
 
         return service;
+    }
+
+    protected boolean shouldLoadQueue() {
+        return true;
+    }
+
+    protected boolean shouldLoadPubSub() {
+        return true;
+    }
+
+    protected boolean shouldLoadCache() {
+        return true;
     }
 
     protected void setCloudConfig(CloudConfig cloudConfig) {

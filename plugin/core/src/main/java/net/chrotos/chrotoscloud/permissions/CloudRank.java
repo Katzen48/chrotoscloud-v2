@@ -1,5 +1,6 @@
 package net.chrotos.chrotoscloud.permissions;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import net.chrotos.chrotoscloud.persistence.SoftDeletable;
 import net.chrotos.chrotoscloud.player.CloudPlayer;
@@ -35,9 +36,11 @@ public class CloudRank extends CloudPermissible implements Rank, SoftDeletable {
     @OneToMany(targetEntity = CloudPermission.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "permissible_unique_id")
     @Where(clause = "permissible_type='rank'")
+    @JsonIgnore
     private Set<Permission> permissions = new HashSet<>();
 
     @OneToMany(targetEntity = CloudPlayer.class, cascade = CascadeType.ALL, mappedBy = "rank")
+    @JsonIgnore
     private Set<Player> players = new HashSet<>();
 
     private boolean team = false;
@@ -48,16 +51,21 @@ public class CloudRank extends CloudPermissible implements Rank, SoftDeletable {
     @Setter
     @OneToOne(cascade = CascadeType.ALL, targetEntity = CloudRank.class)
     @JoinColumn(name = "parent_unique_id")
+    @JsonIgnore
     private Rank parent;
 
+    @JsonIgnore
     private boolean defaultRank = false;
 
     @CreationTimestamp
+    @JsonIgnore
     private Calendar createdAt;
     @Temporal(TemporalType.TIMESTAMP)
     @Version
+    @JsonIgnore
     private Calendar updatedAt;
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonIgnore
     private Calendar deletedAt;
 
     @Override

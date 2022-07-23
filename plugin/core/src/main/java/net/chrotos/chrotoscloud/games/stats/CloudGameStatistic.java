@@ -1,5 +1,6 @@
 package net.chrotos.chrotoscloud.games.stats;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import net.chrotos.chrotoscloud.persistence.SoftDeletable;
 import net.chrotos.chrotoscloud.player.CloudPlayer;
@@ -39,6 +40,7 @@ public class CloudGameStatistic implements GameStatistic, SoftDeletable {
     @ManyToOne(targetEntity = CloudPlayer.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "player_unique_id", updatable = false)
     @NonNull
+    @JsonIgnore
     private Player player;
 
     @Setter
@@ -51,6 +53,7 @@ public class CloudGameStatistic implements GameStatistic, SoftDeletable {
     @Version
     private Calendar updatedAt;
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonIgnore
     private Calendar deletedAt;
 
     @Override

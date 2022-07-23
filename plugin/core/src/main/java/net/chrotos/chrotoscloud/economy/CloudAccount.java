@@ -1,5 +1,6 @@
 package net.chrotos.chrotoscloud.economy;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.persistence.SoftDeletable;
@@ -28,6 +29,7 @@ public class CloudAccount implements Account, SoftDeletable {
     @ManyToOne(targetEntity = CloudPlayer.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_unique_id", updatable = false)
     @NonNull
+    @JsonIgnore
     private AccountHolder owner;
 
     private float balance;
@@ -41,6 +43,7 @@ public class CloudAccount implements Account, SoftDeletable {
     @Version
     private Calendar updatedAt;
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonIgnore
     private Calendar deletedAt;
 
     @Setter

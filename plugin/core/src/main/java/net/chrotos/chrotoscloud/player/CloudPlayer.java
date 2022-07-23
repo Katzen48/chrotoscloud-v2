@@ -1,5 +1,6 @@
 package net.chrotos.chrotoscloud.player;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.economy.Account;
@@ -38,18 +39,21 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     private String name;
 
     @Setter
+    @JsonIgnore
     private transient SidedPlayer sidedPlayer;
 
     @OneToMany(mappedBy = "owner", targetEntity = CloudAccount.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @Filter(name = "accountType")
     @Filter(name = "uniqueId")
     @NonNull
+    @JsonIgnore
     private Set<Account> accounts = new HashSet<>();
 
     @OneToMany(targetEntity = CloudPermission.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "permissible_unique_id")
     @Where(clause = "permissible_type='player'")
     @NonNull
+    @JsonIgnore
     private Set<Permission> permissions = new HashSet<>();
 
     @Setter
@@ -60,16 +64,19 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @OneToMany(mappedBy = "player", targetEntity = CloudGameStatistic.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @Filter(name = "gameMode")
     @NonNull
+    @JsonIgnore
     private Set<GameStatistic> stats = new HashSet<>();
 
     @OneToMany(mappedBy = "player", targetEntity = CloudGameState.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @Filter(name = "gameMode")
     @NonNull
+    @JsonIgnore
     private Set<GameState> states = new HashSet<>();
 
     @OneToMany(mappedBy = "player", targetEntity = CloudPlayerInventory.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @Filter(name = "gameMode")
     @NonNull
+    @JsonIgnore
     private Set<PlayerInventory> inventories = new HashSet<>();
 
     @CreationTimestamp
@@ -78,6 +85,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @Version
     private Calendar updatedAt;
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonIgnore
     private Calendar deletedAt;
 
     @Override
@@ -104,6 +112,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
 
     @Override
     @NonNull
+    @JsonIgnore
     public Component getPrefixes() {
         return Cloud.getInstance().getChatManager().getPrefixes(this);
     }
@@ -133,6 +142,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     }
 
     @Override
+    @JsonIgnore
     public String getResourcePackHash() {
         return sidedPlayer.getResourcePackHash();
     }
