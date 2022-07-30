@@ -1,8 +1,3 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 name: Java CI
 on: 
   push:
@@ -14,12 +9,16 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
     
     steps:
       - uses: actions/checkout@v2
+      - shell: bash
+        env:
+          GRADLE_PROPERTIES: ${{ secrets.GRADLE_PROPERTIES }}
+        run: |
+          mkdir -p ~/.gradle/
+          echo "GRADLE_USER_HOME=${HOME}/.gradle" >> $GITHUB_ENV
+          echo "${GRADLE_PROPERTIES}" > ~/.gradle/gradle.properties
       - uses: actions/setup-java@v1
         with:
           java-version: 17
@@ -33,9 +32,6 @@ jobs:
           CHROTOSCLOUD_TEST_DB_STRING: ${{ secrets.CHROTOSCLOUD_TEST_DB_STRING }}
           CHROTOSCLOUD_TEST_DB_USER: ${{ secrets.CHROTOSCLOUD_TEST_DB_USER }}
           CHROTOSCLOUD_TEST_DB_PASSWORD: ${{ secrets.CHROTOSCLOUD_TEST_DB_PASSWORD }}
-          CHROTOS_USER: ${{ secrets.CHROTOS_USER }}
-          CHROTOS_PASSWORD: ${{ secrets.CHROTOS_PASSWORD }}
-          CHROTOS_CONTEXTURL: "https://artifactory.chrotos.net/artifactory"
 
       - uses: actions/upload-artifact@v2
         with:
