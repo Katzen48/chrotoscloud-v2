@@ -1,6 +1,3 @@
-group 'net.chrotos.chrotoscloud'
-version '3.0-SNAPSHOT'
-
 repositories {
     mavenCentral()
 }

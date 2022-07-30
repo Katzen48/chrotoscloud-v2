@@ -13,6 +13,9 @@ subprojects {
     apply plugin: "maven-publish"
     apply plugin: "com.jfrog.artifactory"
 
+    group 'net.chrotos.chrotoscloud'
+    version '3.0-SNAPSHOT'
+
     artifactory {
         contextUrl = "${chrotos_contextUrl}"
         publish {
