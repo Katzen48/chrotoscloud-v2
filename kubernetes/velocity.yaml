@@ -18,7 +18,6 @@ metadata:
   name: velocity-proxy
   namespace: servers
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: velocity-proxy
@@ -51,6 +50,8 @@ spec:
           env:
             - name: CLOUD_VERSION
               value: 3.0-SNAPSHOT
+            - name: SERVER_SOFTWARE_VERSION
+              value: 3.1.2-SNAPSHOT
             - name: GITHUB_USER
               valueFrom:
                 secretKeyRef:
@@ -84,12 +85,19 @@ spec:
           imagePullPolicy: IfNotPresent
       containers:
         - name: velocity-proxy
-          image: openjdk:16-jdk-alpine
+          image: openjdk:17-jdk-alpine
           command:
             - java
           args:
+            # Based on https://docs.papermc.io/velocity/tuning#tune-your-startup-flags
             - '-Xms4G'
             - '-Xmx4G'
+            - '-XX:+UseG1GC'
+            - '-XX:G1HeapRegionSize=4M'
+            - '-XX:+UnlockExperimentalVMOptions'
+            - '-XX:+ParallelRefProcEnabled'
+            - '-XX:+AlwaysPreTouch'
+            - '-XX:MaxInlineLevel=15'
             - '-jar'
             - server.jar
           workingDir: /opt/proxy
@@ -123,6 +131,21 @@ spec:
               value: rabbitmq.core
             - name: QUEUE_PORT
               value: "5672"
+            - name: CACHE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: CACHE_HOST
+            - name: CACHE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: CACHE_PORT
+            - name: CACHE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: CACHE_PASSWORD
           ports:
             - name: minecraft
               hostPort: 25565
