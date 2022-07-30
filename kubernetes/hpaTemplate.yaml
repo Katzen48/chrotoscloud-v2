@@ -14,10 +14,10 @@ spec:
   - type: Pods
     pods:
       metric:
-	    name: mc_players_online_total
+        name: mc_players_online_total
       target:
-	    type: AverageValue
-	    averageValue: 30
+        type: AverageValue
+        averageValue: 30
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 30
