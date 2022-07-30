@@ -26,15 +26,16 @@ jobs:
 
       - uses: gradle/gradle-build-action@v2
         with:
-          arguments: publish
+          arguments: artifactoryPublish
           gradle-version: 7.2
           build-root-directory: plugin
         env:
           CHROTOSCLOUD_TEST_DB_STRING: ${{ secrets.CHROTOSCLOUD_TEST_DB_STRING }}
           CHROTOSCLOUD_TEST_DB_USER: ${{ secrets.CHROTOSCLOUD_TEST_DB_USER }}
           CHROTOSCLOUD_TEST_DB_PASSWORD: ${{ secrets.CHROTOSCLOUD_TEST_DB_PASSWORD }}
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          CHROTOS_USER: ${{ secrets.CHROTOS_USER }}
+          CHROTOS_PASSWORD: ${{ secrets.CHROTOS_PASSWORD }}
+          CHROTOS_CONTEXTURL: "https://artifactory.chrotos.net/artifactory"
 
       - uses: actions/upload-artifact@v2
         with:
