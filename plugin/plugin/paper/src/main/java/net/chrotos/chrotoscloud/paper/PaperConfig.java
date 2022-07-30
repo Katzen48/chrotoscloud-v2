@@ -1,6 +1,9 @@
 package net.chrotos.chrotoscloud.paper;
 
 import net.chrotos.chrotoscloud.CloudConfig;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.Bukkit;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -67,6 +70,26 @@ public class PaperConfig implements CloudConfig {
     @Override
     public String getGameMode() {
         return podLabels.getProperty("net.chrotos.chrotoscloud.gameserver/gamemode").replaceAll("\"", "");
+    }
+
+    @Override
+    public String getResourcePackUrl() {
+        return Bukkit.getResourcePack();
+    }
+
+    @Override
+    public String getResourcePackHash() {
+        return Bukkit.getResourcePackHash();
+    }
+
+    @Override
+    public boolean getResourcePackRequired() {
+        return Bukkit.isResourcePackRequired();
+    }
+
+    @Override
+    public Component getResourcePackPrompt() {
+        return LegacyComponentSerializer.builder().build().deserialize(Bukkit.getResourcePackPrompt());
     }
 
     @Override

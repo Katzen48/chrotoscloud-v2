@@ -1,5 +1,7 @@
 package net.chrotos.chrotoscloud;
 
+import net.kyori.adventure.text.Component;
+
 public interface CloudConfig {
     String getPersistenceConnectionString();
     String getPersistenceUser();
@@ -15,6 +17,10 @@ public interface CloudConfig {
     String getQueuePassword();
 
     String getGameMode();
+    String getResourcePackUrl();
+    String getResourcePackHash();
+    boolean getResourcePackRequired();
+    Component getResourcePackPrompt();
 
     boolean shouldRunMigrations();
 }

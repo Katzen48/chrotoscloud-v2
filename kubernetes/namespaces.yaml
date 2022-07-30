@@ -6,7 +6,7 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: server
+  name: servers
 ---
 apiVersion: v1
 kind: Namespace

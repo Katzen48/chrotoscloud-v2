@@ -24,7 +24,7 @@ spec:
                   default: "1.18.2"
                 cloudVersion:
                   type: string
-                  default: "2.0.0"
+                  default: "3.0-SNAPSHOT"
                 maps:
                   type: object
                   properties:

@@ -1,5 +1,6 @@
 package net.chrotos.chrotoscloud.player;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.*;
 
@@ -32,6 +33,7 @@ public class CloudPlayerInventory implements PlayerInventory {
     @ManyToOne(targetEntity = CloudPlayer.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "player_unique_id", updatable = false)
     @NonNull
+    @JsonIgnore
     private Player player;
 
     @Setter

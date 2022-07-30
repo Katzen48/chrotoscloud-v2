@@ -11,6 +11,8 @@
         defaultCondition = "unique_id = :uniqueId")
 @FilterDef(name = "gameMode", parameters = {@ParamDef(name = "gameMode", type = "java.lang.String")},
         defaultCondition = "game_mode = :gameMode")
+@FilterDef(name = "name", parameters = {@ParamDef(name = "name", type = "java.lang.String")},
+        defaultCondition = "`name` = :name")
 
 package net.chrotos.chrotoscloud;
 

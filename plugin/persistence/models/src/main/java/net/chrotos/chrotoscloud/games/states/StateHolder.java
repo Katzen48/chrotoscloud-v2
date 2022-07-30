@@ -13,4 +13,7 @@ public interface StateHolder {
     Set<GameState> getStates();
     @NonNull
     Collection<? extends GameState> getStates(@NonNull String gameMode);
+
+    @NonNull
+    Collection<? extends GameState> getStatesByName(@NonNull String name);
 }
