@@ -1,0 +1,30 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
+    }
+}
+
+subprojects {
+    apply plugin: "idea"
+    apply plugin: "java"
+    apply plugin: "maven-publish"
+    apply plugin: "com.jfrog.artifactory"
+
+    artifactory {
+        contextUrl = "${chrotos_contextUrl}"
+        publish {
+            contextUrl = "${chrotos_contextUrl}"
+            repository {
+                repoKey = 'public'
+                username = "${chrotos_user}"
+                password = "${chrotos_password}"
+            }
+            defaults {
+                publications('mavenJava')
+            }
+        }
+    }
+}
