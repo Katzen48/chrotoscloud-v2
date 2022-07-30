@@ -96,7 +96,4 @@ const downloadWorlds = require('./worldDownloader.js');
         console.error('Could not download worlds: ' + e);
         process.exit(1);
     }
-
-    // Set EULA
-    fs.writeFileSync(PATH + '/eula.txt', 'eula=true');
 })();
