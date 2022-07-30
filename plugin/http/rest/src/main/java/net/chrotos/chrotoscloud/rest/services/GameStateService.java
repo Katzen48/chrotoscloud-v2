@@ -2,24 +2,30 @@ package net.chrotos.chrotoscloud.rest.services;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import net.chrotos.chrotoscloud.Cloud;
+import net.chrotos.chrotoscloud.games.states.CloudGameState;
 import net.chrotos.chrotoscloud.games.states.GameState;
-import net.chrotos.chrotoscloud.player.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
-@Path("/players/{uuid}/gamestates")
-public class GameStateService extends PlayerFetchingService {
+@Path("/gamestates")
+public class GameStateService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<? extends GameState> getGameStates(@PathParam("uuid") UUID uuid, @QueryParam("gamemode") String gameMode) {
-        Player player = getPlayer(uuid);
-
-        if (gameMode == null) {
-            return new ArrayList<>(player.getStates());
+    public List<? extends GameState> getGameStates(@QueryParam("gamemode") String gameMode,
+                                                   @QueryParam("name") String name) {
+        if (name != null) {
+            return new ArrayList<>(Cloud.getInstance().getPersistence()
+                    .getFiltered(CloudGameState.class, "name", Collections.singletonMap("name", name)));
         }
 
-        return new ArrayList<>(player.getStates(gameMode));
+        if (gameMode != null) {
+            return new ArrayList<>(Cloud.getInstance().getPersistence()
+                    .getFiltered(CloudGameState.class, "gameMode", Collections.singletonMap("gameMode", gameMode)));
+        }
+
+        throw new BadRequestException("Either \"gamemode\" or \"name\" query parameter has to be set");
     }
 }

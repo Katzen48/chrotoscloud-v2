@@ -1,6 +1,7 @@
 package net.chrotos.chrotoscloud.velocity;
 
 import net.chrotos.chrotoscloud.CloudConfig;
+import net.kyori.adventure.text.Component;
 
 public class VelocityConfig implements CloudConfig {
     @Override
@@ -55,6 +56,26 @@ public class VelocityConfig implements CloudConfig {
 
     @Override
     public String getGameMode() {
+        return null;
+    }
+
+    @Override
+    public String getResourcePackUrl() {
+        return null;
+    }
+
+    @Override
+    public String getResourcePackHash() {
+        return null;
+    }
+
+    @Override
+    public boolean getResourcePackRequired() {
+        return false;
+    }
+
+    @Override
+    public Component getResourcePackPrompt() {
         return null;
     }
 

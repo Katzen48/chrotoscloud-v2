@@ -34,8 +34,6 @@ public class RestServer {
             ch.setLevel(Level.ALL);
             l.addHandler(ch);
 
-            Logger logger = Logger.getLogger(getClass().getName());
-
             httpServer.start();
         } catch (Exception e) {
             e.printStackTrace();

@@ -26,7 +26,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @DynamicUpdate
 @SQLDelete(sql = "UPDATE players SET deleted_at=now() WHERE unique_id = ?")
-@Where(clause = "deleted_at IS NUlL")
+@Where(clause = "deleted_at IS NULL")
 @SelectBeforeUpdate
 public class CloudPlayer extends CloudPermissible implements Player, SoftDeletable {
     @Id
@@ -69,6 +69,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
 
     @OneToMany(mappedBy = "player", targetEntity = CloudGameState.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @Filter(name = "gameMode")
+    @Filter(name = "name")
     @NonNull
     @JsonIgnore
     private Set<GameState> states = new HashSet<>();
@@ -131,6 +132,14 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
         return Cloud.getInstance().getPersistence()
                 .executeFiltered("gameMode",
                         Collections.singletonMap("gameMode", gameMode), () -> getStates().stream().toList());
+    }
+
+    @Override
+    @NonNull
+    public Collection<? extends GameState> getStatesByName(@NonNull String name) {
+        return Cloud.getInstance().getPersistence()
+                .executeFiltered("name",
+                        Collections.singletonMap("name", name), () -> getStates().stream().toList());
     }
 
     @Override

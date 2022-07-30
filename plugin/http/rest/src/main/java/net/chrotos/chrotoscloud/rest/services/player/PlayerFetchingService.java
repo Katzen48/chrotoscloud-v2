@@ -1,4 +1,4 @@
-package net.chrotos.chrotoscloud.rest.services;
+package net.chrotos.chrotoscloud.rest.services.player;
 
 import jakarta.ws.rs.NotFoundException;
 import net.chrotos.chrotoscloud.Cloud;
@@ -15,7 +15,7 @@ public abstract class PlayerFetchingService {
         Player player = Cloud.getInstance().getPlayerManager().getPlayer(uuid);
 
         if (player == null) {
-            throw new NotFoundException();
+            throw new NotFoundException("Player not found");
         }
 
         return player;

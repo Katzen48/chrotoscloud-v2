@@ -8,7 +8,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 import java.text.SimpleDateFormat;
 
-@ApplicationPath("/")
+@ApplicationPath("/api/")
 public class RestApplication extends ResourceConfig {
     public RestApplication() {
         packages("net.chrotos.chrotoscloud.rest.services");

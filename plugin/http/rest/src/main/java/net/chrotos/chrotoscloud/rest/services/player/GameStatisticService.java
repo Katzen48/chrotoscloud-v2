@@ -1,4 +1,4 @@
-package net.chrotos.chrotoscloud.rest.services;
+package net.chrotos.chrotoscloud.rest.services.player;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
