@@ -52,16 +52,6 @@ spec:
               value: 3.0-SNAPSHOT
             - name: SERVER_SOFTWARE_VERSION
               value: 3.1.2-SNAPSHOT
-            - name: GITHUB_USER
-              valueFrom:
-                secretKeyRef:
-                  name: github-credentials
-                  key: GITHUB_USER
-            - name: GITHUB_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: github-credentials
-                  key: GITHUB_TOKEN
             - name: DB_STRING
               valueFrom:
                 secretKeyRef:
