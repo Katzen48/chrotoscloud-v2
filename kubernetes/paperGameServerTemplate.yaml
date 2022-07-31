@@ -77,6 +77,51 @@ spec:
                 secretKeyRef:
                   name: velocity-secret
                   key: VELOCITY_SECRET
+            - name: CONFIG_REPO_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: repositories-config
+                  key: CONFIG_REPO_URL
+            - name: CONFIG_REPO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: repositories-secret
+                  key: CONFIG_REPO_USER
+            - name: CONFIG_REPO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: repositories-secret
+                  key: CONFIG_REPO_PASSWORD
+            - name: WORLD_REPO_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: repositories-config
+                  key: WORLD_REPO_URL
+            - name: WORLD_REPO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: repositories-secret
+                  key: WORLD_REPO_USER
+            - name: WORLD_REPO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: repositories-secret
+                  key: WORLD_REPO_PASSWORD
+            - name: MAVEN_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: repositories-config
+                  key: MAVEN_URL
+            - name: MAVEN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: repositories-secret
+                  key: MAVEN_USER
+            - name: MAVEN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: repositories-secret
+                  key: MAVEN_PASSWORD
           imagePullPolicy: IfNotPresent
       containers:
         - name: paper
