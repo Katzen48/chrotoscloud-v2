@@ -2,7 +2,7 @@ const resolveMaven = require('./resolveMaven');
 const download = require('./download');
 const configDownload = require('./configurationDownloader');
 
-module.exports = async function (pluginDirectory, gameMode, mavenUrl, mavenUser, mavenPassword) {
+module.exports = async function (pluginDirectory, gameMode, mavenUrl, mavenUser, mavenPassword, configRepoUrl, configRepoUser, configRepoPassword) {
     let plugins = gameMode.body.spec.plugins;
 
     if (!plugins || plugins.length < 1) {
@@ -43,7 +43,7 @@ module.exports = async function (pluginDirectory, gameMode, mavenUrl, mavenUser,
         if (plugin.configuration) {
             console.log("Downloading Configuration");
 
-            await configDownload(pluginDirectory, fileName, plugin.configuration, mavenUrl, mavenUser, mavenPassword);
+            await configDownload(pluginDirectory, fileName, plugin.configuration, configRepoUrl, configRepoUser, configRepoPassword);
         }
     }
 };

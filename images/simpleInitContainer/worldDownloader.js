@@ -62,10 +62,8 @@ module.exports = async function (worldDirectory, gameMode, repoUrl, repoUser, re
 
             console.log('GroupId: %s, ArtifactId: %s, Version: %s', groupId, artifactId, version);
 
-            url = repoUrl + '/' + groupId.replaceAll('.', '/');
-            url += '/' + artifactId;
-            url += '/' + version;
-
+            let groupPath = groupId.replaceAll('.', '/');
+            url = `${repoUrl}/${groupPath}/${artifactId}/${version}/${artifactId}-${version}.zip`
             user = repoUser;
             password = repoPassword;
         } else if (map.dependency.url) {

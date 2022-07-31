@@ -1,7 +1,7 @@
 // Fetch newest paper version
 
 const BASE_URL = 'https://papermc.io/api/v2/projects/';
-const CLOUD_BASE_URL = 'https://maven.pkg.github.com/katzen48/chrotoscloud-v2'
+const CLOUD_BASE_URL = 'https://artifactory.chrotos.net/artifactory/public'
 const PATH = '/workdir'
 const PropertiesReader = require('properties-reader');
 const fetch = require('cross-fetch')
@@ -17,6 +17,9 @@ const downloadWorlds = require('./worldDownloader.js');
     const MAVEN_URL = process.env.MAVEN_URL;
     const MAVEN_USER = process.env.MAVEN_USER;
     const MAVEN_PASSWORD = process.env.MAVEN_PASSWORD;
+    const CONFIG_REPO_URL = process.env.CONFIG_REPO_URL;
+    const CONFIG_REPO_USER = process.env.CONFIG_REPO_USER;
+    const CONFIG_REPO_PASSWORD = process.env.CONFIG_REPO_PASSWORD;
     const WORLD_REPO_URL = process.env.WORLD_REPO_URL;
     const WORLD_REPO_USER = process.env.WORLD_REPO_USER;
     const WORLD_REPO_PASSWORD = process.env.WORLD_REPO_PASSWORD;
@@ -79,7 +82,7 @@ const downloadWorlds = require('./worldDownloader.js');
     try {
         if (gameMode) {
             console.log('Starting download of plugins');
-            await downloadPlugins(PATH + '/plugins', gameMode, MAVEN_URL, MAVEN_USER, MAVEN_PASSWORD);
+            await downloadPlugins(PATH + '/plugins', gameMode, MAVEN_URL, MAVEN_USER, MAVEN_PASSWORD, CONFIG_REPO_URL, CONFIG_REPO_USER, CONFIG_REPO_PASSWORD);
         }
     } catch (e) {
         console.error('Could not download plugins: ' + e);
