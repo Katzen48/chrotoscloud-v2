@@ -1,6 +1,6 @@
 const fetch = require('cross-fetch')
 const { XMLParser } = require("fast-xml-parser");
-const parser = new XMLParser({preserveOrder: true, parseAttributeValue: false, parseTagValue: false});
+const parser = new XMLParser();
 
 module.exports = async function(repository, groupId, artifactId, version, user, password) {
         let artifactUrl = repository + '/' + groupId.replaceAll('.', '/') + '/' + artifactId + '/' + version;
@@ -23,15 +23,15 @@ module.exports = async function(repository, groupId, artifactId, version, user, 
 
         console.log('Parsing metadata');
         let pomResponse = parser.parse(xmlContent);
-        let metadata = pomResponse[0].metadata;
-        let versioning = metadata[3].versioning;
+        let metadata = pomResponse.metadata;
+        let versioning = metadata.versioning;
 
         let versionString = artifactId + '-';
         if (version.endsWith('-SNAPSHOT')) {
-            let snapshot = versioning[0].snapshot;
+            let snapshot = versioning.snapshot;
             versionString += version.substr(0, version.lastIndexOf('-SNAPSHOT') + 1);
-            versionString += snapshot[0].timestamp[0]['#text'] + '-' +
-                snapshot[1].buildNumber[0]['#text'];
+            versionString += snapshot.timestamp + '-' +
+                snapshot.buildNumber;
         } else {
             versionString += metadata.release[0];
         }
