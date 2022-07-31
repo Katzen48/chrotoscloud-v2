@@ -1,5 +1,5 @@
 plugins {
-    id 'com.github.johnrengelman.shadow' version '7.1.1'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 repositories {
@@ -32,9 +32,13 @@ test {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        mavenJava(MavenPublication) { publication ->
             artifactId = 'plugin-paper'
-            from(components.java)
+            from shadow.component(publication)
         }
     }
+}
+
+shadowJar {
+    classifier = null
 }

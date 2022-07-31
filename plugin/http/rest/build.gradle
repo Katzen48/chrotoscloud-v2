@@ -29,8 +29,6 @@ dependencies {
     implementation "net.kyori:adventure-text-serializer-legacy:4.11.0"
 
     // HTTP Server
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.3'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
     implementation 'com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-json-provider:2.13.3'
     implementation 'org.glassfish.grizzly:grizzly-http-server:3.0.1'
     implementation 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.0.5'
@@ -46,11 +44,15 @@ test {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        mavenJava(MavenPublication) { publication ->
             artifactId = 'http-rest'
-            from(components.java)
+            from shadow.component(publication)
         }
     }
+}
+
+shadowJar {
+    classifier = null
 }
 
 jar {

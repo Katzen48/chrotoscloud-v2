@@ -31,9 +31,13 @@ test {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        mavenJava(MavenPublication) { publication ->
             artifactId = 'plugin-velocity'
-            from(components.java)
+            from shadow.component(publication)
         }
     }
+}
+
+shadowJar {
+    classifier = null
 }
