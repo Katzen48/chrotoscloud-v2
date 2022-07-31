@@ -67,12 +67,12 @@ const downloadWorlds = require('./worldDownloader.js');
     try {
         console.log('Resolving newest build of ChrotosCloud-Plugin');
         let cloudUrl = await resolveMaven(CLOUD_BASE_URL, 'net.chrotos.chrotoscloud',
-            'plugin-' + SOFTWARE, CLOUD_VERSION, process.env.GITHUB_USER,  process.env.GITHUB_TOKEN);
+            'plugin-' + SOFTWARE, CLOUD_VERSION);
         cloudUrl += '-all.jar';
 
         console.log('Found newest build url:', cloudUrl);
 
-        await download(cloudUrl, PATH + '/plugins/chrotoscloud.jar', process.env.GITHUB_USER, process.env.GITHUB_TOKEN);
+        await download(cloudUrl, PATH + '/plugins/chrotoscloud.jar');
     } catch (e) {
         console.error('Could not download chrotoscloud: ' + e);
         process.exit(1);
