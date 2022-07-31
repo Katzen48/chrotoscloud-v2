@@ -1,0 +1,9 @@
+apiVersion: v1
+data:
+  CONFIG_REPO_URL: https://artifactory.chrotos.net/artifactory/configs
+  WORLD_REPO_URL: https://artifactory.chrotos.net/artifactory/worlds
+  MAVEN_URL: https://artifactory.chrotos.net/artifactory/gradle-release
+kind: ConfigMap
+metadata:
+  name: repositories-config
+  namespace: servers

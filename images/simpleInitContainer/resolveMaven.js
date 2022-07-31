@@ -29,11 +29,16 @@ module.exports = async function(repository, groupId, artifactId, version, user, 
         let versionString = artifactId + '-';
         if (version.endsWith('-SNAPSHOT')) {
             let snapshot = versioning.snapshot;
-            versionString += version.substr(0, version.lastIndexOf('-SNAPSHOT') + 1);
-            versionString += snapshot.timestamp + '-' +
-                snapshot.buildNumber;
+
+            if (!snapshot) {
+                versionString += version;
+            } else {
+                versionString += version.substr(0, version.lastIndexOf('-SNAPSHOT') + 1);
+                versionString += snapshot.timestamp + '-' +
+                    snapshot.buildNumber;
+            }
         } else {
-            versionString += metadata.release[0];
+            versionString += metadata.release;
         }
 
         console.log('Version String:', versionString);
