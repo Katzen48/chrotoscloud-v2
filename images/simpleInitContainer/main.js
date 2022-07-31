@@ -68,6 +68,7 @@ const downloadWorlds = require('./worldDownloader.js');
         console.log('Resolving newest build of ChrotosCloud-Plugin');
         let cloudUrl = await resolveMaven(CLOUD_BASE_URL, 'net.chrotos.chrotoscloud',
             'plugin-' + SOFTWARE, CLOUD_VERSION);
+        cloudUrl += '.jar';
 
         console.log('Found newest build url:', cloudUrl);
 
