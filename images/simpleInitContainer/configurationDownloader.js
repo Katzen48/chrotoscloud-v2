@@ -22,8 +22,8 @@ module.exports = async function(pluginDirectory, pluginFileName, pluginConfigura
 
         console.log('GroupId: %s, ArtifactId: %s, Version: %s', groupId, artifactId, version);
 
-        url = await resolveMaven(mavenUrl, groupId, artifactId, version, mavenUser, mavenPassword);
-        url += '.zip'
+        let groupPath = groupId.replaceAll('.', '/');
+        url = `${mavenUrl}/${groupPath}/${artifactId}/${version}/${artifactId}-${version}.zip`
         user = mavenUser;
         password = mavenPassword;
     } else if (pluginConfiguration.url) {
