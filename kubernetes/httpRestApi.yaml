@@ -9,6 +9,9 @@ spec:
     matchLabels:
       app: chrotoscloud-http-rest
   template:
+    metadata:
+      labels:
+        app: chrotoscloud-http-rest
     spec:
       volumes:
         - name: workdir
@@ -48,20 +51,14 @@ spec:
                   name: cloud-secret
                   key: DB_PASSWORD
             - name: CACHE_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: redis-secret
-                  key: CACHE_HOST
+              value: redis
             - name: CACHE_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: redis-secret
-                  key: CACHE_PORT
+              value: "6379"
             - name: CACHE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: redis-secret
-                  key: CACHE_PASSWORD
+                  key: REDIS_PASSWORD
             - name: QUEUE_USER
               valueFrom:
                 secretKeyRef:
