@@ -1,10 +1,8 @@
-package net.chrotos.chrotoscloud.rest;
+package net.chrotos.chrotoscloud.rest.middleware;
 
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.container.ContainerResponseFilter;
-
-import java.io.IOException;
 
 public class CORSFilter implements ContainerResponseFilter {
     @Override
