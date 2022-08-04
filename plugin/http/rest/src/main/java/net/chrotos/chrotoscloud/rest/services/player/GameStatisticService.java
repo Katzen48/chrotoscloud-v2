@@ -5,6 +5,7 @@ import jakarta.ws.rs.core.MediaType;
 import net.chrotos.chrotoscloud.games.stats.GameStatistic;
 import net.chrotos.chrotoscloud.player.Player;
 import net.chrotos.chrotoscloud.rest.middleware.Cache;
+import net.chrotos.chrotoscloud.rest.response.Response;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,13 +16,13 @@ public class GameStatisticService extends PlayerFetchingService {
     @Cache(seconds = 180)
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<? extends GameStatistic> getGameStats(@PathParam("uuid") UUID uuid, @QueryParam("gamemode") String gameMode) {
+    public Response<List<? extends GameStatistic>> getGameStats(@PathParam("uuid") UUID uuid, @QueryParam("gamemode") String gameMode) {
         Player player = getPlayer(uuid);
 
         if (gameMode == null) {
-            return new ArrayList<>(player.getStats());
+            return new Response<>(new ArrayList<>(player.getStats()));
         }
 
-        return new ArrayList<>(player.getStats(gameMode));
+        return new Response<>(new ArrayList<>(player.getStats(gameMode)));
     }
 }

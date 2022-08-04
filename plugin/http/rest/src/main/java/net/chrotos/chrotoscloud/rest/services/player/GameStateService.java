@@ -5,29 +5,29 @@ import jakarta.ws.rs.core.MediaType;
 import net.chrotos.chrotoscloud.games.states.GameState;
 import net.chrotos.chrotoscloud.player.Player;
 import net.chrotos.chrotoscloud.rest.middleware.Cache;
+import net.chrotos.chrotoscloud.rest.response.Response;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Path("/players/{uuid}")
+@Path("/players/{uuid}/gamestates")
 public class GameStateService extends PlayerFetchingService {
     @Cache(seconds = 180)
     @GET
-    @Path("/gamestates")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<? extends GameState> getGameStates(@PathParam("uuid") UUID uuid, @QueryParam("gamemode") String gameMode,
-                                                   @QueryParam("name") String name) {
+    public Response<List<? extends GameState>> getGameStates(@PathParam("uuid") UUID uuid, @QueryParam("gamemode") String gameMode,
+                                                            @QueryParam("name") String name) {
         Player player = getPlayer(uuid);
 
         if (name != null) {
-            return new ArrayList<>(player.getStatesByName(name));
+            return new Response<>(new ArrayList<>(player.getStatesByName(name)));
         }
 
         if (gameMode != null) {
-            return new ArrayList<>(player.getStates(gameMode));
+            return new Response<>(new ArrayList<>(player.getStates(gameMode)));
         }
 
-        return new ArrayList<>(player.getStates());
+        return new Response<>(new ArrayList<>(player.getStates()));
     }
 }

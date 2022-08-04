@@ -5,6 +5,7 @@ import jakarta.ws.rs.core.MediaType;
 import net.chrotos.chrotoscloud.economy.Account;
 import net.chrotos.chrotoscloud.economy.AccountType;
 import net.chrotos.chrotoscloud.rest.middleware.Cache;
+import net.chrotos.chrotoscloud.rest.response.Response;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,19 +16,19 @@ public class AccountService extends PlayerFetchingService {
     @Cache(seconds = 180)
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Account> getAccounts(@PathParam("uuid") UUID uuid, @QueryParam("type") AccountType type) {
+    public Response<List<Account>> getAccounts(@PathParam("uuid") UUID uuid, @QueryParam("type") AccountType type) {
         if (type == null) {
-            return new ArrayList<>(getPlayer(uuid).getAccounts());
+            return new Response<>(new ArrayList<>(getPlayer(uuid).getAccounts()));
         }
 
-        return new ArrayList<>(getPlayer(uuid).getAccounts(type));
+        return new Response<>(new ArrayList<>(getPlayer(uuid).getAccounts(type)));
     }
 
     @Cache(seconds = 60)
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Account getAccount(@PathParam("uuid") UUID uuid, @PathParam("id") UUID id) {
-        return getPlayer(uuid).getAccount(id);
+    public Response<Account> getAccount(@PathParam("uuid") UUID uuid, @PathParam("id") UUID id) {
+        return new Response<>(getPlayer(uuid).getAccount(id));
     }
 }
