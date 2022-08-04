@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 import jakarta.ws.rs.ApplicationPath;
+import net.chrotos.chrotoscloud.rest.middleware.CORSFilter;
+import net.chrotos.chrotoscloud.rest.middleware.DynamicCache;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import java.text.SimpleDateFormat;
@@ -15,6 +17,7 @@ public class RestApplication extends ResourceConfig {
 
         register(getJacksonProvider());
         register(new CORSFilter());
+        register(new DynamicCache());
     }
 
     private JacksonJsonProvider getJacksonProvider() {
