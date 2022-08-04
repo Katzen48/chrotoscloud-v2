@@ -110,7 +110,7 @@ const downloadWorlds = require('./worldDownloader.js');
 
             console.log('Found newest build url:', cloudUrl);
 
-            await download(cloudUrl, PATH + 'server.jar');
+            await download(cloudUrl, PATH + '/server.jar');
         } catch (e) {
             console.error('Could not download chrotoscloud: ' + e);
             process.exit(1);
