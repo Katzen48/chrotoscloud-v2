@@ -13,7 +13,7 @@ import java.util.List;
 
 @Path("/gamestates")
 public class GameStateService {
-    @Cache(seconds = 300)
+    @Cache(seconds = 600)
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<? extends GameState> getGameStates(@QueryParam("gamemode") String gameMode,
