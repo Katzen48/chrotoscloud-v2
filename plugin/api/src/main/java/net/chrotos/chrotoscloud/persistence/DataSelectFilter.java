@@ -15,4 +15,7 @@ public class DataSelectFilter {
     String orderKey;
     @Builder.Default
     Ordering ordering = Ordering.ASCENDING;
+    @Builder.Default
+    int pageSize = 0;
+    int first = 0;
 }

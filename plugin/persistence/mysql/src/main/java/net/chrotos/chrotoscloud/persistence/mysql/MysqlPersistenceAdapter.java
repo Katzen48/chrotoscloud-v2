@@ -105,7 +105,14 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
             all = all.orderBy(order);
         }
 
-        return session.createQuery(all);
+        TypedQuery<E> query = session.createQuery(all)
+                                     .setFirstResult(filter.getFirst());
+
+        if (filter.getPageSize() > 0) {
+            query = query.setMaxResults(filter.getPageSize());
+        }
+
+        return query;
     }
 
     @Override
