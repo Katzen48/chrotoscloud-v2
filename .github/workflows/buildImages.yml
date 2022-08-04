@@ -40,6 +40,13 @@ jobs:
           context: images/simpleInitContainer
           push: true
           tags: ${{ env.BASE_IMAGE }}:simple-init-container
+          
+      - name: apiInitContainer
+        uses: docker/build-push-action@v2.7.0
+        with:
+          context: images/apiInitContainer
+          push: true
+          tags: ${{ env.BASE_IMAGE }}:api-init-container
 
       - name: paperInitContainer
         uses: docker/build-push-action@v2.7.0
