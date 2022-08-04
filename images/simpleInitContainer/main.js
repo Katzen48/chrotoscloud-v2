@@ -54,49 +54,66 @@ const downloadWorlds = require('./worldDownloader.js');
     const VERSION = (SOFTWARE === 'paper') ? gameMode.body.spec.version : process.env.SERVER_SOFTWARE_VERSION;
     const CLOUD_VERSION = (SOFTWARE === 'paper') ? gameMode.body.spec.cloudVersion : process.env.CLOUD_VERSION;
 
-    console.log('Fetching newest Build of', SOFTWARE, 'of version', VERSION); // Maybe remove and include in image?
+    if (SOFTWARE !== 'api') {
+        console.log('Fetching newest Build of', SOFTWARE, 'of version', VERSION); // Maybe remove and include in image?
 
-    let versionResponse = await fetch(`${VERSIONS_URL}/${VERSION}`)
-    let json = await versionResponse.json();
-    let newestBuild = json.builds[json.builds.length - 1];
+        let versionResponse = await fetch(`${VERSIONS_URL}/${VERSION}`)
+        let json = await versionResponse.json();
+        let newestBuild = json.builds[json.builds.length - 1];
 
-    console.log('Starting download of build', newestBuild);
-    await download(`${VERSIONS_URL}/${VERSION}/builds/${newestBuild}/downloads/${SOFTWARE}-${VERSION}-${newestBuild}.jar`, PATH + '/server.jar');
+        console.log('Starting download of build', newestBuild);
+        await download(`${VERSIONS_URL}/${VERSION}/builds/${newestBuild}/downloads/${SOFTWARE}-${VERSION}-${newestBuild}.jar`, PATH + '/server.jar');
 
-    // Download ChrotosCloud-V2 implementation
-    try {
-        console.log('Resolving newest build of ChrotosCloud-Plugin');
-        let cloudUrl = await resolveMaven(CLOUD_BASE_URL, 'net.chrotos.chrotoscloud',
-            'plugin-' + SOFTWARE, CLOUD_VERSION);
-        cloudUrl += '.jar';
+        // Download ChrotosCloud-V2 implementation
+        try {
+            console.log('Resolving newest build of ChrotosCloud-Plugin');
+            let cloudUrl = await resolveMaven(CLOUD_BASE_URL, 'net.chrotos.chrotoscloud',
+                'plugin-' + SOFTWARE, CLOUD_VERSION);
+            cloudUrl += '.jar';
 
-        console.log('Found newest build url:', cloudUrl);
+            console.log('Found newest build url:', cloudUrl);
 
-        await download(cloudUrl, PATH + '/plugins/chrotoscloud.jar');
-    } catch (e) {
-        console.error('Could not download chrotoscloud: ' + e);
-        process.exit(1);
-    }
-
-    // Download Plugins
-    try {
-        if (gameMode) {
-            console.log('Starting download of plugins');
-            await downloadPlugins(PATH + '/plugins', gameMode, MAVEN_URL, MAVEN_USER, MAVEN_PASSWORD, CONFIG_REPO_URL, CONFIG_REPO_USER, CONFIG_REPO_PASSWORD);
+            await download(cloudUrl, PATH + '/plugins/chrotoscloud.jar');
+        } catch (e) {
+            console.error('Could not download chrotoscloud: ' + e);
+            process.exit(1);
         }
-    } catch (e) {
-        console.error('Could not download plugins: ' + e);
-        process.exit(1);
-    }
 
-    // Download Worlds
-    try {
-        if (gameMode) {
-            console.log('Starting download of worlds');
-            await downloadWorlds(PATH + '/worlds', gameMode, WORLD_REPO_URL, WORLD_REPO_USER, WORLD_REPO_PASSWORD);
+        // Download Plugins
+        try {
+            if (gameMode) {
+                console.log('Starting download of plugins');
+                await downloadPlugins(PATH + '/plugins', gameMode, MAVEN_URL, MAVEN_USER, MAVEN_PASSWORD, CONFIG_REPO_URL, CONFIG_REPO_USER, CONFIG_REPO_PASSWORD);
+            }
+        } catch (e) {
+            console.error('Could not download plugins: ' + e);
+            process.exit(1);
         }
-    } catch (e) {
-        console.error('Could not download worlds: ' + e);
-        process.exit(1);
+
+        // Download Worlds
+        try {
+            if (gameMode) {
+                console.log('Starting download of worlds');
+                await downloadWorlds(PATH + '/worlds', gameMode, WORLD_REPO_URL, WORLD_REPO_USER, WORLD_REPO_PASSWORD);
+            }
+        } catch (e) {
+            console.error('Could not download worlds: ' + e);
+            process.exit(1);
+        }
+    } else {
+        // Download ChrotosCloud-V2 implementation
+        try {
+            console.log('Resolving newest build of ChrotosCloud-API');
+            let cloudUrl = await resolveMaven(CLOUD_BASE_URL, 'net.chrotos.chrotoscloud',
+                'http-rest', CLOUD_VERSION); // TODO accept other implementations
+            cloudUrl += '.jar';
+
+            console.log('Found newest build url:', cloudUrl);
+
+            await download(cloudUrl, PATH + 'server.jar');
+        } catch (e) {
+            console.error('Could not download chrotoscloud: ' + e);
+            process.exit(1);
+        }
     }
 })();

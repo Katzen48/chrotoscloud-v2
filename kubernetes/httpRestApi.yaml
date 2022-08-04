@@ -1,0 +1,142 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: chrotoscloud-http-rest
+  namespace: core
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chrotoscloud-http-rest
+  template:
+    spec:
+      volumes:
+        - name: workdir
+          emptyDir: {}
+      initContainers:
+        - name: api-download
+          image: ghcr.io/katzen48/chrotoscloud-v2:api-init-container
+          volumeMounts:
+            - name: workdir
+              mountPath: /workdir
+          imagePullPolicy: IfNotPresent
+      containers:
+        - name: api-server
+          image: openjdk:17-jdk
+          command:
+            - java
+          args:
+            - '-Xms1G'
+            - '-Xmx1G'
+            - '-jar'
+            - server.jar
+          workingDir: /opt/api
+          env:
+            - name: DB_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: cloud-secret
+                  key: DB_STRING
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cloud-secret
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cloud-secret
+                  key: DB_PASSWORD
+            - name: CACHE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: CACHE_HOST
+            - name: CACHE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: CACHE_PORT
+            - name: CACHE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: CACHE_PASSWORD
+            - name: QUEUE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret
+                  key: RABBITMQ_USERNAME
+            - name: QUEUE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret
+                  key: RABBITMQ_PASSWORD
+            - name: QUEUE_HOST
+              value: rabbitmq.core
+            - name: QUEUE_PORT
+              value: "5672"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          resources:
+            limits:
+              memory: 2G
+            requests:
+              memory: 1G
+          volumeMounts:
+            - name: workdir
+              mountPath: /opt/api
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 60
+            timeoutSeconds: 1
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 2
+            successThreshold: 1
+            failureThreshold: 10
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: chrotoscloud-http-rest
+  namespace: core
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: http
+  selector:
+    app: chrotoscloud-http-rest
+---
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: chrotoscloud-http-rest
+  namespace: core
+  labels:
+    name: chrotoscloud-http-rest
+spec:
+  rules:
+    - host: chrotoscloud.chrotos.net
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: chrotoscloud-http-rest
+                port:
+                  name: http
