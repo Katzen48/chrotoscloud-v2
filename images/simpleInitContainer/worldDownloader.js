@@ -56,9 +56,9 @@ module.exports = async function (worldDirectory, gameMode, repoUrl, repoUser, re
         let user = null;
         let password = null;
         if (map.dependency.mavenLike) {
-            let groupId = plugin.dependency.mavenLike.groupId;
-            let artifactId = plugin.dependency.mavenLike.artifactId;
-            let version = plugin.dependency.mavenLike.version;
+            let groupId = map.dependency.mavenLike.groupId;
+            let artifactId = map.dependency.mavenLike.artifactId;
+            let version = map.dependency.mavenLike.version;
 
             console.log('GroupId: %s, ArtifactId: %s, Version: %s', groupId, artifactId, version);
 
