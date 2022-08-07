@@ -1,6 +1,6 @@
 FROM node:18-bullseye
 
-RUN apt-get update && apt-get install -y gettext-base
+RUN apt-get update && apt-get upgrade -y --with-new-pkgs && apt-get install -y ca-certificates gettext-base
 
 COPY package*.json ./
 RUN npm install

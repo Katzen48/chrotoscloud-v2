@@ -35,23 +35,26 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: simpleInitContainer
-        uses: docker/build-push-action@v2.7.0
+        uses: docker/build-push-action@v3.1.1
         with:
           context: images/simpleInitContainer
+          pull: true
           push: true
           tags: ${{ env.BASE_IMAGE }}:simple-init-container
           
       - name: apiInitContainer
-        uses: docker/build-push-action@v2.7.0
+        uses: docker/build-push-action@v3.1.1
         with:
           context: images/apiInitContainer
+          pull: true
           push: true
           tags: ${{ env.BASE_IMAGE }}:api-init-container
 
       - name: paperInitContainer
-        uses: docker/build-push-action@v2.7.0
+        uses: docker/build-push-action@v3.1.1
         with:
           context: images/paperInitContainer
+          pull: true
           push: true
           tags: ${{ env.BASE_IMAGE }}:paper-init-container
           
@@ -63,9 +66,10 @@ jobs:
           target: "images/velocityInitContainer/velocity-all.jar"
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: velocityInitContainer
-        uses: docker/build-push-action@v2.7.0
+        uses: docker/build-push-action@v3.1.1
         with:
           context: images/velocityInitContainer
+          pull: true
           push: true
           tags: ${{ env.BASE_IMAGE }}:velocity-init-container
           
@@ -76,8 +80,9 @@ jobs:
           target: "images/waterfallInitContainer/bungeecord-all.jar"
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: waterfallInitContainer
-        uses: docker/build-push-action@v2.7.0
+        uses: docker/build-push-action@v3.1.1
         with:
           context: images/waterfallInitContainer
+          pull: true
           push: true
           tags: ${{ env.BASE_IMAGE }}:waterfall-init-container
