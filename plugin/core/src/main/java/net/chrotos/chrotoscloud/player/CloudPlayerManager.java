@@ -9,6 +9,7 @@ import net.chrotos.chrotoscloud.persistence.EntityExistsException;
 
 import java.util.Collections;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 @RequiredArgsConstructor
 public class CloudPlayerManager implements PlayerManager {
@@ -16,8 +17,15 @@ public class CloudPlayerManager implements PlayerManager {
 
     @Override
     public Player getPlayer(@NonNull UUID uniqueId) {
-        return cloud.getPersistence().getOne(CloudPlayer.class, DataSelectFilter.builder()
-                .primaryKeyValue(uniqueId).build());
+        AtomicReference<Player> player = new AtomicReference<>();
+        cloud.getPersistence().runInTransaction(databaseTransaction -> {
+            databaseTransaction.suppressCommit();
+
+            player.set(cloud.getPersistence().getOne(CloudPlayer.class, DataSelectFilter.builder()
+                    .primaryKeyValue(uniqueId).build()));
+        });
+
+        return player.get();
     }
 
     @Override
