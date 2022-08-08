@@ -1,6 +1,7 @@
 package net.chrotos.chrotoscloud.games.stats;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import lombok.*;
 import net.chrotos.chrotoscloud.persistence.SoftDeletable;
 import net.chrotos.chrotoscloud.player.CloudPlayer;
@@ -40,7 +41,7 @@ public class CloudGameStatistic implements GameStatistic, SoftDeletable {
     @ManyToOne(targetEntity = CloudPlayer.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "player_unique_id", updatable = false)
     @NonNull
-    @JsonIgnore
+    @JsonIncludeProperties({"unique_id", "name"})
     private Player player;
 
     @Setter
