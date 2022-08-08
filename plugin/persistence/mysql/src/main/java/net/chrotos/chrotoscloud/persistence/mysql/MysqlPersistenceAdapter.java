@@ -222,7 +222,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
         Session session = getSession();
 
         if (session.contains(object)) {
-            session.detach(object);
+            session.evict(object);
         }
     }
 
