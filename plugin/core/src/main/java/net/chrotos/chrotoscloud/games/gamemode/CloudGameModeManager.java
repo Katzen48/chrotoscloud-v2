@@ -20,7 +20,7 @@ public class CloudGameModeManager implements GameModeManager {
         Configuration.setDefaultApiClient(apiClient);
 
         this.api = new GenericKubernetesApi<>(CloudGameMode.class, CloudGameModeList.class,
-                "chrotoscloud.chrotos.net", "apiextensions.k8s.io/v1", "servers", apiClient);
+                "chrotoscloud.chrotos.net", "v1", "gamemodes", apiClient);
     }
 
     @Override
