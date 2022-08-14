@@ -9,9 +9,11 @@ import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Pod;
 import io.kubernetes.client.openapi.models.V1PodList;
 import io.kubernetes.client.util.Config;
+import lombok.Getter;
 import lombok.NonNull;
 import net.chrotos.chrotoscloud.games.*;
 import net.chrotos.chrotoscloud.games.events.*;
+import net.chrotos.chrotoscloud.games.gamemode.CloudGameModeManager;
 import net.chrotos.chrotoscloud.messaging.queue.Listener;
 import net.chrotos.chrotoscloud.messaging.queue.Message;
 import net.chrotos.chrotoscloud.messaging.queue.Registration;
@@ -29,6 +31,8 @@ import java.util.stream.Collectors;
 
 public class VelocityGameManager implements GameManager, AutoCloseable {
     private final VelocityCloud cloud;
+    @Getter
+    private final CloudGameModeManager gameModeManager = new CloudGameModeManager();
     private final CoreV1Api coreV1Api;
     private Registration<GameServerLookupRequest, Void> lookup;
     private Registration<GameServerPingRequest, Void> ping;

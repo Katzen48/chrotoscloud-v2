@@ -1,9 +1,11 @@
 package net.chrotos.chrotoscloud.paper.games;
 
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.chrotos.chrotoscloud.games.*;
 import net.chrotos.chrotoscloud.games.events.*;
+import net.chrotos.chrotoscloud.games.gamemode.CloudGameModeManager;
 import net.chrotos.chrotoscloud.messaging.queue.Listener;
 import net.chrotos.chrotoscloud.messaging.queue.Message;
 import net.chrotos.chrotoscloud.messaging.queue.Registration;
@@ -25,6 +27,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PaperGameManager implements GameManager, AutoCloseable {
     private final PaperCloud cloud;
+    @Getter
+    private final CloudGameModeManager gameModeManager = new CloudGameModeManager();
     private Registration<GameServerConnectedEvent, Void> connectedEventRegistration;
 
     @Override

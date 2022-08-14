@@ -1,7 +1,7 @@
 package net.chrotos.chrotoscloud.rest;
 
 import net.chrotos.chrotoscloud.CloudConfig;
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 
 public class RestConfig implements CloudConfig {
 
@@ -76,7 +76,7 @@ public class RestConfig implements CloudConfig {
     }
 
     @Override
-    public Component getResourcePackPrompt() {
+    public TextComponent getResourcePackPrompt() {
         return null;
     }
 

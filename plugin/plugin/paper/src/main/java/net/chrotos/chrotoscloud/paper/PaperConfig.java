@@ -1,7 +1,9 @@
 package net.chrotos.chrotoscloud.paper;
 
+import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.CloudConfig;
-import net.kyori.adventure.text.Component;
+import net.chrotos.chrotoscloud.games.gamemode.GameMode;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 
@@ -11,6 +13,7 @@ import java.util.Properties;
 
 public class PaperConfig implements CloudConfig {
     private final Properties podLabels;
+    private GameMode gameModeSpec;
 
     protected PaperConfig() throws IOException {
         this.podLabels = new Properties();
@@ -74,21 +77,21 @@ public class PaperConfig implements CloudConfig {
 
     @Override
     public String getResourcePackUrl() {
-        return Bukkit.getResourcePack();
+        return getGameModeSpec().getResourcePack() != null ? getGameModeSpec().getResourcePack().getUrl() : null;
     }
 
     @Override
     public String getResourcePackHash() {
-        return Bukkit.getResourcePackHash();
+        return getGameModeSpec().getResourcePack() != null ? getGameModeSpec().getResourcePack().getHash() : null;
     }
 
     @Override
     public boolean getResourcePackRequired() {
-        return Bukkit.isResourcePackRequired();
+        return getGameModeSpec().getResourcePack() != null && getGameModeSpec().getResourcePack().isRequired();
     }
 
     @Override
-    public Component getResourcePackPrompt() {
+    public TextComponent getResourcePackPrompt() {
         return LegacyComponentSerializer.builder().build().deserialize(Bukkit.getResourcePackPrompt());
     }
 
@@ -97,5 +100,13 @@ public class PaperConfig implements CloudConfig {
         String value = System.getenv("DB_UPGRADE");
 
         return value != null && (value.equalsIgnoreCase("1") ||value.equalsIgnoreCase("true"));
+    }
+
+    private GameMode getGameModeSpec() {
+        if (gameModeSpec != null) {
+            return gameModeSpec;
+        }
+
+        return (gameModeSpec = Cloud.getInstance().getGameManager().getGameModeManager().getByName(getGameMode()));
     }
 }

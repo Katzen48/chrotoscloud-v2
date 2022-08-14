@@ -55,7 +55,12 @@ public class PaperEventHandler implements Listener {
                 }
 
                 loadScoreboardTags(cloudPlayer, player);
-                ((PaperSidedPlayer)cloudPlayer.getSidedPlayer()).setSentResourcePackHash(Bukkit.getResourcePackHash());
+
+                if (cloud.getCloudConfig().getResourcePackUrl() != null) {
+                    cloudPlayer.setResourcePack(cloud.getCloudConfig().getResourcePackUrl(),
+                            cloud.getCloudConfig().getResourcePackHash(), cloud.getCloudConfig().getResourcePackRequired(),
+                            cloud.getCloudConfig().getResourcePackPrompt());
+                }
             } catch (PlayerSoftDeletedException e) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("Your account has been deleted!")); // TODO: Translate
             } catch (Exception e) {

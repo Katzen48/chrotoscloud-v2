@@ -41,7 +41,7 @@ spec:
                 expirationSeconds: 7200
       initContainers:
         - name: velocity-download
-          image: ghcr.io/katzen48/chrotoscloud-v2:velocity-init-container
+          image: katzen48/chrotoscloud-v2:velocity-init-container
           volumeMounts:
             - name: workdir
               mountPath: /workdir

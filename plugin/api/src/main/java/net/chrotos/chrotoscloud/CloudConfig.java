@@ -1,6 +1,6 @@
 package net.chrotos.chrotoscloud;
 
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 
 public interface CloudConfig {
     String getPersistenceConnectionString();
@@ -20,7 +20,7 @@ public interface CloudConfig {
     String getResourcePackUrl();
     String getResourcePackHash();
     boolean getResourcePackRequired();
-    Component getResourcePackPrompt();
+    TextComponent getResourcePackPrompt();
 
     boolean shouldRunMigrations();
 }

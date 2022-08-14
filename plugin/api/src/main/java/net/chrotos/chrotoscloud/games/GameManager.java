@@ -1,12 +1,14 @@
 package net.chrotos.chrotoscloud.games;
 
 import lombok.NonNull;
+import net.chrotos.chrotoscloud.games.gamemode.GameModeManager;
 import net.chrotos.chrotoscloud.player.Player;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface GameManager {
+    GameModeManager getGameModeManager();
     CompletableFuture<? extends GameServer> getGameServer(@NonNull String name);
     CompletableFuture<List<? extends GameServer>> getGameServers();
     CompletableFuture<List<? extends GameServer>> getGameServers(@NonNull String gameMode);
