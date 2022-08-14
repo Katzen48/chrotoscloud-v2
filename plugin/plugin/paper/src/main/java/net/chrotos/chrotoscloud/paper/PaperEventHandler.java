@@ -15,13 +15,13 @@ import net.chrotos.chrotoscloud.player.CloudPlayerInventory;
 import net.chrotos.chrotoscloud.player.PlayerInventory;
 import net.chrotos.chrotoscloud.player.PlayerSoftDeletedException;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
@@ -55,12 +55,6 @@ public class PaperEventHandler implements Listener {
                 }
 
                 loadScoreboardTags(cloudPlayer, player);
-
-                if (cloud.getCloudConfig().getResourcePackUrl() != null) {
-                    cloudPlayer.setResourcePack(cloud.getCloudConfig().getResourcePackUrl(),
-                            cloud.getCloudConfig().getResourcePackHash(), cloud.getCloudConfig().getResourcePackRequired(),
-                            cloud.getCloudConfig().getResourcePackPrompt());
-                }
             } catch (PlayerSoftDeletedException e) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("Your account has been deleted!")); // TODO: Translate
             } catch (Exception e) {
@@ -69,6 +63,17 @@ public class PaperEventHandler implements Listener {
                 cloud.getPlayerManager().logoutPlayer(event.getPlayer().getUniqueId());
             }
         });
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getPlayer(event.getPlayer().getUniqueId());
+
+        if (cloud.getCloudConfig().getResourcePackUrl() != null) {
+            cloudPlayer.setResourcePack(cloud.getCloudConfig().getResourcePackUrl(),
+                    cloud.getCloudConfig().getResourcePackHash(), cloud.getCloudConfig().getResourcePackRequired(),
+                    cloud.getCloudConfig().getResourcePackPrompt());
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
