@@ -77,17 +77,20 @@ public class PaperConfig implements CloudConfig {
 
     @Override
     public String getResourcePackUrl() {
-        return getGameModeSpec().getResourcePack() != null ? getGameModeSpec().getResourcePack().getUrl() : null;
+        return getGameModeSpec() != null && getGameModeSpec().getResourcePack() != null ?
+                getGameModeSpec().getResourcePack().getUrl() : null;
     }
 
     @Override
     public String getResourcePackHash() {
-        return getGameModeSpec().getResourcePack() != null ? getGameModeSpec().getResourcePack().getHash() : null;
+        return getGameModeSpec() != null && getGameModeSpec().getResourcePack() != null ?
+                getGameModeSpec().getResourcePack().getHash() : null;
     }
 
     @Override
     public boolean getResourcePackRequired() {
-        return getGameModeSpec().getResourcePack() != null && getGameModeSpec().getResourcePack().isRequired();
+        return getGameModeSpec() != null && getGameModeSpec().getResourcePack() != null &&
+                getGameModeSpec().getResourcePack().isRequired();
     }
 
     @Override

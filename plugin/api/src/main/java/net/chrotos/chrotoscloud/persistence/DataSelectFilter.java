@@ -17,5 +17,6 @@ public class DataSelectFilter {
     Ordering ordering = Ordering.ASCENDING;
     @Builder.Default
     int pageSize = 0;
+    @Builder.Default
     int first = 0;
 }
