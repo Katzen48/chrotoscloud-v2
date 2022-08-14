@@ -67,7 +67,7 @@ public class PaperEventHandler implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getPlayer(event.getPlayer().getUniqueId());
+        net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getOrCreatePlayer(new PaperSidedPlayer(event.getPlayer()));
 
         if (cloud.getCloudConfig().getResourcePackUrl() != null) {
             cloudPlayer.setResourcePack(cloud.getCloudConfig().getResourcePackUrl(),
