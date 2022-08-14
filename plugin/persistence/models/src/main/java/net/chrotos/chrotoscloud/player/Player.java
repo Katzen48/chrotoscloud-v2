@@ -7,6 +7,7 @@ import net.chrotos.chrotoscloud.games.stats.StatsHolder;
 import net.chrotos.chrotoscloud.permissions.Permissible;
 import net.chrotos.chrotoscloud.permissions.Rank;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 
 import java.util.UUID;
 
@@ -21,9 +22,8 @@ public interface Player extends AccountHolder, InventoryHolder, Permissible, Sta
     @NonNull
     Component getPrefixes();
     String getResourcePackHash();
-    void setResourcePack(@NonNull String url);
     void setResourcePack(@NonNull String url, @NonNull String hash);
     void setResourcePack(@NonNull String url, @NonNull String hash, boolean required);
-    void setResourcePack(@NonNull String url, @NonNull String hash, boolean required, @NonNull Component prompt);
+    void setResourcePack(@NonNull String url, @NonNull String hash, boolean required, @NonNull TextComponent prompt);
     boolean hasResourcePackApplied(@NonNull String hash);
 }

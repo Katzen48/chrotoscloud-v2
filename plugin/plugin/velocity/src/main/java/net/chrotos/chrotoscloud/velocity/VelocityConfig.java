@@ -1,7 +1,7 @@
 package net.chrotos.chrotoscloud.velocity;
 
 import net.chrotos.chrotoscloud.CloudConfig;
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 
 public class VelocityConfig implements CloudConfig {
     @Override
@@ -75,7 +75,7 @@ public class VelocityConfig implements CloudConfig {
     }
 
     @Override
-    public Component getResourcePackPrompt() {
+    public TextComponent getResourcePackPrompt() {
         return null;
     }
 

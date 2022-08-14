@@ -105,6 +105,19 @@ spec:
                            type: string
                     required:
                     - dependency
+                resourcePack:
+                  type: object
+                  properties:
+                    url:
+                      type: string
+                    hash:
+                      type: string
+                    required:
+                      type: boolean
+                      default: true
+                  required:
+                  - url
+                  - hash
               required:
               - maps
   scope: Namespaced

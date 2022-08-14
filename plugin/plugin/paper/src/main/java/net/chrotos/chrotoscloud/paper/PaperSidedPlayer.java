@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.chrotos.chrotoscloud.player.SidedPlayer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
@@ -36,25 +37,18 @@ public class PaperSidedPlayer implements SidedPlayer {
     }
 
     @Override
-    public void setResourcePack(@NonNull String url) {
-        sidedObject.setResourcePack(url);
-    }
-
-    @Override
     public void setResourcePack(@NonNull String url, @NonNull String hash) {
-        sidedObject.setResourcePack(url, hash);
-        sentResourcePackHash = hash;
+        setResourcePack(url, hash, false);
     }
 
     @Override
     public void setResourcePack(@NonNull String url, @NonNull String hash, boolean required) {
-        sidedObject.setResourcePack(url, hash, required);
-        sentResourcePackHash = hash;
+        setResourcePack(url, hash, required, null);
     }
 
     @Override
-    public void setResourcePack(@NonNull String url, @NonNull String hash, boolean required, @NonNull Component prompt) {
-        sidedObject.setResourcePack(url, hash, required, prompt);
+    public void setResourcePack(@NonNull String url, @NonNull String hash, boolean required, TextComponent prompt) {
+        sidedObject.setResourcePack(url, hash, required, prompt != null && !prompt.content().equals("") ? prompt : null);
         sentResourcePackHash = hash;
     }
 

@@ -13,6 +13,7 @@ import net.chrotos.chrotoscloud.games.stats.GameStatistic;
 import net.chrotos.chrotoscloud.permissions.*;
 import net.chrotos.chrotoscloud.persistence.SoftDeletable;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.hibernate.annotations.*;
 
 import javax.persistence.*;
@@ -157,11 +158,6 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     }
 
     @Override
-    public void setResourcePack(@NonNull String url) {
-        sidedPlayer.setResourcePack(url);
-    }
-
-    @Override
     public void setResourcePack(@NonNull String url, @NonNull String hash) {
         sidedPlayer.setResourcePack(url, hash);
     }
@@ -172,7 +168,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     }
 
     @Override
-    public void setResourcePack(@NonNull String url, @NonNull String hash, boolean required, @NonNull Component prompt) {
+    public void setResourcePack(@NonNull String url, @NonNull String hash, boolean required, @NonNull TextComponent prompt) {
         sidedPlayer.setResourcePack(url, hash, required, prompt);
     }
 
