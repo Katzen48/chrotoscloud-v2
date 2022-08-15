@@ -224,6 +224,13 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
         if (session.contains(object)) {
             session.evict(object);
         }
+
+        if (sessionFactory.getCache() != null) {
+            Object identifier = sessionFactory.getPersistenceUnitUtil().getIdentifier(object);
+            if (sessionFactory.getCache().contains(object.getClass(), identifier)) {
+                sessionFactory.getCache().evict(object.getClass(), identifier);
+            }
+        }
     }
 
     @Override
