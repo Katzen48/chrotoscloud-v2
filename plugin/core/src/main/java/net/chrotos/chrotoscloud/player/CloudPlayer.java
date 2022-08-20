@@ -209,7 +209,12 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
         });
 
         if (sidedPlayer != null) {
-            kick();
+            Locale locale = sidedPlayer.getLocale();
+            if (locale == null) {
+                locale = Locale.US;
+            }
+
+            kick(ban.getBanMessage(locale));
         }
 
         return ban;
