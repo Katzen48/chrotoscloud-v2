@@ -46,7 +46,7 @@ public class BanCommand {
                             return Command.SINGLE_SUCCESS;
                         }
 
-                        ban(player, plugin.getProxyServer().getPlayer(player.getUniqueId()).orElse(null),
+                        ban(player, context.getSource(), plugin.getProxyServer().getPlayer(player.getUniqueId()).orElse(null),
                                 reason, 0);
 
                         return Command.SINGLE_SUCCESS;
@@ -68,7 +68,7 @@ public class BanCommand {
                                 return Command.SINGLE_SUCCESS;
                             }
 
-                                ban(player, plugin.getProxyServer().getPlayer(player.getUniqueId()).orElse(null),
+                                ban(player, context.getSource(), plugin.getProxyServer().getPlayer(player.getUniqueId()).orElse(null),
                                         reason, days);
 
                                 return Command.SINGLE_SUCCESS;
@@ -78,7 +78,8 @@ public class BanCommand {
             ).build()));
     }
 
-    private static void ban(@NonNull Player cloudPlayer, com.velocitypowered.api.proxy.Player player, @NonNull String reason, int days) {
+    private static void ban(@NonNull Player cloudPlayer, @NonNull CommandSource source, com.velocitypowered.api.proxy.Player player,
+                            @NonNull String reason, int days) {
         Calendar expiresAt = null;
         if (days > 0) {
             expiresAt = Calendar.getInstance();
@@ -94,5 +95,18 @@ public class BanCommand {
 
             player.disconnect(ban.getBanMessage(locale));
         }
+
+        Component response = Component.text("Player ", NamedTextColor.RED)
+                .append(Component.text(cloudPlayer.getName(), NamedTextColor.GOLD))
+                .append(Component.text(" has been banned"));
+
+        if (days > 0) {
+            response = response.append(Component.text(" for ", NamedTextColor.RED))
+                                .append(Component.text(days + " Days", NamedTextColor.GOLD));
+        }
+        response = response.append(Component.text("! Reason: ", NamedTextColor.RED))
+                            .append(Component.text(reason, NamedTextColor.GOLD));
+
+        source.sendMessage(response);
     }
 }
