@@ -11,6 +11,7 @@ import lombok.Getter;
 import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.velocity.commands.BanCommand;
 import net.chrotos.chrotoscloud.velocity.commands.HubCommand;
+import net.chrotos.chrotoscloud.velocity.commands.UnbanCommand;
 import org.slf4j.Logger;
 
 @Plugin(id="chrotoscloud", name = "ChrotosCloud", version = "3.0-SNAPSHOT", authors = {"Katzen48"})
@@ -58,6 +59,7 @@ public class CloudPlugin {
 
         proxyServer.getCommandManager().register(lobbyMeta, new HubCommand(proxyServer));
         BanCommand.register(this);
+        UnbanCommand.register(this);
     }
 
     @Subscribe(async = false)

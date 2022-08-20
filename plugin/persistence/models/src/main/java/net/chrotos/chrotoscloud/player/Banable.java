@@ -12,4 +12,5 @@ public interface Banable {
     boolean isBanned();
     Ban ban(@NonNull String reason);
     Ban ban(@NonNull String reason, Calendar expiresAt);
+    boolean unban();
 }

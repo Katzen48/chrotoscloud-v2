@@ -226,6 +226,19 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     }
 
     @Override
+    public boolean unban() {
+        if (!isBanned()) {
+            return false;
+        }
+
+        Cloud.getInstance().getPersistence().runInTransaction((transaction) -> {
+            bans.remove(getActiveBan());
+        });
+
+        return true;
+    }
+
+    @Override
     public void kick(Component message) {
         if (sidedPlayer == null) {
             Cloud.getInstance().getQueue().publish("games.server.kick", new PlayerKickedEvent(getUniqueId(),
