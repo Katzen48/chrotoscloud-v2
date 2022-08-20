@@ -230,8 +230,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
         if (!isBanned()) {
             return false;
         }
-
-        Cloud.getInstance().getPersistence().delete(getActiveBan());
+        getBans().clear();
 
         return true;
     }
