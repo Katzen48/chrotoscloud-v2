@@ -222,6 +222,13 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     }
 
     @Override
+    public <E> void delete(E entity) {
+        Session session = getSession();
+
+        runInTransaction((databaseTransaction) -> session.delete(entity));
+    }
+
+    @Override
     public void removeFromContext(Object object) {
         Session session = getSession();
 

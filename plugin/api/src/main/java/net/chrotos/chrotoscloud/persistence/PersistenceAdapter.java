@@ -16,6 +16,7 @@ public interface PersistenceAdapter {
     <E> E executeFiltered(String predefinedFilter, Map<String, Object> parameters, Supplier<E> supplier);
     <E> E getOne(Class<E> clazz, DataSelectFilter filter);
     <E> void save(E entity) throws EntityExistsException;
+    <E> void delete(E entity);
     void removeFromContext(Object object);
     void runInTransaction(TransactionRunnable runnable);
     void refresh(Object object);

@@ -19,7 +19,7 @@ import java.util.Collections;
 
 public class UnbanCommand {
     public static void register(@NonNull final CloudPlugin plugin) {
-        plugin.getProxyServer().getCommandManager().register(new BrigadierCommand(LiteralArgumentBuilder.<CommandSource>literal("ban")
+        plugin.getProxyServer().getCommandManager().register(new BrigadierCommand(LiteralArgumentBuilder.<CommandSource>literal("unban")
             .requires(source -> source.hasPermission("velocity.command.unban"))
             .then(RequiredArgumentBuilder.<CommandSource, String>argument("player", StringArgumentType.word())
                 .executes(context -> {
