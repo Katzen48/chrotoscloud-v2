@@ -80,6 +80,14 @@ public class BanCommand {
 
     private static void ban(@NonNull Player cloudPlayer, @NonNull CommandSource source, com.velocitypowered.api.proxy.Player player,
                             @NonNull String reason, int days) {
+        if (cloudPlayer.isBanned()) {
+            source.sendMessage(Component.text("Player ", NamedTextColor.RED)
+                    .append(Component.text(cloudPlayer.getName(), NamedTextColor.GOLD))
+                    .append(Component.text(" is already banned!")));
+
+            return;
+        }
+
         Calendar expiresAt = null;
         if (days > 0) {
             expiresAt = Calendar.getInstance();
