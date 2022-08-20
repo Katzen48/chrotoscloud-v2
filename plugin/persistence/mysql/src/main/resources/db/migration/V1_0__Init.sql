@@ -126,3 +126,16 @@ create table ranks (
                        index (name),
                        index (deleted_at)
 ) engine=InnoDB;
+
+create table bans (
+                    unique_id varchar(36) not null,
+                    player_unique_id varchar(36) not null,
+                    reason varchar(100) not null,
+                    created_at datetime not null,
+                    expires_at datetime,
+
+                    primary key (unique_id),
+                    index (player_unique_id),
+                    index (created_at),
+                    index (expires_at)
+) engine=InnoDB;

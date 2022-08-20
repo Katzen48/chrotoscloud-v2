@@ -50,6 +50,12 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @JsonIgnore
     private Set<Account> accounts = new HashSet<>();
 
+    @OneToMany(mappedBy = "player", targetEntity = CloudBan.class, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Filter(name = "uniqueId")
+    @NonNull
+    @JsonIgnore
+    private Set<Ban> bans = new HashSet<>();
+
     @OneToMany(targetEntity = CloudPermission.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "permissible_unique_id")
     @Where(clause = "permissible_type='player'")
@@ -173,7 +179,47 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     }
 
     @Override
+    @JsonIgnore
     public boolean hasResourcePackApplied(@NonNull String hash) {
         return sidedPlayer.hasResourcePackApplied(hash);
+    }
+
+    @Override
+    public Ban getActiveBan() {
+        return Cloud.getInstance().getPersistence().executeFiltered("active", Collections.emptyMap(),
+                () -> getBans().stream().findFirst().orElse(null));
+    }
+
+    @Override
+    public boolean isBanned() {
+        return getActiveBan() != null;
+    }
+
+    @Override
+    public Ban ban(@NonNull String reason) {
+        return ban(reason, null);
+    }
+
+    @Override
+    public Ban ban(@NonNull String reason, Calendar expiresAt) {
+        Ban ban = new CloudBan(UUID.randomUUID(), this, reason, Calendar.getInstance(), expiresAt);
+        Cloud.getInstance().getPersistence().runInTransaction((transaction) -> {
+            bans.add(ban);
+        });
+
+        if (sidedPlayer != null) {
+            kick();
+        }
+
+        return ban;
+    }
+
+    @Override
+    public void kick(Component message) {
+        if (sidedPlayer == null) {
+            return;
+        }
+
+        sidedPlayer.kick(message);
     }
 }

@@ -11,10 +11,12 @@ import net.chrotos.chrotoscloud.games.states.CloudGameState;
 import net.chrotos.chrotoscloud.games.states.GameState;
 import net.chrotos.chrotoscloud.paper.chat.PaperChatRenderer;
 import net.chrotos.chrotoscloud.paper.permissions.PermissibleInjector;
+import net.chrotos.chrotoscloud.player.Ban;
 import net.chrotos.chrotoscloud.player.CloudPlayerInventory;
 import net.chrotos.chrotoscloud.player.PlayerInventory;
 import net.chrotos.chrotoscloud.player.PlayerSoftDeletedException;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -27,13 +29,13 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 @RequiredArgsConstructor
 public class PaperEventHandler implements Listener {
     private final Gson gson = new Gson();
-    private final byte opLevel;
     private final PaperCloud cloud;
     private final PaperChatRenderer renderer = new PaperChatRenderer();
 
@@ -46,8 +48,15 @@ public class PaperEventHandler implements Listener {
                 databaseTransaction.suppressCommit();
 
                 net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getOrCreatePlayer(new PaperSidedPlayer(player));
-                PermissibleInjector.inject(player, cloudPlayer);
 
+                Ban ban = getBan(cloudPlayer);
+                if (ban != null) {
+                    event.disallow(PlayerLoginEvent.Result.KICK_BANNED, ban.getBanMessage(player.locale()));
+
+                    return;
+                }
+
+                PermissibleInjector.inject(player, cloudPlayer);
                 player.setOp(player.hasPermission("minecraft.command.op"));
 
                 if (cloud.isInventorySavingEnabled()) {
@@ -56,10 +65,10 @@ public class PaperEventHandler implements Listener {
 
                 loadScoreboardTags(cloudPlayer, player);
             } catch (PlayerSoftDeletedException e) {
-                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("Your account has been deleted!")); // TODO: Translate
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("Your account has been deleted!")); // TODO Translate
             } catch (Exception e) {
                 e.printStackTrace();
-                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("An error occured!")); // TODO: Translate
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("An error occured!")); // TODO Translate
                 cloud.getPlayerManager().logoutPlayer(event.getPlayer().getUniqueId());
             }
         });
@@ -86,14 +95,20 @@ public class PaperEventHandler implements Listener {
             net.chrotos.chrotoscloud.player.Player player = cloud.getPlayerManager().getOrCreatePlayer(event.getPlayerProfile().getId(),
                     event.getPlayerProfile().getName());
 
-            event.setWhitelisted(event.isWhitelisted() || event.isOp() || player.hasPermission("minecraft.command.op")); // TODO: remove op?
+            Ban ban = getBan(player);
+            if (ban != null) {
+                event.setWhitelisted(false);
+                event.kickMessage(ban.getBanMessage(Locale.US));
+            } else {
+                event.setWhitelisted(event.isWhitelisted() || event.isOp() || player.hasPermission("minecraft.command.op")); // TODO remove op?
+            }
         } catch (PlayerSoftDeletedException e) {
             event.setWhitelisted(false);
-            event.kickMessage(Component.text("Your account has been deleted!")); // TODO: Translate
+            event.kickMessage(Component.text("Your account has been deleted!", NamedTextColor.RED)); // TODO Translate
         } catch (Exception e) {
             e.printStackTrace();
             event.setWhitelisted(false);
-            event.kickMessage(Component.text("An error occured!")); // TODO: Translate
+            event.kickMessage(Component.text("An error occured!")); // TODO Translate
             cloud.getPlayerManager().logoutPlayer(event.getPlayerProfile().getId());
         }
     }
@@ -210,5 +225,17 @@ public class PaperEventHandler implements Listener {
         }
 
         Cloud.getInstance().getPersistence().save(cloudPlayer);
+    }
+
+    private Ban getBan(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer) {
+        AtomicReference<Ban> ban = new AtomicReference<>();
+
+        Cloud.getInstance().getPersistence().runInTransaction(transaction -> {
+            transaction.suppressCommit();
+
+            ban.set(cloudPlayer.getActiveBan());
+        });
+
+        return ban.get();
     }
 }

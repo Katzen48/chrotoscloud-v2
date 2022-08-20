@@ -11,7 +11,7 @@ import net.kyori.adventure.text.TextComponent;
 
 import java.util.UUID;
 
-public interface Player extends AccountHolder, InventoryHolder, Permissible, StatsHolder, StateHolder {
+public interface Player extends AccountHolder, Banable, InventoryHolder, Kickable, Permissible, StatsHolder, StateHolder {
     SidedPlayer getSidedPlayer();
     @NonNull
     String getName();

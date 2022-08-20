@@ -7,15 +7,19 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
+import lombok.Getter;
 import net.chrotos.chrotoscloud.Cloud;
+import net.chrotos.chrotoscloud.velocity.commands.BanCommand;
 import net.chrotos.chrotoscloud.velocity.commands.HubCommand;
 import org.slf4j.Logger;
 
 @Plugin(id="chrotoscloud", name = "ChrotosCloud", version = "3.0-SNAPSHOT", authors = {"Katzen48"})
 public class CloudPlugin {
+    @Getter
     protected final ProxyServer proxyServer;
     private final Logger logger;
     protected final VelocityCloud cloud;
+    @Getter
     private VelocityCacheSynchronizer synchronizer;
 
     @Inject
@@ -53,6 +57,7 @@ public class CloudPlugin {
                                             .build();
 
         proxyServer.getCommandManager().register(lobbyMeta, new HubCommand(proxyServer));
+        BanCommand.register(this);
     }
 
     @Subscribe(async = false)

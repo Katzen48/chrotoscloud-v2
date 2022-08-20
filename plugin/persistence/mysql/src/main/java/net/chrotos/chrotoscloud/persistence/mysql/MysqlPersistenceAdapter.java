@@ -91,7 +91,11 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
         CriteriaQuery<E> all = cq.select(rootEntry);
 
         for (Map.Entry<String, Object> entry : filter.getColumnFilters().entrySet()) {
-            all = all.where(cb.equal(rootEntry.get(entry.getKey()), entry.getValue()));
+            if (entry.getValue() == null) {
+                all = all.where(cb.isNull(rootEntry.get(entry.getKey())));
+            } else {
+                all = all.where(cb.equal(rootEntry.get(entry.getKey()), entry.getValue()));
+            }
         }
 
         if (filter.getOrderKey() != null) {
@@ -223,6 +227,13 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
         if (session.contains(object)) {
             session.evict(object);
+        }
+
+        if (sessionFactory.getCache() != null) {
+            Object identifier = sessionFactory.getPersistenceUnitUtil().getIdentifier(object);
+            if (sessionFactory.getCache().contains(object.getClass(), identifier)) {
+                sessionFactory.getCache().evict(object.getClass(), identifier);
+            }
         }
     }
 

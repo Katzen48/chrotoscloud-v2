@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.player.SidedPlayer;
 import net.chrotos.chrotoscloud.velocity.VelocityCloud;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 
 import java.nio.charset.StandardCharsets;
@@ -63,5 +64,10 @@ public class VelocitySidedPlayer implements SidedPlayer {
 
     private ResourcePackInfo.Builder getResourcePackBuilder(@NonNull String url) {
         return ((VelocityCloud)Cloud.getInstance()).getProxyServer().createResourcePackBuilder(url);
+    }
+
+    @Override
+    public void kick(Component message) {
+        sidedObject.disconnect(message == null ? Component.empty() : message);
     }
 }

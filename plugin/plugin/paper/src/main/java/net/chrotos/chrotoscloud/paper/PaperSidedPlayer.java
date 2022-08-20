@@ -57,4 +57,9 @@ public class PaperSidedPlayer implements SidedPlayer {
             resourcePackHash = sentResourcePackHash;
         }
     }
+
+    @Override
+    public void kick(Component message) {
+        sidedObject.kick(message);
+    }
 }
