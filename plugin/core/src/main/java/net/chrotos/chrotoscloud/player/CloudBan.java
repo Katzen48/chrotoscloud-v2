@@ -32,7 +32,7 @@ public class CloudBan implements Ban {
     @Type(type = "uuid-char")
     private UUID uniqueId;
 
-    @ManyToOne(targetEntity = CloudPlayer.class, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = CloudPlayer.class)
     @JoinColumn(name = "player_unique_id", updatable = false)
     @NonNull
     private Player player;

@@ -43,7 +43,7 @@ public class CloudGameState implements GameState, SoftDeletable {
     @Column(updatable = false, nullable = false)
     private String gameMode;
 
-    @ManyToOne(targetEntity = CloudPlayer.class, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = CloudPlayer.class)
     @JoinColumn(name = "player_unique_id", updatable = false)
     @NonNull
     @JsonIncludeProperties({"unique_id", "name"})
