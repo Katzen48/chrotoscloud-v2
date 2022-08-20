@@ -11,6 +11,7 @@ import net.chrotos.chrotoscloud.player.CloudPlayerManager;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
+import java.util.TimeZone;
 
 public abstract class CoreCloud extends Cloud {
     private static boolean loaded;
@@ -61,6 +62,8 @@ public abstract class CoreCloud extends Cloud {
         if (!loaded) {
             throw new IllegalArgumentException("Not loaded! Cannot initialize!");
         }
+
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
 

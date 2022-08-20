@@ -1,6 +1,7 @@
 package net.chrotos.chrotoscloud.player;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.economy.Account;
@@ -188,12 +189,14 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     }
 
     @Override
+    @JsonProperty("ban")
     public Ban getActiveBan() {
         return Cloud.getInstance().getPersistence().executeFiltered("active", Collections.emptyMap(),
                 () -> getBans().stream().findFirst().orElse(null));
     }
 
     @Override
+    @JsonIgnore
     public boolean isBanned() {
         return getActiveBan() != null;
     }
