@@ -22,7 +22,8 @@ import java.util.UUID;
 @DynamicUpdate
 @SQLDelete(sql = "UPDATE bans SET expires_at=now() WHERE unique_id = ?")
 @SelectBeforeUpdate
-@Filter(name = "active", condition = "`expires_at` IS NULL OR `expires_at` >= now()")
+@FilterDef(name = "active", defaultCondition = "`expires_at` IS NULL OR `expires_at` >= now()")
+@Filter(name = "active")
 public class CloudBan implements Ban {
     @Id
     @Column(updatable = false, nullable = false)
