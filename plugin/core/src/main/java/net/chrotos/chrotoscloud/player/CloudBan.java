@@ -64,6 +64,7 @@ public class CloudBan implements Ban {
             message = message.append(Component.text(" until ", NamedTextColor.RED)); // TODO translate
             message = message.append(Component.text(dateFormat.format(expiration.getTime()), NamedTextColor.GOLD));
         }
+        message = message.append(Component.text("!", NamedTextColor.RED));
 
         return message;
     }
