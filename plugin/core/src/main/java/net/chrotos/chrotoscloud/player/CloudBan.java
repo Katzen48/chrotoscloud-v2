@@ -1,5 +1,6 @@
 package net.chrotos.chrotoscloud.player;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -35,6 +36,7 @@ public class CloudBan implements Ban {
     @ManyToOne(targetEntity = CloudPlayer.class)
     @JoinColumn(name = "player_unique_id", updatable = false)
     @NonNull
+    @JsonIgnore
     private Player player;
 
     @NonNull
@@ -46,8 +48,9 @@ public class CloudBan implements Ban {
     private Calendar expiresAt;
 
     @Override
+    @JsonIgnore
     public boolean isActive() {
-        return getExpiresAt() == null || getExpiresAt().before(Calendar.getInstance());
+        return getExpiresAt() == null || getExpiresAt().after(Calendar.getInstance());
     }
 
     @Override

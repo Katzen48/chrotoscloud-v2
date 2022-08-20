@@ -1,6 +1,8 @@
 package net.chrotos.chrotoscloud.rest.services.player;
 
 import net.chrotos.chrotoscloud.Cloud;
+import net.chrotos.chrotoscloud.persistence.DataSelectFilter;
+import net.chrotos.chrotoscloud.player.CloudPlayer;
 import net.chrotos.chrotoscloud.player.Player;
 import net.chrotos.chrotoscloud.rest.exception.NotFoundException;
 
@@ -12,7 +14,7 @@ public abstract class PlayerFetchingService {
             throw new NotFoundException();
         }
 
-        Player player = Cloud.getInstance().getPlayerManager().getPlayer(uuid);
+        Player player = Cloud.getInstance().getPersistence().getOne(CloudPlayer.class, DataSelectFilter.builder().primaryKeyValue(uuid).build());
 
         if (player == null) {
             throw new NotFoundException("Player not found");
