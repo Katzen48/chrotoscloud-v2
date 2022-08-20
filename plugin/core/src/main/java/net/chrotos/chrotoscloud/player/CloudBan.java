@@ -57,7 +57,7 @@ public class CloudBan implements Ban {
         if (getExpiresAt() != null) {
             Calendar expiration = getExpiresAt();
 
-            DateFormat dateFormat = SimpleDateFormat.getDateInstance(DateFormat.FULL, locale);
+            DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, locale);
             dateFormat.setTimeZone(expiration.getTimeZone());
 
             message = message.append(Component.text(" until ", NamedTextColor.RED)); // TODO translate
