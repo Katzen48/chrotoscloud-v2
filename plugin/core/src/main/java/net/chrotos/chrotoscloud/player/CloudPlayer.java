@@ -52,6 +52,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
 
     @OneToMany(mappedBy = "player", targetEntity = CloudBan.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @Filter(name = "uniqueId")
+    @Filter(name = "active", condition = "`expires_at` IS NULL OR `expires_at` >= now()")
     @NonNull
     @JsonIgnore
     private Set<Ban> bans = new HashSet<>();
