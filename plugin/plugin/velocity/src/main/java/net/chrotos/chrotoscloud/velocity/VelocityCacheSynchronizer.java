@@ -28,7 +28,7 @@ public class VelocityCacheSynchronizer {
     private int playerCount;
 
     public void initialize() {
-        proxyKey = "proxy:" + Cloud.getInstance().getHostname() + ":players";
+        proxyKey = "proxy:" + Cloud.getInstance().getHostname();
 
         checkTask = plugin.proxyServer.getScheduler()
                                         .buildTask(plugin, this::checkProxies)
@@ -63,18 +63,20 @@ public class VelocityCacheSynchronizer {
 
     @Subscribe(order = PostOrder.FIRST)
     public void onPostLogin(PostLoginEvent event) {
-        plugin.cloud.getCache().setAdd(proxyKey, event.getPlayer().getUniqueId().toString());
+        plugin.cloud.getCache().setAdd(proxyKey + ":players", event.getPlayer().getUniqueId().toString());
+        plugin.cloud.getCache().setAdd(proxyKey + ":playernames", event.getPlayer().getUsername());
     }
 
     @Subscribe(order = PostOrder.FIRST)
     public void onDisconnect(DisconnectEvent event) {
         String value = event.getPlayer().getUniqueId().toString();
 
-        if (!plugin.cloud.getCache().setContains(proxyKey, value)) {
+        if (!plugin.cloud.getCache().setContains(proxyKey + ":players", value)) {
             return;
         }
 
-        plugin.cloud.getCache().setRemove(proxyKey, value);
+        plugin.cloud.getCache().setRemove(proxyKey + ":players", value);
+        plugin.cloud.getCache().setRemove(proxyKey + ":playernames", event.getPlayer().getUsername());
     }
 
     @Subscribe(order = PostOrder.LAST)
@@ -93,6 +95,16 @@ public class VelocityCacheSynchronizer {
         return playerCount;
     }
 
+    public Set<String> getPlayerNames() {
+        Set<String> playerNames = new HashSet<>();
+
+        for (String proxy : proxies) {
+            playerNames.addAll(plugin.cloud.getCache().setMembers("proxy:" + proxy + ":playernames"));
+        }
+
+        return playerNames;
+    }
+
     public Set<String> getPlayers() {
         Set<String> players = new HashSet<>();
 
@@ -109,7 +121,8 @@ public class VelocityCacheSynchronizer {
         proxies.clear();
         keys.forEach((key) -> proxies.add(key.split(":")[1]));
 
-        plugin.cloud.getCache().expire(proxyKey, Duration.ofSeconds(10L));
+        plugin.cloud.getCache().expire(proxyKey + ":players", Duration.ofSeconds(10L));
+        plugin.cloud.getCache().expire(proxyKey + ":playernames", Duration.ofSeconds(10L));
 
         playerCount = (int) proxies.stream().mapToLong(
                 (proxy) -> plugin.cloud.getCache().setSize("proxy:" + proxy + ":players")).sum();

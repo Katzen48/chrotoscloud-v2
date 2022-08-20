@@ -24,58 +24,58 @@ import java.util.Locale;
 public class BanCommand {
     public static void register(@NonNull final CloudPlugin plugin) {
         plugin.getProxyServer().getCommandManager().register(new BrigadierCommand(LiteralArgumentBuilder.<CommandSource>literal("ban")
-                .requires(source -> source.hasPermission("velocity.command.ban"))
-                .then(RequiredArgumentBuilder.<CommandSource, String>argument("players", StringArgumentType.word())
-                        .suggests((ctx, builder) -> {
-                            plugin.getSynchronizer().getPlayers().forEach(builder::suggest);
-                            return builder.buildFuture();
-                        })
-                        .then(RequiredArgumentBuilder.<CommandSource, String>argument("reason", StringArgumentType.word())
-                            .executes(context -> {
-                                String playerName = context.getArgument("player", String.class);
-                                String reason = context.getArgument("reason", String.class);
+            .requires(source -> source.hasPermission("velocity.command.ban"))
+            .then(RequiredArgumentBuilder.<CommandSource, String>argument("player", StringArgumentType.word())
+                .suggests((ctx, builder) -> {
+                    plugin.getSynchronizer().getPlayerNames().forEach(builder::suggest);
+                    return builder.buildFuture();
+                })
+                .then(RequiredArgumentBuilder.<CommandSource, String>argument("reason", StringArgumentType.word())
+                    .executes(context -> {
+                        String playerName = context.getArgument("player", String.class);
+                        String reason = context.getArgument("reason", String.class);
 
-                                Player player = Cloud.getInstance().getPersistence().getOne(CloudPlayer.class, DataSelectFilter.builder()
-                                        .columnFilters(Collections.singletonMap("name", playerName)).build());
+                        Player player = Cloud.getInstance().getPersistence().getOne(CloudPlayer.class, DataSelectFilter.builder()
+                                .columnFilters(Collections.singletonMap("name", playerName)).build());
 
-                                if (player == null) {
-                                    context.getSource().sendMessage(Component.text("Player ", NamedTextColor.RED)
-                                            .append(Component.text(playerName, NamedTextColor.GOLD))
-                                            .append(Component.text(" does not exist!", NamedTextColor.RED)));
+                        if (player == null) {
+                            context.getSource().sendMessage(Component.text("Player ", NamedTextColor.RED)
+                                    .append(Component.text(playerName, NamedTextColor.GOLD))
+                                    .append(Component.text(" does not exist!", NamedTextColor.RED)));
 
-                                    return Command.SINGLE_SUCCESS;
-                                }
+                            return Command.SINGLE_SUCCESS;
+                        }
 
-                                ban(player, plugin.getProxyServer().getPlayer(player.getUniqueId()).orElse(null),
-                                        reason, 0);
+                        ban(player, plugin.getProxyServer().getPlayer(player.getUniqueId()).orElse(null),
+                                reason, 0);
+
+                        return Command.SINGLE_SUCCESS;
+                    })
+                    .then(RequiredArgumentBuilder.<CommandSource, Integer>argument("days", IntegerArgumentType.integer(1))
+                        .executes(context -> {
+                            String playerName = context.getArgument("player", String.class);
+                            String reason = context.getArgument("reason", String.class);
+                            int days = context.getArgument("days", Integer.class);
+
+                            Player player = Cloud.getInstance().getPersistence().getOne(CloudPlayer.class, DataSelectFilter.builder()
+                                    .columnFilters(Collections.singletonMap("name", playerName)).build());
+
+                            if (player == null) {
+                                context.getSource().sendMessage(Component.text("Player ", NamedTextColor.RED)
+                                        .append(Component.text(playerName, NamedTextColor.GOLD))
+                                        .append(Component.text(" does not exist!", NamedTextColor.RED)));
 
                                 return Command.SINGLE_SUCCESS;
-                            })
-                            .then(RequiredArgumentBuilder.<CommandSource, Integer>argument("days", IntegerArgumentType.integer(1))
-                                    .executes(context -> {
-                                        String playerName = context.getArgument("player", String.class);
-                                        String reason = context.getArgument("reason", String.class);
-                                        int days = context.getArgument("days", Integer.class);
+                            }
 
-                                        Player player = Cloud.getInstance().getPersistence().getOne(CloudPlayer.class, DataSelectFilter.builder()
-                                                .columnFilters(Collections.singletonMap("name", playerName)).build());
+                                ban(player, plugin.getProxyServer().getPlayer(player.getUniqueId()).orElse(null),
+                                        reason, days);
 
-                                        if (player == null) {
-                                            context.getSource().sendMessage(Component.text("Player ", NamedTextColor.RED)
-                                                    .append(Component.text(playerName, NamedTextColor.GOLD))
-                                                    .append(Component.text(" does not exist!", NamedTextColor.RED)));
-
-                                            return Command.SINGLE_SUCCESS;
-                                        }
-
-                                            ban(player, plugin.getProxyServer().getPlayer(player.getUniqueId()).orElse(null),
-                                                    reason, days);
-
-                                            return Command.SINGLE_SUCCESS;
-                                    })
-                            )
-                        )
-                ).build()));
+                                return Command.SINGLE_SUCCESS;
+                        })
+                    )
+                )
+            ).build()));
     }
 
     private static void ban(@NonNull Player cloudPlayer, com.velocitypowered.api.proxy.Player player, @NonNull String reason, int days) {
