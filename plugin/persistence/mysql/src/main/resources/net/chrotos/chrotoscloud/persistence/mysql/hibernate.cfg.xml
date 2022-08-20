@@ -30,6 +30,7 @@
 
         <mapping class="net.chrotos.chrotoscloud.permissions.CloudPermission" />
         <mapping class="net.chrotos.chrotoscloud.permissions.CloudRank" />
+        <mapping class="net.chrotos.chrotoscloud.player.CloudBan" />
 
         <mapping package = "net.chrotos.chrotoscloud" />
     </session-factory>
