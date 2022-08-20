@@ -15,6 +15,8 @@ import net.chrotos.chrotoscloud.paper.games.queue.PaperLeastPlayersQueueManager;
 import net.chrotos.chrotoscloud.paper.games.queue.PaperMostPlayersQueueManager;
 import net.chrotos.chrotoscloud.paper.games.queue.PaperRandomQueueManager;
 import net.chrotos.chrotoscloud.player.Player;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 
 import java.io.IOException;
@@ -30,6 +32,7 @@ public class PaperGameManager implements GameManager, AutoCloseable {
     @Getter
     private final CloudGameModeManager gameModeManager = new CloudGameModeManager();
     private Registration<GameServerConnectedEvent, Void> connectedEventRegistration;
+    private Registration<PlayerKickedEvent, Void> kickedEventRegistration;
 
     @Override
     public CompletableFuture<GameServer> getGameServer(@NonNull String name) {
@@ -134,6 +137,22 @@ public class PaperGameManager implements GameManager, AutoCloseable {
                         Bukkit.getPluginManager().callEvent(new CloudPlayerConnectEvent(
                             event.getFrom(), cloud.getPlayerManager().getPlayer(event.getPlayerId()))))),
             "games.server.connect:" + cloud.getHostname());
+
+        kickedEventRegistration = cloud.getQueue().register(kickedListener(event -> {
+            org.bukkit.entity.Player player = Bukkit.getPlayer(event.getPlayerId());
+            if (player == null) {
+                return;
+            }
+
+            String reason = event.getReason();
+
+            if (reason == null) {
+                player.kick();
+            } else {
+                Component message = LegacyComponentSerializer.builder().build().deserialize(reason);
+                player.kick(message);
+            }
+        }), "games.server.kick");
     }
 
     @Override
@@ -192,6 +211,28 @@ public class PaperGameManager implements GameManager, AutoCloseable {
         };
     }
 
+    private Listener<PlayerKickedEvent, Void> kickedListener(Consumer<PlayerKickedEvent> callback) {
+        return new Listener<>() {
+            @Override
+            public void onMessage(@NonNull Message<PlayerKickedEvent> object, @NonNull String sender) {
+                callback.accept(object.getMessage());
+            }
+
+            @Override
+            public void onReply(@NonNull Message<Void> object, @NonNull String sender) {}
+
+            @Override
+            public Class<Void> getReplyClass() {
+                return Void.class;
+            }
+
+            @Override
+            public @NonNull Class<PlayerKickedEvent> getMessageClass() {
+                return PlayerKickedEvent.class;
+            }
+        };
+    }
+
     private Listener<GameServerConnectedEvent, Void> connectedListener(Consumer<GameServerConnectedEvent> callback) {
         return new Listener<>() {
             @Override
@@ -218,6 +259,10 @@ public class PaperGameManager implements GameManager, AutoCloseable {
     public void close() {
         if (connectedEventRegistration != null && connectedEventRegistration.isSubscribed()) {
             connectedEventRegistration.unsubscribe();
+        }
+
+        if (kickedEventRegistration != null && kickedEventRegistration.isSubscribed()) {
+            kickedEventRegistration.unsubscribe();
         }
     }
 }

@@ -6,6 +6,7 @@ import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.economy.Account;
 import net.chrotos.chrotoscloud.economy.AccountType;
 import net.chrotos.chrotoscloud.economy.CloudAccount;
+import net.chrotos.chrotoscloud.games.events.PlayerKickedEvent;
 import net.chrotos.chrotoscloud.games.states.CloudGameState;
 import net.chrotos.chrotoscloud.games.states.GameState;
 import net.chrotos.chrotoscloud.games.stats.CloudGameStatistic;
@@ -14,6 +15,7 @@ import net.chrotos.chrotoscloud.permissions.*;
 import net.chrotos.chrotoscloud.persistence.SoftDeletable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.hibernate.annotations.*;
 
 import javax.persistence.*;
@@ -215,6 +217,9 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
             }
 
             kick(ban.getBanMessage(locale));
+        } else {
+            Cloud.getInstance().getQueue().publish("games.server.kick", new PlayerKickedEvent(getUniqueId(),
+                    LegacyComponentSerializer.builder().build().serialize(ban.getBanMessage(Locale.US))));
         }
 
         return ban;
@@ -223,6 +228,9 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @Override
     public void kick(Component message) {
         if (sidedPlayer == null) {
+            Cloud.getInstance().getQueue().publish("games.server.kick", new PlayerKickedEvent(getUniqueId(),
+                    message != null ? LegacyComponentSerializer.builder().build().serialize(message) : null));
+
             return;
         }
 
