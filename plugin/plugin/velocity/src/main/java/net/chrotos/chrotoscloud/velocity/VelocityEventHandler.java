@@ -22,6 +22,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class VelocityEventHandler {
     private final CloudPlugin plugin;
@@ -57,15 +58,15 @@ public class VelocityEventHandler {
 
         try {
             SidedPlayer sidedPlayer = new VelocitySidedPlayer(player);
-            net.chrotos.chrotoscloud.player.Player cloudPlayer = plugin.cloud.getPlayerManager().getOrCreatePlayer(sidedPlayer);
 
             AtomicBoolean banned = new AtomicBoolean(false);
             Cloud.getInstance().getPersistence().runInTransaction((transaction) -> {
-                transaction.suppressCommit();
+                net.chrotos.chrotoscloud.player.Player cloudPlayer = plugin.cloud.getPlayerManager().getOrCreatePlayer(sidedPlayer);
 
                 Ban ban = cloudPlayer.getActiveBan();
                 if (ban != null) {
                     banned.set(true);
+
                     Locale locale = player.getEffectiveLocale();
                     if (locale == null) {
                         locale = Locale.US;

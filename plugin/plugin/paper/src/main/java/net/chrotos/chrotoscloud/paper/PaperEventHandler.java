@@ -11,10 +11,7 @@ import net.chrotos.chrotoscloud.games.states.CloudGameState;
 import net.chrotos.chrotoscloud.games.states.GameState;
 import net.chrotos.chrotoscloud.paper.chat.PaperChatRenderer;
 import net.chrotos.chrotoscloud.paper.permissions.PermissibleInjector;
-import net.chrotos.chrotoscloud.player.Ban;
-import net.chrotos.chrotoscloud.player.CloudPlayerInventory;
-import net.chrotos.chrotoscloud.player.PlayerInventory;
-import net.chrotos.chrotoscloud.player.PlayerSoftDeletedException;
+import net.chrotos.chrotoscloud.player.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -92,16 +89,20 @@ public class PaperEventHandler implements Listener {
         }
 
         try {
-            net.chrotos.chrotoscloud.player.Player player = cloud.getPlayerManager().getOrCreatePlayer(event.getPlayerProfile().getId(),
-                    event.getPlayerProfile().getName());
+            Cloud.getInstance().getPersistence().runInTransaction(transaction -> {
+                transaction.suppressCommit();
 
-            Ban ban = getBan(player);
-            if (ban != null) {
-                event.setWhitelisted(false);
-                event.kickMessage(ban.getBanMessage(Locale.US));
-            } else {
-                event.setWhitelisted(event.isWhitelisted() || event.isOp() || player.hasPermission("minecraft.command.op")); // TODO remove op?
-            }
+                net.chrotos.chrotoscloud.player.Player player = cloud.getPlayerManager().getOrCreatePlayer(event.getPlayerProfile().getId(),
+                        event.getPlayerProfile().getName());
+
+                Ban ban = getBan(player);
+                if (ban != null) {
+                    event.setWhitelisted(false);
+                    event.kickMessage(ban.getBanMessage(Locale.US));
+                } else {
+                    event.setWhitelisted(event.isWhitelisted() || event.isOp() || player.hasPermission("minecraft.command.op")); // TODO remove op?
+                }
+            });
         } catch (PlayerSoftDeletedException e) {
             event.setWhitelisted(false);
             event.kickMessage(Component.text("Your account has been deleted!", NamedTextColor.RED)); // TODO Translate
