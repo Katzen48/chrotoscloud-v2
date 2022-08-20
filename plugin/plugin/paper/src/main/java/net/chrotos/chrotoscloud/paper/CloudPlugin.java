@@ -40,7 +40,7 @@ public class CloudPlugin extends JavaPlugin {
         eventHandler = new PaperEventHandler(cloud);
         getServer().getPluginManager().registerEvents(eventHandler, this);
 
-        tryUnregisterReloadCommands();
+        tryUnregisterCommands();
     }
 
     @Override
@@ -48,17 +48,39 @@ public class CloudPlugin extends JavaPlugin {
         Bukkit.getOnlinePlayers().forEach(eventHandler::onPlayerLeave);
     }
 
-    private void tryUnregisterReloadCommands() {
+    private void tryUnregisterCommands() {
         try {
             Field knownCommandsField = org.bukkit.command.SimpleCommandMap.class.getDeclaredField("knownCommands");
             knownCommandsField.setAccessible(true);
 
             Map<String, Command> knownCommands = (Map<String, Command>) knownCommandsField.get(getServer().getCommandMap());
+            // Reload Commands
             knownCommands.remove("reload");
             knownCommands.remove("bukkit:reload");
             knownCommands.remove("bukkit:rl");
             knownCommands.remove("spigot:reload");
+            knownCommands.remove("paper");
             knownCommands.remove("paper:paper");
+
+            // Ban Commands
+            knownCommands.remove("ban");
+            knownCommands.remove("minecraft:ban");
+            knownCommands.remove("essentials:ban");
+            knownCommands.remove("banip");
+            knownCommands.remove("minecraft:ban-ip");
+            knownCommands.remove("essentials:banip");
+            // Unban Commands
+            knownCommands.remove("unban");
+            knownCommands.remove("pardon");
+            knownCommands.remove("minecraft:pardon");
+            knownCommands.remove("essentials:unban");
+            knownCommands.remove("essentials:pardon");
+            knownCommands.remove("unbanip");
+            knownCommands.remove("pardonip");
+            knownCommands.remove("pardon-ip");
+            knownCommands.remove("minecraft:pardon-ip");
+            knownCommands.remove("essentials:pardonip");
+            knownCommands.remove("essentials:unbanip");
         } catch (Exception e) {
             e.printStackTrace();
         }
