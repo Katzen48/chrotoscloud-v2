@@ -5,13 +5,13 @@ import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
-import com.velocitypowered.api.event.player.PlayerResourcePackStatusEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
-import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import lombok.NonNull;
+import net.chrotos.chrotoscloud.Cloud;
 import net.chrotos.chrotoscloud.games.CloudGameServer;
 import net.chrotos.chrotoscloud.games.events.GameServerConnectedEvent;
+import net.chrotos.chrotoscloud.player.Ban;
 import net.chrotos.chrotoscloud.player.PlayerSoftDeletedException;
 import net.chrotos.chrotoscloud.player.SidedPlayer;
 import net.chrotos.chrotoscloud.velocity.player.PermissionsProvider;
@@ -19,7 +19,9 @@ import net.chrotos.chrotoscloud.velocity.player.VelocitySidedPlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class VelocityEventHandler {
     private final CloudPlugin plugin;
@@ -55,12 +57,33 @@ public class VelocityEventHandler {
 
         try {
             SidedPlayer sidedPlayer = new VelocitySidedPlayer(player);
-            plugin.cloud.getPlayerManager().getOrCreatePlayer(sidedPlayer);
+            net.chrotos.chrotoscloud.player.Player cloudPlayer = plugin.cloud.getPlayerManager().getOrCreatePlayer(sidedPlayer);
+
+            AtomicBoolean banned = new AtomicBoolean(false);
+            Cloud.getInstance().getPersistence().runInTransaction((transaction) -> {
+                transaction.suppressCommit();
+
+                Ban ban = cloudPlayer.getActiveBan();
+                if (ban != null) {
+                    banned.set(true);
+                    Locale locale = player.getEffectiveLocale();
+                    if (locale == null) {
+                        locale = Locale.US;
+                    }
+
+                    player.disconnect(ban.getBanMessage(locale));
+                }
+            });
+
+            if (banned.get()) {
+                return;
+            }
 
             event.setProvider(permissionsProvider);
+
             continuation.resume();
         } catch (PlayerSoftDeletedException e) {
-            player.disconnect(Component.text("Your account has been deleted!").color(NamedTextColor.RED)); //TODO translate
+            player.disconnect(Component.text("Your account has been deleted!", NamedTextColor.RED)); // TODO translate
         } catch (Exception e) {
             continuation.resumeWithException(e);
         }

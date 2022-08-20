@@ -7,7 +7,7 @@ import net.kyori.adventure.text.TextComponent;
 import java.util.Locale;
 import java.util.UUID;
 
-public interface SidedPlayer {
+public interface SidedPlayer extends Kickable {
     Object getSidedObject();
     UUID getUniqueId();
     String getName();
