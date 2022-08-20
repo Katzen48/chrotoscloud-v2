@@ -32,7 +32,7 @@ public class CloudTransaction implements Transaction {
     @JsonIgnore
     private AccountType accountType;
 
-    @ManyToOne(targetEntity = CloudAccount.class, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = CloudAccount.class)
     @JoinColumn(name = "accountId", referencedColumnName = "uniqueId", nullable = false)
     @JoinColumn(name = "accountType", referencedColumnName = "accountType", nullable = false)
     @JsonIgnore

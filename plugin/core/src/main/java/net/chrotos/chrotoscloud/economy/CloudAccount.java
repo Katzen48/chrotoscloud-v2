@@ -26,7 +26,7 @@ public class CloudAccount implements Account, SoftDeletable {
     @EmbeddedId
     private AccountKey key;
 
-    @ManyToOne(targetEntity = CloudPlayer.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = CloudPlayer.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_unique_id", updatable = false)
     @NonNull
     @JsonIgnore
