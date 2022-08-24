@@ -34,8 +34,11 @@ dependencies {
     implementation 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.0.5'
     implementation 'org.glassfish.jersey.containers:jersey-container-grizzly2-servlet:3.0.5'
     implementation 'org.glassfish.jersey.inject:jersey-hk2:3.0.5'
-
     implementation 'javax.validation:validation-api:2.0.1.Final'
+
+    // Authentication
+    implementation 'com.auth0:java-jwt:4.0.0'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
 }
 
 test {
