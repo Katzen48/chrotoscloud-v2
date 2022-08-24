@@ -10,10 +10,10 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CacheHeader implements ContainerResponseFilter {
     private final Cache cache;
+    private final String cacheType;
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
-        responseContext.getHeaders().add("Cache-Control", String.format("%s, max-age=%d",
-                AuthenticationMiddleware.isAuthenticationRequired() ? "private" : "public", cache.seconds()));
+        responseContext.getHeaders().add("Cache-Control", String.format("%s, max-age=%d", cacheType, cache.seconds()));
     }
 }
