@@ -10,15 +10,17 @@ public class AuthenticationMiddleware implements DynamicFeature {
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {
         String authenticator = System.getenv("REST_AUTHENTICATION");
-        if (authenticator == null || authenticator.isEmpty()) {
+        if (authenticator == null || authenticator.isBlank()) {
             return;
         }
 
         switch (authenticator.toLowerCase()) {
             case "token":
                 context.register(new StaticTokenAuthenticator());
+                break;
             case "jwt":
                 context.register(new JWTAuthenticator());
+                break;
         }
     }
 }
