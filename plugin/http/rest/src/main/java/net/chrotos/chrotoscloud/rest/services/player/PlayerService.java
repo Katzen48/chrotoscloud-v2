@@ -7,6 +7,7 @@ import net.chrotos.chrotoscloud.persistence.DataSelectFilter;
 import net.chrotos.chrotoscloud.player.CloudPlayer;
 import net.chrotos.chrotoscloud.player.Player;
 import net.chrotos.chrotoscloud.rest.middleware.Cache;
+import net.chrotos.chrotoscloud.rest.middleware.authentication.Authenticate;
 import net.chrotos.chrotoscloud.rest.response.PagedResponse;
 import net.chrotos.chrotoscloud.rest.response.Response;
 
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 @Path("/players")
 public class PlayerService extends PlayerFetchingService {
+    @Authenticate
     @Cache(seconds = 60)
     @GET
     @Path("{uuid}")
@@ -24,6 +26,7 @@ public class PlayerService extends PlayerFetchingService {
             return new Response<>(getPlayer(uuid));
     }
 
+    @Authenticate
     @Cache(seconds = 600)
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -41,7 +44,6 @@ public class PlayerService extends PlayerFetchingService {
 
         return new PagedResponse<>(getPlayers(filter), first, pageSize);
     }
-
 
     private List<Player> getPlayers(DataSelectFilter filter) {
         return new ArrayList<>(Cloud.getInstance().getPersistence().getAll(CloudPlayer.class, filter));

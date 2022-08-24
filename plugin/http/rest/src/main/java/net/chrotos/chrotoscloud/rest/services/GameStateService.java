@@ -8,6 +8,7 @@ import net.chrotos.chrotoscloud.games.states.GameState;
 import net.chrotos.chrotoscloud.persistence.DataSelectFilter;
 import net.chrotos.chrotoscloud.rest.exception.BadRequestException;
 import net.chrotos.chrotoscloud.rest.middleware.Cache;
+import net.chrotos.chrotoscloud.rest.middleware.authentication.Authenticate;
 import net.chrotos.chrotoscloud.rest.response.PagedResponse;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Path("/gamestates")
 public class GameStateService {
+    @Authenticate
     @Cache(seconds = 600)
     @GET
     @Produces(MediaType.APPLICATION_JSON)

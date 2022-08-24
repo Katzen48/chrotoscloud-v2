@@ -4,6 +4,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import net.chrotos.chrotoscloud.player.PlayerInventory;
 import net.chrotos.chrotoscloud.rest.middleware.Cache;
+import net.chrotos.chrotoscloud.rest.middleware.authentication.Authenticate;
 import net.chrotos.chrotoscloud.rest.response.Response;
 
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 @Path("/players/{uuid}/inventories")
 public class InventoryService extends PlayerFetchingService {
+    @Authenticate
     @Cache(seconds = 180)
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -19,6 +21,7 @@ public class InventoryService extends PlayerFetchingService {
         return new Response<>(new ArrayList<>(getPlayer(uuid).getInventories()));
     }
 
+    @Authenticate
     @Cache(seconds = 60)
     @GET
     @Path("{gamemode}")
