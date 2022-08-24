@@ -40,6 +40,7 @@ public class AuthenticationMiddleware implements DynamicFeature {
         return switch (authenticator.toLowerCase()) {
             case "token" -> (authenticatorCache = new StaticTokenAuthenticator());
             case "jwt" -> (authenticatorCache = new JWTAuthenticator());
+            default -> null;
         };
     }
 
