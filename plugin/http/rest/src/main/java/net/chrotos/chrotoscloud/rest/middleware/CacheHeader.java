@@ -13,6 +13,7 @@ public class CacheHeader implements ContainerResponseFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
-        responseContext.getHeaders().add("Cache-Control", String.format("public, max-age=%d", cache.seconds()));
+        responseContext.getHeaders().add("Cache-Control", String.format("%s, max-age=%d",
+                AuthenticationMiddleware.isAuthenticationRequired() ? "private" : "public", cache.seconds()));
     }
 }
