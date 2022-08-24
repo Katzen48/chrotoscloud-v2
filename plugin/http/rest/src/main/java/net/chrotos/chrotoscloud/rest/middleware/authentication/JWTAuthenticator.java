@@ -99,4 +99,8 @@ public class JWTAuthenticator extends TokenAuthenticator {
             return null;
         }
     }
+
+    static {
+        java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+    }
 }
