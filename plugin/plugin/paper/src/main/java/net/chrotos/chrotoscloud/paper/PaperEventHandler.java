@@ -100,7 +100,8 @@ public class PaperEventHandler implements Listener {
                     event.setWhitelisted(false);
                     event.kickMessage(ban.getBanMessage(Locale.US));
                 } else {
-                    event.setWhitelisted(event.isWhitelisted() || event.isOp() || player.hasPermission("minecraft.command.op")); // TODO remove op?
+                    event.setWhitelisted(event.isWhitelisted() || event.isOp() || player.hasPermission("minecraft.command.op")
+                            || player.hasPermission("cloud.server.join." + cloud.getGameMode())); // TODO remove op?
                 }
             });
         } catch (PlayerSoftDeletedException e) {
