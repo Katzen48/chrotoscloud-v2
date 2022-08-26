@@ -73,13 +73,23 @@ public class PaperEventHandler implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getOrCreatePlayer(new PaperSidedPlayer(event.getPlayer()));
+        Cloud.getInstance().getPersistence().runInTransaction(transaction -> {
+            transaction.suppressCommit();
 
-        if (cloud.getCloudConfig().getResourcePackUrl() != null) {
-            cloudPlayer.setResourcePack(cloud.getCloudConfig().getResourcePackUrl(),
-                    cloud.getCloudConfig().getResourcePackHash(), cloud.getCloudConfig().getResourcePackRequired(),
-                    cloud.getCloudConfig().getResourcePackPrompt());
-        }
+            net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getOrCreatePlayer(new PaperSidedPlayer(event.getPlayer()));
+
+            Ban ban = getBan(cloudPlayer);
+            if (ban != null) {
+                cloudPlayer.kick(ban.getBanMessage(cloudPlayer.getLocale()));
+                return;
+            }
+
+            if (cloud.getCloudConfig().getResourcePackUrl() != null) {
+                cloudPlayer.setResourcePack(cloud.getCloudConfig().getResourcePackUrl(),
+                        cloud.getCloudConfig().getResourcePackHash(), cloud.getCloudConfig().getResourcePackRequired(),
+                        cloud.getCloudConfig().getResourcePackPrompt());
+            }
+        });
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -95,14 +105,8 @@ public class PaperEventHandler implements Listener {
                 net.chrotos.chrotoscloud.player.Player player = cloud.getPlayerManager().getOrCreatePlayer(event.getPlayerProfile().getId(),
                         event.getPlayerProfile().getName());
 
-                Ban ban = getBan(player);
-                if (ban != null) {
-                    event.setWhitelisted(false);
-                    event.kickMessage(ban.getBanMessage(player.getLocale()));
-                } else {
-                    event.setWhitelisted(event.isWhitelisted() || event.isOp() || player.hasPermission("minecraft.command.op")
-                            || player.hasPermission("cloud.server.join." + cloud.getGameMode())); // TODO remove op?
-                }
+                event.setWhitelisted(event.isWhitelisted() || event.isOp() || player.hasPermission("minecraft.command.op")
+                        || player.hasPermission("cloud.server.join." + cloud.getGameMode())); // TODO remove op?
             });
         } catch (PlayerSoftDeletedException e) {
             event.setWhitelisted(false);

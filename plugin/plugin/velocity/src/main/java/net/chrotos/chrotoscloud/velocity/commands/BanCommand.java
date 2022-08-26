@@ -27,7 +27,11 @@ public class BanCommand {
             .requires(source -> source.hasPermission("velocity.command.ban"))
             .then(RequiredArgumentBuilder.<CommandSource, String>argument("player", StringArgumentType.word())
                 .suggests((ctx, builder) -> {
-                    plugin.getSynchronizer().getPlayerNames().forEach(builder::suggest);
+                    if (ctx.getSource() instanceof com.velocitypowered.api.proxy.Player proxyPlayer) {
+                        plugin.getSynchronizer().getPlayerNames().stream().filter(name -> !name.equals(proxyPlayer.getUsername())).forEach(builder::suggest);
+                    } else {
+                        plugin.getSynchronizer().getPlayerNames().forEach(builder::suggest);
+                    }
                     return builder.buildFuture();
                 })
                 .then(RequiredArgumentBuilder.<CommandSource, String>argument("reason", StringArgumentType.word())
@@ -44,6 +48,15 @@ public class BanCommand {
                                     .append(Component.text(" does not exist!", NamedTextColor.RED)));
 
                             return Command.SINGLE_SUCCESS;
+                        }
+
+                        if (context.getSource() instanceof com.velocitypowered.api.proxy.Player proxyPlayer) {
+                            if (proxyPlayer.getUniqueId().equals(player.getUniqueId())) {
+                                context.getSource().sendMessage(Component.text("You cannot ban yourself!",
+                                        NamedTextColor.RED));
+
+                                return Command.SINGLE_SUCCESS;
+                            }
                         }
 
                         ban(player, context.getSource(), plugin.getProxyServer().getPlayer(player.getUniqueId()).orElse(null),
