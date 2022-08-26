@@ -65,8 +65,7 @@ public class VelocityEventHandler {
                 Ban ban = cloudPlayer.getActiveBan();
                 if (ban != null) {
                     banned.set(true);
-                    cloudPlayer.kick(GlobalTranslator.render(ban.getBanMessage(cloudPlayer.getLocale(), cloudPlayer.getTimeZone()),
-                            cloudPlayer.getLocale()));
+                    cloudPlayer.kick(ban.getBanMessage(cloudPlayer.getLocale(), cloudPlayer.getTimeZone()));
                 }
             });
 
