@@ -212,6 +212,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
         try {
             zoneId = ZoneId.of(timeZoneString);
         } catch (ZoneRulesException e) {
+            e.printStackTrace();
             zoneId = ZoneId.of("UTC");
         }
 
