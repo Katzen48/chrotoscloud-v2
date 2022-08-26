@@ -7,10 +7,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.hibernate.annotations.*;
 
 import javax.persistence.*;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -69,7 +66,7 @@ public class CloudBan implements Ban {
         if (getExpiresAt() != null) {
             Calendar expiration = getExpiresAt();
             LocalDateTime local = LocalDateTime.ofInstant(expiration.toInstant(), timeZone.toZoneId());
-            DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);;
+            DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(locale);
 
             message = message.append(Component.text(" until ", NamedTextColor.RED)); // TODO translate
             message = message.append(Component.text(formatter.format(local), NamedTextColor.GOLD));
