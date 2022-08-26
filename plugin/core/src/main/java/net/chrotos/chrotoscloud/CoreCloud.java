@@ -1,5 +1,6 @@
 package net.chrotos.chrotoscloud;
 
+import com.maxmind.geoip2.DatabaseReader;
 import lombok.Getter;
 import lombok.NonNull;
 import net.chrotos.chrotoscloud.cache.RedisCacheAdapter;
@@ -9,6 +10,8 @@ import net.chrotos.chrotoscloud.messaging.queue.RabbitQueueAdapter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 import net.chrotos.chrotoscloud.player.CloudPlayerManager;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 import java.util.TimeZone;
@@ -22,10 +25,23 @@ public abstract class CoreCloud extends Cloud {
     @Getter
     @NonNull
     private final ChatManager chatManager;
+    @Getter
+    private final DatabaseReader geoIp;
 
     protected CoreCloud() {
         this.playerManager = new CloudPlayerManager(this);
         this.chatManager = new CoreChatManager();
+
+        DatabaseReader geoIp = null;
+        try {
+            geoIp = new DatabaseReader.Builder(new File("/usr/share/GeoIP/GeoLite2-City.mmdb")).build();
+        } catch (FileNotFoundException e) {
+            System.err.println("MaxMind GeoLite2-City database not installed. Cannot resolve location data." +
+                    "Please install the database in /usr/share/GeoIP/GeoLite2-City.mmdb or use geoipupdate!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        this.geoIp = geoIp;
     }
 
     @Override

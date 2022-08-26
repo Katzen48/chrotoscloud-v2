@@ -98,7 +98,7 @@ public class BanCommand {
         if (cloudPlayer.getSidedPlayer() == null && player != null) {
             Locale locale = player.getEffectiveLocale();
             if (locale == null) {
-                locale = Locale.US;
+                locale = cloudPlayer.getLocale();
             }
 
             player.disconnect(ban.getBanMessage(locale));

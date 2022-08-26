@@ -40,6 +40,12 @@ spec:
         - name: paper-config
           configMap:
             name: paper-config
+        - name: geoip-database
+          emptyDir: {}
+        - name: geoipupdate-secret
+          secret:
+            secretName: geoipupdate-secret
+            optional: true
         - name: podinfo
           downwardAPI:
             items:
@@ -56,6 +62,10 @@ spec:
               mountPath: /etc/config
             - name: podinfo
               mountPath: /etc/podinfo
+            - name: geoip-database
+              mountPath: /usr/share/GeoIP
+            - name: geoipupdate-secret
+              mountPath: /etc
           env:
             - name: DB_STRING
               valueFrom:
@@ -216,6 +226,8 @@ spec:
               mountPath: /opt/paper
             - name: podinfo
               mountPath: /etc/podinfo
+            - name: geoip-database
+              mountPath: /usr/share/GeoIP
           livenessProbe:
             tcpSocket:
               port: 25565
