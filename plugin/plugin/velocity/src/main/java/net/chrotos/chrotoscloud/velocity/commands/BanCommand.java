@@ -55,7 +55,7 @@ public class BanCommand {
                             if (proxyPlayer.getUniqueId().equals(player.getUniqueId())) {
                                 context.getSource().sendMessage(GlobalTranslator.renderer()
                                         .render(Component.translatable("cloud.ban.self", NamedTextColor.RED),
-                                                player.getLocale()));
+                                                Locale.US));
 
                                 return Command.SINGLE_SUCCESS;
                             }
