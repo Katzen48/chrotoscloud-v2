@@ -31,7 +31,7 @@ jobs:
         id: download-geoipupdate
         with:
           repo: "maxmind/geoipupdate"
-          file: "*_linux_amd64\\.tar\\.gz"
+          file: "_linux_amd64\\.tar\\.gz"
           regex: true
           target: "images/simpleInitContainer/geoipupdate/"
           token: ${{ secrets.GITHUB_TOKEN }}
