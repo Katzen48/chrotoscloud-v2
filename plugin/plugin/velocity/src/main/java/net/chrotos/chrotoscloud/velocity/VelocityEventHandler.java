@@ -18,6 +18,7 @@ import net.chrotos.chrotoscloud.velocity.player.PermissionsProvider;
 import net.chrotos.chrotoscloud.velocity.player.VelocitySidedPlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.translation.GlobalTranslator;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -64,7 +65,8 @@ public class VelocityEventHandler {
                 Ban ban = cloudPlayer.getActiveBan();
                 if (ban != null) {
                     banned.set(true);
-                    cloudPlayer.kick(ban.getBanMessage(cloudPlayer.getLocale(), cloudPlayer.getTimeZone()));
+                    cloudPlayer.kick(GlobalTranslator.render(ban.getBanMessage(cloudPlayer.getLocale(), cloudPlayer.getTimeZone()),
+                            cloudPlayer.getLocale()));
                 }
             });
 
