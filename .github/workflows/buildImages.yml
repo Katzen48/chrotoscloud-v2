@@ -28,11 +28,12 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - uses: dsaltares/fetch-gh-release-asset@master
+        id: download-geoipupdate
         with:
           repo: "maxmind/geoipupdate"
           file: "_linux_amd64\\.tar\\.gz"
           regex: true
-          target: "images/simpleInitContainer/geoipupdate.tar.gz"
+          target: "images/simpleInitContainer/geoipupdate"
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: simpleInitContainer
         uses: docker/build-push-action@v3.1.1
