@@ -2,7 +2,7 @@ FROM node:18-bullseye
 
 RUN apt-get update && apt-get upgrade -y --with-new-pkgs && apt-get install -y ca-certificates gettext-base unar
 
-COPY geoipupdate /opt/
+COPY geoipupdate /opt/usr/local/bin/
 RUN cd /opt/ && \
     find . -name "*.tar.gz" -exec unar -q {} \; && \
     cp geoipupdate /usr/local/bin/ && \
