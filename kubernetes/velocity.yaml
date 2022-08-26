@@ -56,7 +56,8 @@ spec:
             - name: geoip-database
               mountPath: /usr/share/GeoIP
             - name: geoipupdate-secret
-              mountPath: /etc
+              mountPath: /etc/GeoIP.conf
+              subPath: GeoIP.conf
           env:
             - name: CLOUD_VERSION
               value: 3.0-SNAPSHOT
