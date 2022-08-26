@@ -278,7 +278,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @JsonIgnore
     private Locale getValidLocale(@NonNull String key, @NonNull String countryIsoCode) {
         Locale locale = Locale.forLanguageTag(key);
-        if (locale.getCountry().equalsIgnoreCase(countryIsoCode)) {
+        if (locale.getCountry().isBlank() || locale.getCountry().equalsIgnoreCase(countryIsoCode)) {
             return locale;
         }
 
