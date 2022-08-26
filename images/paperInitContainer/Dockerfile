@@ -1,7 +1,5 @@
 FROM ghcr.io/katzen48/chrotoscloud-v2:simple-init-container
 
-RUN apt-get update && apt-get install -y unar
-
 COPY entrypoint.sh /usr/local/bin/
 RUN chmod u+x /usr/local/bin/entrypoint.sh
 

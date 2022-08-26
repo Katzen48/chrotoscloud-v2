@@ -98,7 +98,7 @@ public class PaperEventHandler implements Listener {
                 Ban ban = getBan(player);
                 if (ban != null) {
                     event.setWhitelisted(false);
-                    event.kickMessage(ban.getBanMessage(Locale.US));
+                    event.kickMessage(ban.getBanMessage(player.getLocale()));
                 } else {
                     event.setWhitelisted(event.isWhitelisted() || event.isOp() || player.hasPermission("minecraft.command.op")
                             || player.hasPermission("cloud.server.join." + cloud.getGameMode())); // TODO remove op?

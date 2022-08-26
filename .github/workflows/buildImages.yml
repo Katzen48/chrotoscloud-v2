@@ -27,12 +27,20 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: "maxmind/geoipupdate"
+          file: "_linux_amd64\\.tar\\.gz"
+          regex: true
+          target: "images/simpleInitContainer/geoipupdate.tar.gz"
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: simpleInitContainer
         uses: docker/build-push-action@v3.1.1
         with:
           context: images/simpleInitContainer
           pull: true
           push: true
+          platforms: linux/amd64
           tags: ${{ env.BASE_IMAGE }}:simple-init-container
           
       - name: apiInitContainer
@@ -41,6 +49,7 @@ jobs:
           context: images/apiInitContainer
           pull: true
           push: true
+          platforms: linux/amd64
           tags: ${{ env.BASE_IMAGE }}:api-init-container
 
       - name: paperInitContainer
@@ -49,6 +58,7 @@ jobs:
           context: images/paperInitContainer
           pull: true
           push: true
+          platforms: linux/amd64
           tags: ${{ env.BASE_IMAGE }}:paper-init-container
           
           
@@ -64,6 +74,7 @@ jobs:
           context: images/velocityInitContainer
           pull: true
           push: true
+          platforms: linux/amd64
           tags: ${{ env.BASE_IMAGE }}:velocity-init-container
           
       - uses: dsaltares/fetch-gh-release-asset@master
@@ -78,4 +89,5 @@ jobs:
           context: images/waterfallInitContainer
           pull: true
           push: true
+          platforms: linux/amd64
           tags: ${{ env.BASE_IMAGE }}:waterfall-init-container

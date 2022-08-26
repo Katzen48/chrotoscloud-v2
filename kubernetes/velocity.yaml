@@ -39,6 +39,12 @@ spec:
             - serviceAccountToken:
                 path: k8s-token
                 expirationSeconds: 7200
+        - name: geoip-database
+          emptyDir: {}
+        - name: geoipupdate-secret
+          secret:
+            secretName: geoipupdate-secret
+            optional: true
       initContainers:
         - name: velocity-download
           image: katzen48/chrotoscloud-v2:velocity-init-container
@@ -47,6 +53,10 @@ spec:
               mountPath: /workdir
             - name: velocity-config
               mountPath: /etc/config
+            - name: geoip-database
+              mountPath: /usr/share/GeoIP
+            - name: geoipupdate-secret
+              mountPath: /etc
           env:
             - name: CLOUD_VERSION
               value: 3.0-SNAPSHOT
@@ -149,6 +159,8 @@ spec:
           volumeMounts:
             - name: workdir
               mountPath: /opt/proxy
+            - name: geoip-database
+              mountPath: /usr/share/GeoIP
           livenessProbe:
             tcpSocket:
               port: 25577

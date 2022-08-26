@@ -62,7 +62,7 @@ public class CloudBan implements Ban {
             Calendar expiration = getExpiresAt();
 
             DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, locale);
-            dateFormat.setTimeZone(convertLocaleToTimeZone(locale));
+            dateFormat.setTimeZone(getPlayer().getTimeZone());
 
             message = message.append(Component.text(" until ", NamedTextColor.RED)); // TODO translate
             message = message.append(Component.text(dateFormat.format(expiration.getTime()), NamedTextColor.GOLD));
@@ -70,21 +70,5 @@ public class CloudBan implements Ban {
         message = message.append(Component.text("!", NamedTextColor.RED));
 
         return message;
-    }
-
-    private TimeZone convertLocaleToTimeZone(@NonNull Locale locale) {
-        if (Locale.GERMAN.equals(locale) || Locale.GERMANY.equals(locale)) {
-            return TimeZone.getTimeZone("Europe/Berlin");
-        } else if (Locale.UK.equals(locale)) {
-            return TimeZone.getTimeZone("Europe/London");
-        } else if (Locale.US.equals(locale)) {
-            return TimeZone.getTimeZone("America/New_York");
-        } else if (Locale.CANADA.equals(locale)) {
-            return TimeZone.getTimeZone("America/Toronto");
-        } else if (Locale.CHINA.equals(locale) || Locale.CHINESE.equals(locale) || Locale.SIMPLIFIED_CHINESE.equals(locale) || Locale.TRADITIONAL_CHINESE.equals(locale)) {
-            return TimeZone.getTimeZone("Asia/Shanghai");
-        } else {
-            return TimeZone.getDefault();
-        }
     }
 }

@@ -2,8 +2,11 @@ package net.chrotos.chrotoscloud.player;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.model.CityResponse;
 import lombok.*;
 import net.chrotos.chrotoscloud.Cloud;
+import net.chrotos.chrotoscloud.CoreCloud;
 import net.chrotos.chrotoscloud.economy.Account;
 import net.chrotos.chrotoscloud.economy.AccountType;
 import net.chrotos.chrotoscloud.economy.CloudAccount;
@@ -22,6 +25,9 @@ import org.hibernate.annotations.*;
 import javax.persistence.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import java.io.IOException;
+import java.time.ZoneId;
+import java.time.zone.ZoneRulesException;
 import java.util.*;
 
 @Entity(name = "players")
@@ -45,6 +51,9 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @Setter
     @JsonIgnore
     private transient SidedPlayer sidedPlayer;
+
+    @JsonIgnore
+    private transient CityResponse cityResponse;
 
     @OneToMany(mappedBy = "owner", targetEntity = CloudAccount.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @Filter(name = "accountType")
@@ -189,6 +198,56 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     }
 
     @Override
+    @JsonIgnore
+    public TimeZone getTimeZone() {
+        return getTimeZone(null);
+    }
+
+    @Override
+    public TimeZone getTimeZone(Locale locale) {
+        CityResponse city = getCityResponse();
+
+        String timeZoneString = city != null ? city.getLocation().getTimeZone() : getTimeZoneString(locale);
+        ZoneId zoneId;
+        try {
+            zoneId = ZoneId.of(timeZoneString);
+        } catch (ZoneRulesException e) {
+            zoneId = ZoneId.of("UTC");
+        }
+
+        return TimeZone.getTimeZone(zoneId);
+    }
+
+    private String getTimeZoneString(Locale locale) {
+        if (Locale.GERMAN.equals(locale) || Locale.GERMANY.equals(locale)) {
+            return "Europe/Berlin";
+        } else if (Locale.UK.equals(locale)) {
+            return "Europe/London";
+        } else if (Locale.US.equals(locale)) {
+            return "America/New_York";
+        } else if (Locale.CANADA.equals(locale)) {
+            return "America/Toronto";
+        } else if (Locale.CHINA.equals(locale) || Locale.CHINESE.equals(locale) || Locale.SIMPLIFIED_CHINESE.equals(locale) || Locale.TRADITIONAL_CHINESE.equals(locale)) {
+            return "Asia/Shanghai";
+        } else {
+            return TimeZone.getDefault().getID();
+        }
+    }
+
+    @Override
+    public Locale getLocale() {
+        if (getSidedPlayer() == null) {
+            return Locale.US;
+        }
+
+        if (getSidedPlayer().getLocale() != null) {
+            return getSidedPlayer().getLocale();
+        }
+
+        return Locale.US;
+    }
+
+    @Override
     @JsonProperty("ban")
     public Ban getActiveBan() {
         return Cloud.getInstance().getPersistence().executeFiltered("active", Collections.emptyMap(),
@@ -214,12 +273,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
         });
 
         if (sidedPlayer != null) {
-            Locale locale = sidedPlayer.getLocale();
-            if (locale == null) {
-                locale = Locale.US;
-            }
-
-            kick(ban.getBanMessage(locale));
+            kick(ban.getBanMessage(getLocale()));
         } else {
             Cloud.getInstance().getQueue().publish("games.server.kick", new PlayerKickedEvent(getUniqueId(),
                     LegacyComponentSerializer.builder().build().serialize(ban.getBanMessage(Locale.US))));
@@ -248,5 +302,27 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
         }
 
         sidedPlayer.kick(message);
+    }
+
+    private CityResponse getCity() {
+        if (cityResponse != null) {
+            return cityResponse;
+        }
+
+        if (getSidedPlayer() == null || getSidedPlayer().getIPAddress() == null) {
+            return null;
+        }
+
+        DatabaseReader geoIp = ((CoreCloud)Cloud.getInstance()).getGeoIp();
+        if (geoIp == null) {
+            return null;
+        }
+
+        try {
+            return (cityResponse = geoIp.city(getSidedPlayer().getIPAddress()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

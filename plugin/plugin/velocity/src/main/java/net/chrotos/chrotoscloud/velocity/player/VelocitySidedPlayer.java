@@ -11,6 +11,7 @@ import net.chrotos.chrotoscloud.velocity.VelocityCloud;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 
+import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.HexFormat;
 import java.util.Locale;
@@ -60,6 +61,11 @@ public class VelocitySidedPlayer implements SidedPlayer {
         builder.setPrompt(prompt);
 
         sidedObject.sendResourcePackOffer(builder.build());
+    }
+
+    @Override
+    public InetAddress getIPAddress() {
+        return sidedObject.getRemoteAddress().getAddress();
     }
 
     private ResourcePackInfo.Builder getResourcePackBuilder(@NonNull String url) {
