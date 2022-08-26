@@ -244,6 +244,18 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
             return getSidedPlayer().getLocale();
         }
 
+        CityResponse city = getCity();
+        if (city != null) {
+            String isoCode = city.getCountry().getIsoCode();
+            Optional<Locale> optional = Arrays.stream(Locale.getAvailableLocales())
+                                            .filter(locale -> locale.getISO3Country().equalsIgnoreCase(isoCode))
+                                            .findFirst();
+
+            if (optional.isPresent()) {
+                return optional.get();
+            }
+        }
+
         return Locale.US;
     }
 
