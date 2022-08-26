@@ -9,7 +9,9 @@ import org.hibernate.annotations.*;
 import javax.persistence.*;
 import javax.persistence.Entity;
 import java.time.LocalDateTime;
+import java.time.chrono.IsoChronology;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
 import java.util.Calendar;
 import java.util.Locale;
@@ -66,7 +68,9 @@ public class CloudBan implements Ban {
         if (getExpiresAt() != null) {
             Calendar expiration = getExpiresAt();
             LocalDateTime local = LocalDateTime.ofInstant(expiration.toInstant(), timeZone.toZoneId());
-            DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(locale);
+            String datePattern = DateTimeFormatterBuilder.getLocalizedDateTimePattern(FormatStyle.SHORT, FormatStyle.LONG,
+                    IsoChronology.INSTANCE, locale);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(datePattern, locale);
 
             message = message.append(Component.text(" until ", NamedTextColor.RED)); // TODO translate
             message = message.append(Component.text(formatter.format(local), NamedTextColor.GOLD));
