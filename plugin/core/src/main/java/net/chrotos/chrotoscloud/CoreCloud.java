@@ -9,12 +9,16 @@ import net.chrotos.chrotoscloud.chat.CoreChatManager;
 import net.chrotos.chrotoscloud.messaging.queue.RabbitQueueAdapter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 import net.chrotos.chrotoscloud.player.CloudPlayerManager;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.translation.GlobalTranslator;
+import net.kyori.adventure.translation.TranslationRegistry;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Iterator;
-import java.util.ServiceLoader;
-import java.util.TimeZone;
+import java.io.*;
+import java.net.URL;
+import java.security.CodeSource;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public abstract class CoreCloud extends Cloud {
     private static boolean loaded;
@@ -27,6 +31,8 @@ public abstract class CoreCloud extends Cloud {
     private final ChatManager chatManager;
     @Getter
     private final DatabaseReader geoIp;
+    @Getter
+    private TranslationRegistry translationRegistry;
 
     protected CoreCloud() {
         this.playerManager = new CloudPlayerManager(this);
@@ -103,6 +109,8 @@ public abstract class CoreCloud extends Cloud {
 
         Thread.currentThread().setContextClassLoader(loader);
 
+        initializeTranslations();
+
         initialized = true;
     }
 
@@ -127,6 +135,65 @@ public abstract class CoreCloud extends Cloud {
         }
 
         return service;
+    }
+
+    private void initializeTranslations() {
+        File translationsDir = getTranslationDir();
+        if (translationsDir == null) {
+            return;
+        }
+
+        if (!translationsDir.exists()) {
+            translationsDir.mkdirs();
+        }
+
+        CodeSource src = getClass().getProtectionDomain().getCodeSource();
+        if (src != null) {
+            try {
+                URL jar = src.getLocation();
+                ZipInputStream zip = new ZipInputStream(jar.openStream());
+                ZipEntry entry;
+                while((entry = zip.getNextEntry()) != null) {
+                    if (!entry.getName().startsWith("translations") || !entry.getName().contains("chrotoscloud")) {
+                        continue;
+                    }
+
+                    File translationFile = new File(translationsDir, entry.getName().replace("translations/", ""));
+                    if (!translationFile.exists()) {
+                        translationFile.createNewFile();
+
+                        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(translationFile));
+                        byte[] buffer = new byte[1024];
+
+                        int count;
+                        while ((count = zip.read(buffer)) != -1) {
+                            out.write(buffer, 0, count);
+                        }
+
+                        out.close();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        translationRegistry = TranslationRegistry.create(Key.key("chrotoscloud"));
+        Arrays.stream(translationsDir.listFiles((dir, name) -> name.endsWith(".properties"))).forEach(file -> {
+            try {
+                String[] fileNameParts = file.getName().split("_", 2);
+                Locale locale = fileNameParts.length > 1 ?
+                        Locale.forLanguageTag(fileNameParts[1].replace(".properties", "")) : Locale.US;
+
+                ResourceBundle resourceBundle = new PropertyResourceBundle(new FileInputStream(file));
+
+                translationRegistry.registerAll(locale, resourceBundle, false);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        GlobalTranslator.translator().addSource(translationRegistry);
     }
 
     protected boolean shouldLoadQueue() {

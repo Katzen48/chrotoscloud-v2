@@ -29,25 +29,25 @@ public class UnbanCommand {
                             .columnFilters(Collections.singletonMap("name", playerName)).build());
 
                     if (player == null) {
-                        context.getSource().sendMessage(Component.text("Player ", NamedTextColor.RED)
+                        context.getSource().sendMessage(Component.translatable("cloud.unban.player", NamedTextColor.RED)
                                 .append(Component.text(playerName, NamedTextColor.GOLD))
-                                .append(Component.text(" does not exist!", NamedTextColor.RED)));
+                                .append(Component.translatable("cloud.unban.invalid", NamedTextColor.RED)));
 
                         return Command.SINGLE_SUCCESS;
                     }
 
                     if (!player.isBanned()) {
-                        context.getSource().sendMessage(Component.text("Player ", NamedTextColor.RED)
+                        context.getSource().sendMessage(Component.translatable("cloud.unban.player", NamedTextColor.RED)
                                 .append(Component.text(player.getName(), NamedTextColor.GOLD))
-                                .append(Component.text(" is not banned!")));
+                                .append(Component.translatable("cloud.unban.notbanned", NamedTextColor.RED)));
 
                         return Command.SINGLE_SUCCESS;
                     }
                     player.unban();
 
-                    context.getSource().sendMessage(Component.text("Player ", NamedTextColor.RED)
+                    context.getSource().sendMessage(Component.translatable("cloud.unban.player", NamedTextColor.RED)
                             .append(Component.text(player.getName(), NamedTextColor.GOLD))
-                            .append(Component.text(" has been unbanned!")));
+                            .append(Component.translatable("cloud.unban.unbanned", NamedTextColor.RED)));
 
                     return Command.SINGLE_SUCCESS;
                 }))));

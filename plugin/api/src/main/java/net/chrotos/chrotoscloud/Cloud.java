@@ -10,7 +10,9 @@ import net.chrotos.chrotoscloud.messaging.pubsub.PubSubAdapter;
 import net.chrotos.chrotoscloud.messaging.queue.QueueAdapter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 import net.chrotos.chrotoscloud.player.PlayerManager;
+import net.kyori.adventure.translation.TranslationRegistry;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
@@ -24,6 +26,7 @@ public abstract class Cloud {
     protected CacheAdapter cache;
     protected PubSubAdapter pubSub;
     protected QueueAdapter queue;
+    protected TranslationRegistry translationRegistry;
 
     @NonNull
     public static Cloud getInstance() {
@@ -74,6 +77,7 @@ public abstract class Cloud {
     public abstract String getHostname();
     @NonNull
     public abstract GameManager getGameManager();
+    public abstract File getTranslationDir();
 
     public String getGameMode() {
         return getCloudConfig().getGameMode();

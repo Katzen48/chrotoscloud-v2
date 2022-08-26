@@ -43,16 +43,16 @@ public class BanCommand {
                                 .columnFilters(Collections.singletonMap("name", playerName)).build());
 
                         if (player == null) {
-                            context.getSource().sendMessage(Component.text("Player ", NamedTextColor.RED)
+                            context.getSource().sendMessage(Component.translatable("cloud.ban.player", NamedTextColor.RED)
                                     .append(Component.text(playerName, NamedTextColor.GOLD))
-                                    .append(Component.text(" does not exist!", NamedTextColor.RED)));
+                                    .append(Component.translatable("cloud.ban.invalid", NamedTextColor.RED)));
 
                             return Command.SINGLE_SUCCESS;
                         }
 
                         if (context.getSource() instanceof com.velocitypowered.api.proxy.Player proxyPlayer) {
                             if (proxyPlayer.getUniqueId().equals(player.getUniqueId())) {
-                                context.getSource().sendMessage(Component.text("You cannot ban yourself!",
+                                context.getSource().sendMessage(Component.translatable("cloud.ban.self",
                                         NamedTextColor.RED));
 
                                 return Command.SINGLE_SUCCESS;
@@ -74,9 +74,9 @@ public class BanCommand {
                                     .columnFilters(Collections.singletonMap("name", playerName)).build());
 
                             if (player == null) {
-                                context.getSource().sendMessage(Component.text("Player ", NamedTextColor.RED)
+                                context.getSource().sendMessage(Component.translatable("cloud.ban.player", NamedTextColor.RED)
                                         .append(Component.text(playerName, NamedTextColor.GOLD))
-                                        .append(Component.text(" does not exist!", NamedTextColor.RED)));
+                                        .append(Component.translatable("cloud.ban.invalid", NamedTextColor.RED)));
 
                                 return Command.SINGLE_SUCCESS;
                             }
@@ -94,9 +94,9 @@ public class BanCommand {
     private static void ban(@NonNull Player cloudPlayer, @NonNull CommandSource source, com.velocitypowered.api.proxy.Player player,
                             @NonNull String reason, int days) {
         if (cloudPlayer.isBanned()) {
-            source.sendMessage(Component.text("Player ", NamedTextColor.RED)
+            source.sendMessage(Component.translatable("cloud.ban.player", NamedTextColor.RED)
                     .append(Component.text(cloudPlayer.getName(), NamedTextColor.GOLD))
-                    .append(Component.text(" is already banned!")));
+                    .append(Component.translatable("cloud.ban.bannedalready")));
 
             return;
         }
@@ -117,15 +117,16 @@ public class BanCommand {
             player.disconnect(ban.getBanMessage(locale));
         }
 
-        Component response = Component.text("Player ", NamedTextColor.RED)
+        Component response = Component.translatable("cloud.ban.player", NamedTextColor.RED)
                 .append(Component.text(cloudPlayer.getName(), NamedTextColor.GOLD))
-                .append(Component.text(" has been banned"));
+                .append(Component.translatable("cloud.ban.banned"));
 
         if (days > 0) {
-            response = response.append(Component.text(" for ", NamedTextColor.RED))
-                                .append(Component.text(days + " Days", NamedTextColor.GOLD));
+            response = response.append(Component.translatable("cloud.ban.for", NamedTextColor.RED))
+                                .append(Component.text(days, NamedTextColor.GOLD))
+                                .append(Component.translatable("cloud.ban.days", NamedTextColor.GOLD));
         }
-        response = response.append(Component.text("! Reason: ", NamedTextColor.RED))
+        response = response.append(Component.translatable("cloud.ban.reason", NamedTextColor.RED))
                             .append(Component.text(reason, NamedTextColor.GOLD));
 
         source.sendMessage(response);

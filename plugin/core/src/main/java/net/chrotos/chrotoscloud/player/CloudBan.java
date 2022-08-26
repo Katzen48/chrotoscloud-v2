@@ -60,7 +60,7 @@ public class CloudBan implements Ban {
 
     @Override
     public Component getBanMessage(@NonNull Locale locale, @NonNull TimeZone timeZone) {
-        Component message = Component.text("You have been banned for ", NamedTextColor.RED); // TODO translate
+        Component message = Component.translatable("cloud.player.banned", NamedTextColor.RED);
         message = message.append(Component.text(getReason(), NamedTextColor.GOLD));
 
         if (getExpiresAt() != null) {
@@ -68,7 +68,7 @@ public class CloudBan implements Ban {
             LocalDateTime local = LocalDateTime.ofInstant(expiration.toInstant(), timeZone.toZoneId());
             DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(locale);
 
-            message = message.append(Component.text(" until ", NamedTextColor.RED)); // TODO translate
+            message = message.append(Component.translatable("cloud.player.banned.until", NamedTextColor.RED));
             message = message.append(Component.text(formatter.format(local), NamedTextColor.GOLD));
         }
         message = message.append(Component.text("!", NamedTextColor.RED));

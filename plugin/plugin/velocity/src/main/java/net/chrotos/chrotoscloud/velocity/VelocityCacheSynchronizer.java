@@ -51,13 +51,13 @@ public class VelocityCacheSynchronizer {
             for (String proxy : proxies) {
                 if (plugin.cloud.getCache().setContains("proxy:" + proxy + ":players",
                         event.getPlayer().getUniqueId().toString())) {
-                    event.setResult(ResultedEvent.ComponentResult.denied(Component.text("You are already connected")));
+                    event.setResult(ResultedEvent.ComponentResult.denied(Component.translatable("cloud.server.connected")));
 
                     return;
                 }
             }
         } catch (Exception e) {
-            event.setResult(ResultedEvent.ComponentResult.denied(Component.text("Error")));
+            event.setResult(ResultedEvent.ComponentResult.denied(Component.translatable("cloud.error")));
         }
     }
 

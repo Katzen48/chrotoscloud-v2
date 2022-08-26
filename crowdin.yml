@@ -1,0 +1,10 @@
+project_id: '534676'
+base_path: plugin
+preserve_hierarchy: true
+files:
+  - source: core/src/main/resources/translations/chrotoscloud_core.properties
+    translation: /core/src/main/resources/translations/chrotoscloud_core_%two_letters_code%.properties
+    type: properties
+  - source: plugin/velocity/src/main/resources/translations/chrotoscloud_velocity.properties
+    translation: /plugin/velocity/src/main/resources/translations/chrotoscloud_velocity_%two_letters_code%.properties
+    type: properties

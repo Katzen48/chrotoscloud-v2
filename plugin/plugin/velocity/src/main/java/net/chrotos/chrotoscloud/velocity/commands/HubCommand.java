@@ -35,7 +35,7 @@ public class HubCommand implements SimpleCommand {
         }
 
         if (proxyServer.getConfiguration().getAttemptConnectionOrder().contains(server.get().getServerInfo().getName())) {
-            player.sendMessage(Component.text("You are already connected to the lobby!")); // TODO: i18n
+            player.sendMessage(Component.translatable("cloud.lobby.connected"));
 
             return;
         }

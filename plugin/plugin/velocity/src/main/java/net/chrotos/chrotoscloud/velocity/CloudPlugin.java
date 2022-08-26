@@ -6,6 +6,7 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
+import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.Getter;
 import net.chrotos.chrotoscloud.Cloud;
@@ -13,6 +14,8 @@ import net.chrotos.chrotoscloud.velocity.commands.BanCommand;
 import net.chrotos.chrotoscloud.velocity.commands.HubCommand;
 import net.chrotos.chrotoscloud.velocity.commands.UnbanCommand;
 import org.slf4j.Logger;
+
+import java.nio.file.Path;
 
 @Plugin(id="chrotoscloud", name = "ChrotosCloud", version = "3.0-SNAPSHOT", authors = {"Katzen48"})
 public class CloudPlugin {
@@ -24,7 +27,7 @@ public class CloudPlugin {
     private VelocityCacheSynchronizer synchronizer;
 
     @Inject
-    public CloudPlugin(ProxyServer proxyServer, Logger logger) {
+    public CloudPlugin(ProxyServer proxyServer, Logger logger, @DataDirectory Path dataDir) {
         this.proxyServer = proxyServer;
         this.logger = logger;
 
@@ -32,6 +35,7 @@ public class CloudPlugin {
         this.cloud = (VelocityCloud) Cloud.getInstance();
         this.cloud.setProxyServer(proxyServer);
         this.cloud.setLogger(logger);
+        this.cloud.setDataDir(dataDir);
     }
 
     @Subscribe(async = false)

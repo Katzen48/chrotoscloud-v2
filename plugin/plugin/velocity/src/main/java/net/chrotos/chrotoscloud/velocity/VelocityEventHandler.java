@@ -76,9 +76,9 @@ public class VelocityEventHandler {
 
             continuation.resume();
         } catch (PlayerSoftDeletedException e) {
-            player.disconnect(Component.text("Your account has been deleted!", NamedTextColor.RED)); // TODO translate
+            player.disconnect(Component.translatable("cloud.player.deleted", NamedTextColor.RED));
         } catch (Exception e) {
-            continuation.resumeWithException(e);
+            player.disconnect(Component.translatable("cloud.error", NamedTextColor.RED));
         }
     }
 
