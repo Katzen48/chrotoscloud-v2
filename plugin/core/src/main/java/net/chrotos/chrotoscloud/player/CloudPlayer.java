@@ -26,7 +26,6 @@ import org.hibernate.annotations.*;
 import javax.persistence.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import java.io.IOException;
 import java.time.ZoneId;
 import java.time.zone.ZoneRulesException;
 import java.util.*;
@@ -246,25 +245,44 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
             return getSidedPlayer().getLocale();
         }
 
+        Locale foundLocale = null;
         CityResponse city = getCity();
         if (city != null && !city.getCountry().getIsoCode().isBlank()) {
             String isoCode = city.getCountry().getIsoCode();
-            Optional<Locale> optional = Arrays.stream(Locale.getAvailableLocales())
-                                            .filter(locale -> {
-                                                try {
-                                                    return locale.getCountry().equalsIgnoreCase(isoCode);
-                                                } catch (Exception e) {
-                                                    return false;
-                                                }
-                                            })
-                                            .findFirst();
 
-            if (optional.isPresent()) {
-                return optional.get();
+            if ((foundLocale = getValidLocale(isoCode, isoCode)) == null
+                    && (foundLocale = getValidLocale(isoCode.toLowerCase() + "_" + isoCode.toUpperCase(), isoCode)) == null) {
+                Optional<Locale> optional = Arrays.stream(Locale.getAvailableLocales())
+                        .filter(locale -> {
+                            try {
+                                return locale.getCountry().equalsIgnoreCase(isoCode);
+                            } catch (Exception e) {
+                                return false;
+                            }
+                        })
+                        .findFirst();
+
+                if (optional.isPresent()) {
+                    foundLocale = optional.get();
+                }
             }
         }
 
-        return Locale.US;
+        if (foundLocale == null) {
+            foundLocale = Locale.US;
+        }
+
+        return foundLocale;
+    }
+
+    @JsonIgnore
+    private Locale getValidLocale(@NonNull String key, @NonNull String countryIsoCode) {
+        Locale locale = Locale.forLanguageTag(key);
+        if (locale.getCountry().equalsIgnoreCase(countryIsoCode)) {
+            return locale;
+        }
+
+        return null;
     }
 
     @Override
