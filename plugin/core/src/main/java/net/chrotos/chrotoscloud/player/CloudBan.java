@@ -11,6 +11,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -55,17 +56,22 @@ public class CloudBan implements Ban {
 
     @Override
     public Component getBanMessage(@NonNull Locale locale) {
+        return getBanMessage(locale, getPlayer().getTimeZone());
+    }
+
+    @Override
+    public Component getBanMessage(@NonNull Locale locale, @NonNull TimeZone timeZone) {
         Component message = Component.text("You have been banned for ", NamedTextColor.RED); // TODO translate
         message = message.append(Component.text(getReason(), NamedTextColor.GOLD));
 
         if (getExpiresAt() != null) {
             Calendar expiration = getExpiresAt();
+            LocalDateTime local = LocalDateTime.ofInstant(expiration.toInstant(), timeZone.toZoneId());
 
             DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, locale);
-            dateFormat.setTimeZone(getPlayer().getTimeZone());
 
             message = message.append(Component.text(" until ", NamedTextColor.RED)); // TODO translate
-            message = message.append(Component.text(dateFormat.format(expiration.getTime()), NamedTextColor.GOLD));
+            message = message.append(Component.text(dateFormat.format(local), NamedTextColor.GOLD));
         }
         message = message.append(Component.text("!", NamedTextColor.RED));
 

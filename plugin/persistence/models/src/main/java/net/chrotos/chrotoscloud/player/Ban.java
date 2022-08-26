@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component;
 
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.UUID;
 
 public interface Ban {
@@ -16,4 +17,5 @@ public interface Ban {
     Calendar getCreatedAt();
     Calendar getExpiresAt();
     Component getBanMessage(@NonNull Locale locale);
+    Component getBanMessage(@NonNull Locale locale, @NonNull TimeZone timeZone);
 }
