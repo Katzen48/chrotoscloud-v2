@@ -34,10 +34,10 @@ public abstract class CoreCloud extends Cloud {
 
         DatabaseReader geoIp = null;
         try {
-            geoIp = new DatabaseReader.Builder(new File("/usr/share/GeoIP/GeoLite2-City.mmdb")).build();
+            geoIp = new DatabaseReader.Builder(new File("/usr/local/share/GeoIP/GeoLite2-City.mmdb")).build();
         } catch (FileNotFoundException e) {
             System.err.println("MaxMind GeoLite2-City database not installed. Cannot resolve location data." +
-                    "Please install the database in /usr/share/GeoIP/GeoLite2-City.mmdb or use geoipupdate!");
+                    "Please install the database in /usr/local/share/GeoIP/GeoLite2-City.mmdb or use geoipupdate!");
         } catch (Exception e) {
             e.printStackTrace();
         }
