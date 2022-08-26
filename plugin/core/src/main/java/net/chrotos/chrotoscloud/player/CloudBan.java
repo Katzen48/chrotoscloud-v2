@@ -12,6 +12,8 @@ import javax.persistence.Entity;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -67,11 +69,10 @@ public class CloudBan implements Ban {
         if (getExpiresAt() != null) {
             Calendar expiration = getExpiresAt();
             LocalDateTime local = LocalDateTime.ofInstant(expiration.toInstant(), timeZone.toZoneId());
-
-            DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, locale);
+            DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);;
 
             message = message.append(Component.text(" until ", NamedTextColor.RED)); // TODO translate
-            message = message.append(Component.text(dateFormat.format(local), NamedTextColor.GOLD));
+            message = message.append(Component.text(formatter.format(local), NamedTextColor.GOLD));
         }
         message = message.append(Component.text("!", NamedTextColor.RED));
 
