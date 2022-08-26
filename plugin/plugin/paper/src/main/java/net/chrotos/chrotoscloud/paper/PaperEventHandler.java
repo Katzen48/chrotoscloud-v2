@@ -80,7 +80,7 @@ public class PaperEventHandler implements Listener {
 
             Ban ban = getBan(cloudPlayer);
             if (ban != null) {
-                cloudPlayer.kick(ban.getBanMessage(cloudPlayer.getLocale()));
+                cloudPlayer.kick(ban.getBanMessage(cloudPlayer.getLocale(), cloudPlayer.getTimeZone()));
                 return;
             }
 
