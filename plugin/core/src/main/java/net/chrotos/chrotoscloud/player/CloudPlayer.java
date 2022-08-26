@@ -321,7 +321,11 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
             return;
         }
 
-        getSidedPlayer().kick(GlobalTranslator.render(message, getLocale()));
+        if (message != null) {
+            getSidedPlayer().kick(GlobalTranslator.render(message, getLocale()));
+        } else {
+            getSidedPlayer().kick(null);
+        }
     }
 
     private CityResponse getCity() {
