@@ -181,9 +181,9 @@ public abstract class CoreCloud extends Cloud {
         translationRegistry = TranslationRegistry.create(Key.key("chrotoscloud"));
         Arrays.stream(translationsDir.listFiles((dir, name) -> name.endsWith(".properties"))).forEach(file -> {
             try {
-                String[] fileNameParts = file.getName().split("_", 2);
-                Locale locale = fileNameParts.length > 1 ?
-                        Locale.forLanguageTag(fileNameParts[1].replace(".properties", "")) : Locale.US;
+                String[] fileNameParts = file.getName().split("_", 3);
+                Locale locale = fileNameParts.length > 2 ?
+                        Locale.forLanguageTag(fileNameParts[2].replace(".properties", "")) : Locale.US;
 
                 ResourceBundle resourceBundle = new PropertyResourceBundle(new FileInputStream(file));
 
