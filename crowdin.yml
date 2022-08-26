@@ -19,11 +19,11 @@ files: [
   "translation" : "core/src/main/resources/translations/chrotoscloud_core_%two_letters_code%.properties",
   "type" : "properties"
  },
- {
-  "source" : "plugin/paper/src/main/resources/translations/chrotoscloud_paper.properties",
-  "translation" : "plugin/paper/src/main/resources/translations/chrotoscloud_paper_%two_letters_code%.properties",
-  "type" : "properties"
- },
+# {
+#  "source" : "plugin/paper/src/main/resources/translations/chrotoscloud_paper.properties",
+#  "translation" : "plugin/paper/src/main/resources/translations/chrotoscloud_paper_%two_letters_code%.properties",
+#  "type" : "properties"
+# },
  {
   "source" : "plugin/velocity/src/main/resources/translations/chrotoscloud_velocity.properties",
   "translation" : "plugin/velocity/src/main/resources/translations/chrotoscloud_velocity_%two_letters_code%.properties",
