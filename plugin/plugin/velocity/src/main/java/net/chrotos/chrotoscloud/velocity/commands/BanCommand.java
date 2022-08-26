@@ -16,6 +16,7 @@ import net.chrotos.chrotoscloud.player.Player;
 import net.chrotos.chrotoscloud.velocity.CloudPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.translation.GlobalTranslator;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -52,7 +53,8 @@ public class BanCommand {
 
                         if (context.getSource() instanceof com.velocitypowered.api.proxy.Player proxyPlayer) {
                             if (proxyPlayer.getUniqueId().equals(player.getUniqueId())) {
-                                context.getSource().sendMessage(Component.translatable("cloud.ban.self",
+                                context.getSource().sendMessage(Component.text(GlobalTranslator.get()
+                                                .translate("cloud.ban.self", player.getLocale()).format(null),
                                         NamedTextColor.RED));
 
                                 return Command.SINGLE_SUCCESS;
