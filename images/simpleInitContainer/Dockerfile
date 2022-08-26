@@ -4,9 +4,8 @@ RUN apt-get update && apt-get upgrade -y --with-new-pkgs && apt-get install -y c
 
 COPY geoipupdate/* /opt/
 RUN cd /opt/ && \
-    find . -name "*.tar.gz" -exec unar -q {} \; && \
-    cp geoipupdate /usr/local/bin/ && \
-    cp GeoIP.conf /usr/local/etc/
+    find . -name "*.tar.gz" -exec unar {} \; && \
+    cp */geoipupdate /usr/local/bin/
 
 COPY package*.json ./
 RUN npm install
