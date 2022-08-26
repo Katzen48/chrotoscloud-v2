@@ -251,8 +251,8 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
             Optional<Locale> optional = Arrays.stream(Locale.getAvailableLocales())
                                             .filter(locale -> {
                                                 try {
-                                                    return locale.getISO3Country().equalsIgnoreCase(isoCode);
-                                                } catch (MissingResourceException e) {
+                                                    return locale.getCountry().equalsIgnoreCase(isoCode);
+                                                } catch (Exception e) {
                                                     return false;
                                                 }
                                             })
