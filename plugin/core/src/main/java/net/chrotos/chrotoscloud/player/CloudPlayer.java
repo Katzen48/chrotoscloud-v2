@@ -20,6 +20,7 @@ import net.chrotos.chrotoscloud.persistence.SoftDeletable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.translation.GlobalTranslator;
 import org.hibernate.annotations.*;
 
 import javax.persistence.*;
@@ -291,7 +292,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
             bans.add(ban);
         });
 
-        if (sidedPlayer != null) {
+        if (getSidedPlayer() != null) {
             kick(ban.getBanMessage(getLocale()));
         } else {
             Cloud.getInstance().getQueue().publish("games.server.kick", new PlayerKickedEvent(getUniqueId(),
@@ -313,14 +314,14 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
 
     @Override
     public void kick(Component message) {
-        if (sidedPlayer == null) {
+        if (getSidedPlayer() == null) {
             Cloud.getInstance().getQueue().publish("games.server.kick", new PlayerKickedEvent(getUniqueId(),
                     message != null ? LegacyComponentSerializer.builder().build().serialize(message) : null));
 
             return;
         }
 
-        sidedPlayer.kick(message);
+        getSidedPlayer().kick(GlobalTranslator.render(message, getLocale()));
     }
 
     private CityResponse getCity() {
