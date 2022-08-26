@@ -62,10 +62,10 @@ public class PaperEventHandler implements Listener {
 
                 loadScoreboardTags(cloudPlayer, player);
             } catch (PlayerSoftDeletedException e) {
-                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("Your account has been deleted!")); // TODO Translate
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.translatable("cloud.player.deleted", NamedTextColor.RED));
             } catch (Exception e) {
                 e.printStackTrace();
-                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("An error occured!")); // TODO Translate
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.translatable("cloud.error", NamedTextColor.RED));
                 cloud.getPlayerManager().logoutPlayer(event.getPlayer().getUniqueId());
             }
         });
@@ -110,11 +110,11 @@ public class PaperEventHandler implements Listener {
             });
         } catch (PlayerSoftDeletedException e) {
             event.setWhitelisted(false);
-            event.kickMessage(Component.text("Your account has been deleted!", NamedTextColor.RED)); // TODO Translate
+            event.kickMessage(Component.translatable("cloud.player.deleted", NamedTextColor.RED));
         } catch (Exception e) {
             e.printStackTrace();
             event.setWhitelisted(false);
-            event.kickMessage(Component.text("An error occured!")); // TODO Translate
+            event.kickMessage(Component.translatable("cloud.error", NamedTextColor.RED));
             cloud.getPlayerManager().logoutPlayer(event.getPlayerProfile().getId());
         }
     }

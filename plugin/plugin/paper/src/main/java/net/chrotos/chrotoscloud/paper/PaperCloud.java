@@ -7,6 +7,7 @@ import net.chrotos.chrotoscloud.CoreCloud;
 import net.chrotos.chrotoscloud.paper.games.PaperGameManager;
 import org.bukkit.Bukkit;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 
@@ -40,5 +41,10 @@ public class PaperCloud extends CoreCloud {
     @NonNull
     public String getHostname() {
         return System.getenv("HOSTNAME");
+    }
+
+    @Override
+    public File getTranslationDir() {
+        return new File(plugin.getDataFolder(), "translations");
     }
 }

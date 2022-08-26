@@ -4,6 +4,7 @@ import lombok.NonNull;
 import net.chrotos.chrotoscloud.CoreCloud;
 import net.chrotos.chrotoscloud.games.GameManager;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -28,6 +29,11 @@ public class RestCloud extends CoreCloud {
 
     @Override
     public @NonNull GameManager getGameManager() {
+        return null;
+    }
+
+    @Override
+    public File getTranslationDir() {
         return null;
     }
 

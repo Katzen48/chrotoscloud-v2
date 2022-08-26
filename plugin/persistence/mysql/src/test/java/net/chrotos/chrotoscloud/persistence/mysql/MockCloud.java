@@ -4,6 +4,7 @@ import net.chrotos.chrotoscloud.CoreCloud;
 import net.chrotos.chrotoscloud.games.GameManager;
 import net.chrotos.chrotoscloud.player.Player;
 
+import java.io.File;
 import java.util.List;
 
 public class MockCloud extends CoreCloud {
@@ -18,6 +19,11 @@ public class MockCloud extends CoreCloud {
 
     @Override
     public GameManager getGameManager() {
+        return null;
+    }
+
+    @Override
+    public File getTranslationDir() {
         return null;
     }
 }

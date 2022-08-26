@@ -8,7 +8,9 @@ import net.chrotos.chrotoscloud.CoreCloud;
 import net.chrotos.chrotoscloud.velocity.games.VelocityGameManager;
 import org.slf4j.Logger;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 @Getter
 public class VelocityCloud extends CoreCloud {
@@ -16,6 +18,8 @@ public class VelocityCloud extends CoreCloud {
     private ProxyServer proxyServer;
     @Setter
     private Logger logger;
+    @Setter
+    private Path dataDir;
     private final VelocityGameManager gameManager;
 
     public VelocityCloud() {
@@ -38,5 +42,10 @@ public class VelocityCloud extends CoreCloud {
     @NonNull
     public String getHostname() {
         return System.getenv("HOSTNAME");
+    }
+
+    @Override
+    public File getTranslationDir() {
+        return new File(dataDir.toFile(), "translations");
     }
 }
