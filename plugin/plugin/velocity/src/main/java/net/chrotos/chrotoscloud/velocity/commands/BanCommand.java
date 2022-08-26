@@ -16,7 +16,6 @@ import net.chrotos.chrotoscloud.player.Player;
 import net.chrotos.chrotoscloud.velocity.CloudPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.translation.GlobalTranslator;
 
 import java.util.Calendar;
 import java.util.Collections;
