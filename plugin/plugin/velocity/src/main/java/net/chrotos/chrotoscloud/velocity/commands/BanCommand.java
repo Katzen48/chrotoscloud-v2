@@ -46,6 +46,15 @@ public class BanCommand {
                             return Command.SINGLE_SUCCESS;
                         }
 
+                        if (context.getSource() instanceof com.velocitypowered.api.proxy.Player proxyPlayer) {
+                            if (proxyPlayer.getUniqueId().equals(player.getUniqueId())) {
+                                context.getSource().sendMessage(Component.text("You cannot ban yourself!",
+                                        NamedTextColor.RED));
+
+                                return Command.SINGLE_SUCCESS;
+                            }
+                        }
+
                         ban(player, context.getSource(), plugin.getProxyServer().getPlayer(player.getUniqueId()).orElse(null),
                                 reason, 0);
 
