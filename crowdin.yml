@@ -8,7 +8,7 @@
 # Choose file structure in Crowdin
 # e.g. true or false
 #
-"preserve_hierarchy": false
+"preserve_hierarchy": true
 
 #
 # Files configuration
