@@ -1,4 +1,4 @@
-FROM ghcr.io/katzen48/chrotoscloud-v2:simple-init-container
+FROM katzen48/chrotoscloud-v2:simple-init-container
 
 COPY velocity-all.jar .
 COPY entrypoint.sh /usr/local/bin/
