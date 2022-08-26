@@ -53,9 +53,9 @@ public class BanCommand {
 
                         if (context.getSource() instanceof com.velocitypowered.api.proxy.Player proxyPlayer) {
                             if (proxyPlayer.getUniqueId().equals(player.getUniqueId())) {
-                                context.getSource().sendMessage(Component.text(GlobalTranslator.get()
-                                                .translate("cloud.ban.self", player.getLocale()).format(null),
-                                        NamedTextColor.RED));
+                                context.getSource().sendMessage(GlobalTranslator.renderer()
+                                        .render(Component.translatable("cloud.ban.self", NamedTextColor.RED),
+                                                player.getLocale()));
 
                                 return Command.SINGLE_SUCCESS;
                             }
