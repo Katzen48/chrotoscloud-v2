@@ -49,17 +49,31 @@ public class PaperGameManager implements GameManager, AutoCloseable {
 
             Bukkit.getScheduler().runTaskLater(cloud.getPlugin(), () -> {
                 if (finalReg.isSubscribed()) {
-                    finalReg.unsubscribe();
+                    try {
+                        finalReg.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     future.completeExceptionally(new TimeoutException());
                 }
             }, 2000L);
 
-            return future.whenComplete((gameServers, throwable) -> finalReg.unsubscribe());
+            return future.whenComplete((gameServers, throwable) -> {
+                try {
+                    finalReg.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
         } catch (IOException e) {
             future.completeExceptionally(e);
 
             if (reg != null) {
-                reg.unsubscribe();
+                try {
+                    reg.close();
+                } catch (Exception closeException) {
+                    closeException.printStackTrace();
+                }
             }
         }
 
@@ -83,17 +97,31 @@ public class PaperGameManager implements GameManager, AutoCloseable {
 
             Bukkit.getScheduler().runTaskLater(cloud.getPlugin(), () -> {
                 if (finalReg.isSubscribed()) {
-                    finalReg.unsubscribe();
+                    try {
+                        finalReg.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     future.completeExceptionally(new TimeoutException());
                 }
             }, 2000L);
 
-            return future.whenComplete((gameServers, throwable) -> finalReg.unsubscribe());
+            return future.whenComplete((gameServers, throwable) -> {
+                try {
+                    finalReg.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
         } catch (IOException e) {
             future.completeExceptionally(e);
 
             if (reg != null) {
-                reg.unsubscribe();
+                try {
+                    reg.close();
+                } catch (Exception closeException) {
+                    closeException.printStackTrace();
+                }
             }
         }
 
@@ -117,15 +145,29 @@ public class PaperGameManager implements GameManager, AutoCloseable {
 
             Bukkit.getScheduler().runTaskLater(cloud.getPlugin(), () -> {
                 if (finalReg.isSubscribed()) {
-                    finalReg.unsubscribe();
+                    try {
+                        finalReg.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     future.completeExceptionally(new TimeoutException());
                 }
             }, 2000L);
 
-            return future.whenComplete((gameServers, throwable) -> finalReg.unsubscribe());
+            return future.whenComplete((gameServers, throwable) -> {
+                try {
+                    finalReg.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
         } catch (IOException e) {
             if (reg != null) {
-                reg.unsubscribe();
+                try {
+                    reg.close();
+                } catch (Exception closeException) {
+                    closeException.printStackTrace();
+                }
             }
 
             future.completeExceptionally(e);
@@ -281,13 +323,13 @@ public class PaperGameManager implements GameManager, AutoCloseable {
     }
 
     @Override
-    public void close() {
+    public void close() throws Exception {
         if (connectedEventRegistration != null && connectedEventRegistration.isSubscribed()) {
-            connectedEventRegistration.unsubscribe();
+            connectedEventRegistration.close();
         }
 
         if (kickedEventRegistration != null && kickedEventRegistration.isSubscribed()) {
-            kickedEventRegistration.unsubscribe();
+            kickedEventRegistration.close();
         }
     }
 }

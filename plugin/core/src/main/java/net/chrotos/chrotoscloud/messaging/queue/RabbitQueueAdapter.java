@@ -123,6 +123,10 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
             @Override
             public void close() throws Exception {
                 unsubscribe();
+
+                if (isConnected()) {
+                    mqChannel.close();
+                }
             }
 
             private boolean unsubscribed = false;
