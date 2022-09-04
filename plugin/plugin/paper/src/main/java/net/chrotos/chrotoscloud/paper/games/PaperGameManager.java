@@ -48,7 +48,7 @@ public class PaperGameManager implements GameManager, AutoCloseable {
             Registration<Void, GameServerPingResponse> finalReg = reg;
 
             Bukkit.getScheduler().runTaskLater(cloud.getPlugin(), () -> {
-                if (finalReg.isSubscribed()) {
+                if (finalReg.isConnected()) {
                     try {
                         finalReg.close();
                     } catch (Exception e) {
@@ -96,7 +96,7 @@ public class PaperGameManager implements GameManager, AutoCloseable {
             Registration<Void, GameServerLookupResponse> finalReg = reg;
 
             Bukkit.getScheduler().runTaskLater(cloud.getPlugin(), () -> {
-                if (finalReg.isSubscribed()) {
+                if (finalReg.isConnected()) {
                     try {
                         finalReg.close();
                     } catch (Exception e) {
@@ -144,7 +144,7 @@ public class PaperGameManager implements GameManager, AutoCloseable {
             Registration<Void, GameServerLookupResponse> finalReg = reg;
 
             Bukkit.getScheduler().runTaskLater(cloud.getPlugin(), () -> {
-                if (finalReg.isSubscribed()) {
+                if (finalReg.isConnected()) {
                     try {
                         finalReg.close();
                     } catch (Exception e) {
