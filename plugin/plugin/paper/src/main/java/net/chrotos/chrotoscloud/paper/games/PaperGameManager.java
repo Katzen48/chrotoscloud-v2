@@ -48,7 +48,7 @@ public class PaperGameManager implements GameManager, AutoCloseable {
             Registration<Void, GameServerPingResponse> finalReg = reg;
 
             Bukkit.getScheduler().runTaskLater(cloud.getPlugin(), () -> {
-                if (finalReg.isSubscribed()) {
+                if (finalReg.isConnected()) {
                     try {
                         finalReg.close();
                     } catch (Exception e) {
@@ -56,7 +56,7 @@ public class PaperGameManager implements GameManager, AutoCloseable {
                     }
                     future.completeExceptionally(new TimeoutException());
                 }
-            }, 2000L);
+            }, 100L);
 
             return future.whenComplete((gameServers, throwable) -> {
                 try {
@@ -96,7 +96,7 @@ public class PaperGameManager implements GameManager, AutoCloseable {
             Registration<Void, GameServerLookupResponse> finalReg = reg;
 
             Bukkit.getScheduler().runTaskLater(cloud.getPlugin(), () -> {
-                if (finalReg.isSubscribed()) {
+                if (finalReg.isConnected()) {
                     try {
                         finalReg.close();
                     } catch (Exception e) {
@@ -104,7 +104,7 @@ public class PaperGameManager implements GameManager, AutoCloseable {
                     }
                     future.completeExceptionally(new TimeoutException());
                 }
-            }, 2000L);
+            }, 100L);
 
             return future.whenComplete((gameServers, throwable) -> {
                 try {
@@ -144,7 +144,7 @@ public class PaperGameManager implements GameManager, AutoCloseable {
             Registration<Void, GameServerLookupResponse> finalReg = reg;
 
             Bukkit.getScheduler().runTaskLater(cloud.getPlugin(), () -> {
-                if (finalReg.isSubscribed()) {
+                if (finalReg.isConnected()) {
                     try {
                         finalReg.close();
                     } catch (Exception e) {
@@ -152,7 +152,7 @@ public class PaperGameManager implements GameManager, AutoCloseable {
                     }
                     future.completeExceptionally(new TimeoutException());
                 }
-            }, 2000L);
+            }, 100L);
 
             return future.whenComplete((gameServers, throwable) -> {
                 try {
