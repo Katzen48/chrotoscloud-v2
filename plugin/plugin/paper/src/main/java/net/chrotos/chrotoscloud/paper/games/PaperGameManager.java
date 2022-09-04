@@ -56,7 +56,7 @@ public class PaperGameManager implements GameManager, AutoCloseable {
                     }
                     future.completeExceptionally(new TimeoutException());
                 }
-            }, 2000L);
+            }, 100L);
 
             return future.whenComplete((gameServers, throwable) -> {
                 try {
@@ -104,7 +104,7 @@ public class PaperGameManager implements GameManager, AutoCloseable {
                     }
                     future.completeExceptionally(new TimeoutException());
                 }
-            }, 2000L);
+            }, 100L);
 
             return future.whenComplete((gameServers, throwable) -> {
                 try {
@@ -152,7 +152,7 @@ public class PaperGameManager implements GameManager, AutoCloseable {
                     }
                     future.completeExceptionally(new TimeoutException());
                 }
-            }, 2000L);
+            }, 100L);
 
             return future.whenComplete((gameServers, throwable) -> {
                 try {
