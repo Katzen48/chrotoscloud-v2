@@ -46,6 +46,22 @@ spec:
           secret:
             secretName: geoipupdate-secret
             optional: true
+        - name: log4j2-config
+          configMap:
+            name: log4j2-config
+            items:
+              - key: log4j2.xml
+                path: log4j2.xml
+            defaultMode: 420
+        - name: server-logs
+          emptyDir: {}
+        - name: filebeat-config
+          configMap:
+            name: filebeat-config
+            items:
+              - key: filebeat.yml
+                path: filebeat.yml
+            defaultMode: 420
         - name: podinfo
           downwardAPI:
             items:
@@ -164,6 +180,7 @@ spec:
             - '-Dusing.aikars.flags=https://mcflags.emc.gs'
             - '-Daikars.new.flags=true'
             - '-Dcom.mojang.eula.agree=true'
+            - '-Dlog4j.configurationFile=log4j2.xml'
             - '-jar'
             - server.jar
             - '--nogui'
@@ -229,6 +246,11 @@ spec:
               mountPath: /etc/podinfo
             - name: geoip-database
               mountPath: /usr/local/share/GeoIP
+            - name: log4j2-config
+              mountPath: /opt/paper/log4j2.xml
+              subPath: log4j2.xml
+            - name: server-logs
+              mountPath: /opt/paper/logs/
           livenessProbe:
             tcpSocket:
               port: 25565
@@ -246,5 +268,19 @@ spec:
             successThreshold: 1
             failureThreshold: 10
           imagePullPolicy: IfNotPresent
+        - name: filebeat-sidecar
+          image: docker.elastic.co/beats/filebeat:8.4.1
+          env:
+            - name: FILEBEAT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: filebeat-secret
+                  key: FILEBEAT_API_KEY
+          volumeMounts:
+            - name: server-logs
+              mountPath: /var/log/server/
+            - name: filebeat-config
+              mountPath: /usr/share/filebeat/filebeat.yml
+              subPath: filebeat.yml
       restartPolicy: Always
   serviceName: paper-template
