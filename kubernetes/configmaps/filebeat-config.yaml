@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-config
+  namespace: servers
+data:
+  filebeat.yml: |
+    filebeat.inputs:
+    - type: filestream
+      id: server-logs
+      paths:
+      - /var/log/server/*.json
+      parsers:
+      - ndjson:
+          keys_under_root: true
+    output:
+      elasticsearch:
+        hosts: ["elasticsearch.monitoring:9200"]
+        protocol: "https"
+        ssl.verification_mode: none
+        api_key: ${FILEBEAT_API_KEY}
+        

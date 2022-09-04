@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,14 @@ public class PaperGameManager implements GameManager, AutoCloseable {
             reg.publish(new GameServerPingRequest(name));
 
             Registration<Void, GameServerPingResponse> finalReg = reg;
+
+            Bukkit.getScheduler().runTaskLater(cloud.getPlugin(), () -> {
+                if (finalReg.isSubscribed()) {
+                    finalReg.unsubscribe();
+                    future.completeExceptionally(new TimeoutException());
+                }
+            }, 2000L);
+
             return future.whenComplete((gameServers, throwable) -> finalReg.unsubscribe());
         } catch (IOException e) {
             future.completeExceptionally(e);
@@ -71,6 +80,14 @@ public class PaperGameManager implements GameManager, AutoCloseable {
             reg.publish(new GameServerLookupRequest());
 
             Registration<Void, GameServerLookupResponse> finalReg = reg;
+
+            Bukkit.getScheduler().runTaskLater(cloud.getPlugin(), () -> {
+                if (finalReg.isSubscribed()) {
+                    finalReg.unsubscribe();
+                    future.completeExceptionally(new TimeoutException());
+                }
+            }, 2000L);
+
             return future.whenComplete((gameServers, throwable) -> finalReg.unsubscribe());
         } catch (IOException e) {
             future.completeExceptionally(e);
@@ -97,13 +114,21 @@ public class PaperGameManager implements GameManager, AutoCloseable {
             reg.publish(new GameServerLookupRequest(gameMode));
 
             Registration<Void, GameServerLookupResponse> finalReg = reg;
+
+            Bukkit.getScheduler().runTaskLater(cloud.getPlugin(), () -> {
+                if (finalReg.isSubscribed()) {
+                    finalReg.unsubscribe();
+                    future.completeExceptionally(new TimeoutException());
+                }
+            }, 2000L);
+
             return future.whenComplete((gameServers, throwable) -> finalReg.unsubscribe());
         } catch (IOException e) {
-            future.completeExceptionally(e);
-
             if (reg != null) {
                 reg.unsubscribe();
             }
+
+            future.completeExceptionally(e);
         }
 
         return future;
