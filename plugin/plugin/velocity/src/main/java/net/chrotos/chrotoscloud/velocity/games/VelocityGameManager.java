@@ -85,11 +85,13 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
 
     @Override
     public CompletableFuture<List<? extends GameServer>> getGameServers() {
+        cloud.getLogger().info("Looking up all game servers");
         return getGameServersByGameMode(null);
     }
 
     @Override
     public CompletableFuture<List<? extends GameServer>> getGameServers(@NonNull String gameMode) {
+        cloud.getLogger().info("Looking up game servers for gamemode {}", gameMode);
         return getGameServersByGameMode(gameMode);
     }
 
@@ -137,7 +139,8 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
     }
 
     @Override
-    public void requestTeleport(@NonNull GameServer server, net.chrotos.chrotoscloud.player.@NonNull Player player) {
+    public void requestTeleport(@NonNull GameServer server, @NonNull net.chrotos.chrotoscloud.player.Player player) {
+        cloud.getLogger().info("Trying to teleport {} to {}", player.getName(), server.getName());
         VelocitySidedPlayer sidedPlayer = (VelocitySidedPlayer) player.getSidedPlayer();
         sidedPlayer.getSidedObject().createConnectionRequest(cloud.getProxyServer().getServer(server.getName()).get())
                     .fireAndForget();
@@ -191,6 +194,7 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
         return new Listener<>() {
             @Override
             public void onMessage(@NonNull Message<GameServerLookupRequest> object, @NonNull String sender) {
+                cloud.getLogger().info("Got GameServerLookupRequest");
                 String gameMode = object.getMessage().getGameMode();
                 CompletableFuture<List<? extends GameServer>> gameServers;
 
@@ -205,6 +209,7 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
                     servers.forEach(server -> list.add((CloudGameServer) server));
 
                     try {
+                        cloud.getLogger().info("Replying to GameServerLookupRequest");
                         object.replyTo(new GameServerLookupResponse(list));
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -231,10 +236,12 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
         return new Listener<>() {
             @Override
             public void onMessage(@NonNull Message<GameServerPingRequest> object, @NonNull String sender) {
+                cloud.getLogger().info("Got GameServerPingRequest");
                 String name = object.getMessage().getName();
 
                 getGameServer(name).thenAccept(server -> {
                     try {
+                        cloud.getLogger().info("Replying to GameServerPingRequest");
                         object.replyTo(new GameServerPingResponse(server));
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -261,12 +268,14 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
         return new Listener<>() {
             @Override
             public void onMessage(@NonNull Message<PlayerTeleportToServerRequest> object, @NonNull String sender) {
+                cloud.getLogger().info("Got PlayerTeleportToServerRequest");
                 Player player = cloud.getProxyServer().getPlayer(object.getMessage().getPlayerId()).orElse(null);
                 RegisteredServer server = cloud.getProxyServer().getServer(object.getMessage().getServerName()).orElse(null);
 
                 if (player == null || server == null) {
                     return;
                 }
+                cloud.getLogger().info("Connecting player to server {}", server.getServerInfo().getName());
                 player.createConnectionRequest(server).fireAndForget();
             }
 
