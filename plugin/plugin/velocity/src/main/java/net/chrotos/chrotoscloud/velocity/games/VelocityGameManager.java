@@ -85,13 +85,13 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
 
     @Override
     public CompletableFuture<List<? extends GameServer>> getGameServers() {
-        cloud.getLogger().info("Looking up all game servers");
+        cloud.getLogger().debug("Looking up all game servers");
         return getGameServersByGameMode(null);
     }
 
     @Override
     public CompletableFuture<List<? extends GameServer>> getGameServers(@NonNull String gameMode) {
-        cloud.getLogger().info("Looking up game servers for gamemode {}", gameMode);
+        cloud.getLogger().debug("Looking up game servers for gamemode {}", gameMode);
         return getGameServersByGameMode(gameMode);
     }
 
@@ -108,7 +108,7 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
 
             CompletableFuture[] gameServers = new CompletableFuture[servers.size()];
 
-            cloud.getLogger().info("Looking up server infos");
+            cloud.getLogger().debug("Looking up server infos");
             AtomicInteger i = new AtomicInteger();
             servers.forEach(server -> {
                 String name = server.getServerInfo().getName();
@@ -141,7 +141,7 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
 
     @Override
     public void requestTeleport(@NonNull GameServer server, @NonNull net.chrotos.chrotoscloud.player.Player player) {
-        cloud.getLogger().info("Trying to teleport {} to {}", player.getName(), server.getName());
+        cloud.getLogger().debug("Trying to teleport {} to {}", player.getName(), server.getName());
         VelocitySidedPlayer sidedPlayer = (VelocitySidedPlayer) player.getSidedPlayer();
         sidedPlayer.getSidedObject().createConnectionRequest(cloud.getProxyServer().getServer(server.getName()).get())
                     .fireAndForget();
@@ -159,12 +159,12 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
     }
 
     protected List<String> getPodsByGameMode(@NonNull String gameMode) {
-        cloud.getLogger().info("Getting pods for gamemode {}", gameMode);
+        cloud.getLogger().debug("Getting pods for gamemode {}", gameMode);
         try {
             ArrayList<String> pods = new ArrayList<>();
             V1PodList list = coreV1Api.listNamespacedPod("servers", null, false, null,
                     null, "net.chrotos.chrotoscloud.gameserver/gamemode=" + gameMode, null, null,
-                    null, null);
+                    null, null, null);
 
             for (V1Pod pod : list.getItems()) {
                 pods.add(pod.getMetadata().getName());
@@ -180,7 +180,7 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
         try {
             V1PodList list = coreV1Api.listNamespacedPod("servers", null, false, null,
                     "metadata.name=" + podName, null, null, null,
-                    null, null);
+                    null, null, null);
 
             if (list.getItems().isEmpty()) {
                 return null;
@@ -196,7 +196,7 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
         return new Listener<>() {
             @Override
             public void onMessage(@NonNull Message<GameServerLookupRequest> object, @NonNull String sender) {
-                cloud.getLogger().info("Got GameServerLookupRequest");
+                cloud.getLogger().debug("Got GameServerLookupRequest");
                 String gameMode = object.getMessage().getGameMode();
                 CompletableFuture<List<? extends GameServer>> gameServers;
 
@@ -211,7 +211,7 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
                     servers.forEach(server -> list.add((CloudGameServer) server));
 
                     try {
-                        cloud.getLogger().info("Replying to GameServerLookupRequest");
+                        cloud.getLogger().debug("Replying to GameServerLookupRequest");
                         object.replyTo(new GameServerLookupResponse(list));
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -247,12 +247,12 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
         return new Listener<>() {
             @Override
             public void onMessage(@NonNull Message<GameServerPingRequest> object, @NonNull String sender) {
-                cloud.getLogger().info("Got GameServerPingRequest");
+                cloud.getLogger().debug("Got GameServerPingRequest");
                 String name = object.getMessage().getName();
 
                 getGameServer(name).thenAccept(server -> {
                     try {
-                        cloud.getLogger().info("Replying to GameServerPingRequest");
+                        cloud.getLogger().debug("Replying to GameServerPingRequest");
                         object.replyTo(new GameServerPingResponse(server));
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -279,14 +279,14 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
         return new Listener<>() {
             @Override
             public void onMessage(@NonNull Message<PlayerTeleportToServerRequest> object, @NonNull String sender) {
-                cloud.getLogger().info("Got PlayerTeleportToServerRequest");
+                cloud.getLogger().debug("Got PlayerTeleportToServerRequest");
                 Player player = cloud.getProxyServer().getPlayer(object.getMessage().getPlayerId()).orElse(null);
                 RegisteredServer server = cloud.getProxyServer().getServer(object.getMessage().getServerName()).orElse(null);
 
                 if (player == null || server == null) {
                     return;
                 }
-                cloud.getLogger().info("Connecting player to server {}", server.getServerInfo().getName());
+                cloud.getLogger().debug("Connecting player to server {}", server.getServerInfo().getName());
                 player.createConnectionRequest(server).fireAndForget();
             }
 
