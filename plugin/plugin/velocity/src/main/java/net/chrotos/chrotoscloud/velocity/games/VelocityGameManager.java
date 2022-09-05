@@ -171,7 +171,7 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
             }
 
             return pods;
-        } catch (ApiException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -216,6 +216,15 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                }).exceptionally((Throwable e) -> {
+                    e.printStackTrace();
+                    try {
+                        object.replyTo(new GameServerLookupResponse(new ArrayList<>()));
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+
+                    return null;
                 });
             }
 
