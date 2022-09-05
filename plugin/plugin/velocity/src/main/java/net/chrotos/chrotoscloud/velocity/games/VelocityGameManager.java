@@ -108,6 +108,7 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
 
             CompletableFuture[] gameServers = new CompletableFuture[servers.size()];
 
+            cloud.getLogger().info("Looking up server infos");
             AtomicInteger i = new AtomicInteger();
             servers.forEach(server -> {
                 String name = server.getServerInfo().getName();
@@ -158,6 +159,7 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
     }
 
     protected List<String> getPodsByGameMode(@NonNull String gameMode) {
+        cloud.getLogger().info("Getting pods for gamemode {}", gameMode);
         try {
             ArrayList<String> pods = new ArrayList<>();
             V1PodList list = coreV1Api.listNamespacedPod("servers", null, false, null,
