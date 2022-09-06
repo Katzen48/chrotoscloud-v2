@@ -19,5 +19,4 @@ public class DataSelectFilter {
     int pageSize = 0;
     @Builder.Default
     int first = 0;
-    String namedGraph;
 }

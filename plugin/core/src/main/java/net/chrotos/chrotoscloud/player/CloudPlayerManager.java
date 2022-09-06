@@ -27,15 +27,8 @@ public class CloudPlayerManager implements PlayerManager {
         cloud.getPersistence().runInTransaction(databaseTransaction -> {
             databaseTransaction.suppressCommit();
 
-            if (initialize && cloud.getGameMode() != null) {
-                atomicPlayer.set(cloud.getPersistence().executeFiltered("gameMode", Collections.singletonMap("gameMode", cloud.getGameMode()),
-                        () -> cloud.getPersistence().getOne(CloudPlayer.class, DataSelectFilter.builder()
-                                .primaryKeyValue(uniqueId).namedGraph("graph.Player.join").build())
-                ));
-            } else {
-                atomicPlayer.set(cloud.getPersistence().getOne(CloudPlayer.class, DataSelectFilter.builder()
-                        .primaryKeyValue(uniqueId).build()));
-            }
+            atomicPlayer.set(cloud.getPersistence().getOne(CloudPlayer.class, DataSelectFilter.builder()
+                    .primaryKeyValue(uniqueId).build()));
         });
 
         Player player = atomicPlayer.get();

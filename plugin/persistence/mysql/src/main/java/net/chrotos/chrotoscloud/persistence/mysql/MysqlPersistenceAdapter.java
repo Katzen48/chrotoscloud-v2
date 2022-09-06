@@ -114,10 +114,6 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
             query = query.setMaxResults(filter.getPageSize());
         }
 
-        if (filter.getNamedGraph() != null) {
-            query = query.setHint("javax.persistence.fetchgraph", session.getEntityGraph(filter.getNamedGraph()));
-        }
-
         return query;
     }
 
@@ -185,12 +181,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
         E entity = null;
         if (filter.getPrimaryKeyValue() != null) {
-            Map<String, Object> hints = new HashMap<>();
-            if (filter.getNamedGraph() != null) {
-                hints.put("javax.persistence.fetchgraph", session.getEntityGraph(filter.getNamedGraph()));
-            }
-
-            entity = session.find(clazz, filter.getPrimaryKeyValue(), hints);
+            entity = session.find(clazz, filter.getPrimaryKeyValue());
         } else {
             try {
                 TypedQuery<E> query = getFilteredQuery(session, clazz, filter).setMaxResults(1);

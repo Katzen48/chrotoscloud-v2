@@ -26,8 +26,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Iterator;
-import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -185,7 +183,7 @@ public class PaperEventHandler implements Listener {
     }
 
     private void loadScoreboardTags(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull Player player) {
-        GameState state = cloudPlayer.getStates().stream()
+        GameState state = cloudPlayer.getStates(cloud.getGameMode()).stream()
                 .filter(gameState -> gameState != null && gameState.getName().equals("cloud:tags"))
                 .findFirst().orElse(null);
 
@@ -197,12 +195,7 @@ public class PaperEventHandler implements Listener {
     }
 
     private void loadInventory(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull Player player) throws InvalidConfigurationException {
-        Iterator<PlayerInventory> it = cloudPlayer.getInventories().iterator();
-        if (!it.hasNext()) {
-            return;
-        }
-
-        PlayerInventory inventory = it.next();
+        PlayerInventory inventory = cloudPlayer.getInventory(cloud.getGameMode());
 
         if (inventory != null) {
             YamlConfiguration inventoryContent = new YamlConfiguration();
