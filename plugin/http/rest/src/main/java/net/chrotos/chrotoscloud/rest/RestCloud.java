@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.chrotos.chrotoscloud.CoreCloud;
 import net.chrotos.chrotoscloud.games.GameManager;
+import net.chrotos.chrotoscloud.tasks.Scheduler;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -41,6 +42,11 @@ public class RestCloud extends CoreCloud {
 
     @Override
     public File getTranslationDir() {
+        return null;
+    }
+
+    @Override
+    public Scheduler getScheduler() {
         return null;
     }
 

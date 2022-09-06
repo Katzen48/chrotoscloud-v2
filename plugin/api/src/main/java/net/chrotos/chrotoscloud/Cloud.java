@@ -11,6 +11,7 @@ import net.chrotos.chrotoscloud.messaging.queue.QueueAdapter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 import net.chrotos.chrotoscloud.player.PlayerManager;
 import net.chrotos.chrotoscloud.service.ServiceContainer;
+import net.chrotos.chrotoscloud.tasks.Scheduler;
 import net.kyori.adventure.translation.TranslationRegistry;
 
 import java.io.File;
@@ -79,6 +80,7 @@ public abstract class Cloud implements ServiceContainer {
     @NonNull
     public abstract GameManager getGameManager();
     public abstract File getTranslationDir();
+    public abstract Scheduler getScheduler();
 
     public String getGameMode() {
         return getCloudConfig().getGameMode();

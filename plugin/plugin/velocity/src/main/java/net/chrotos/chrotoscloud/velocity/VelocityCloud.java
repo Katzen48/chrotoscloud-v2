@@ -24,9 +24,13 @@ public class VelocityCloud extends CoreCloud {
     private Path dataDir;
     private final VelocityGameManager gameManager;
     private final Injector serviceInjector;
+    @Setter
+    private CloudPlugin plugin;
+    private final VelocityScheduler scheduler;
 
     public VelocityCloud() {
         this.serviceInjector = Guice.createInjector(new VelocityModule(this));
+        this.scheduler = getServiceInjector().getInstance(VelocityScheduler.class);
         setCloudConfig(new VelocityConfig());
         gameManager = getServiceInjector().getInstance(VelocityGameManager.class);
     }
@@ -40,6 +44,8 @@ public class VelocityCloud extends CoreCloud {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        scheduler.initialize();
     }
 
     @Override
