@@ -1,5 +1,7 @@
 package net.chrotos.chrotoscloud.velocity;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.Getter;
 import lombok.NonNull;
@@ -21,10 +23,12 @@ public class VelocityCloud extends CoreCloud {
     @Setter
     private Path dataDir;
     private final VelocityGameManager gameManager;
+    private final Injector serviceInjector;
 
     public VelocityCloud() {
+        this.serviceInjector = Guice.createInjector(new VelocityModule(this));
         setCloudConfig(new VelocityConfig());
-        gameManager = new VelocityGameManager(this);
+        gameManager = getServiceInjector().getInstance(VelocityGameManager.class);
     }
 
     @Override

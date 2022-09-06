@@ -1,5 +1,6 @@
 package net.chrotos.chrotoscloud.player;
 
+import com.google.inject.Inject;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.chrotos.chrotoscloud.Cloud;
@@ -11,21 +12,38 @@ import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = {@Inject})
 public class CloudPlayerManager implements PlayerManager {
     private final Cloud cloud;
+    private final SidedPlayerFactory sidedPlayerFactory;
 
     @Override
     public Player getPlayer(@NonNull UUID uniqueId) {
-        AtomicReference<Player> player = new AtomicReference<>();
+        return getPlayer(uniqueId, false);
+    }
+
+    private Player getPlayer(@NonNull UUID uniqueId, boolean initialize) {
+        AtomicReference<Player> atomicPlayer = new AtomicReference<>();
         cloud.getPersistence().runInTransaction(databaseTransaction -> {
             databaseTransaction.suppressCommit();
 
-            player.set(cloud.getPersistence().getOne(CloudPlayer.class, DataSelectFilter.builder()
-                    .primaryKeyValue(uniqueId).build()));
+            if (initialize && cloud.getGameMode() != null) {
+                atomicPlayer.set(cloud.getPersistence().executeFiltered("gameMode", Collections.singletonMap("gameMode", cloud.getGameMode()),
+                        () -> cloud.getPersistence().getOne(CloudPlayer.class, DataSelectFilter.builder()
+                                .primaryKeyValue(uniqueId).namedGraph("graph.Player.join").build())
+                ));
+            } else {
+                atomicPlayer.set(cloud.getPersistence().getOne(CloudPlayer.class, DataSelectFilter.builder()
+                        .primaryKeyValue(uniqueId).build()));
+            }
         });
 
-        return player.get();
+        Player player = atomicPlayer.get();
+        if (player != null) {
+            ((CloudPlayer)player).setSidedPlayer(sidedPlayerFactory.generateSidedPlayer(uniqueId));
+        }
+
+        return player;
     }
 
     @Override
@@ -34,44 +52,29 @@ public class CloudPlayerManager implements PlayerManager {
     }
 
     @Override
-    public Player getOrCreatePlayer(@NonNull UUID uniqueId, String name) throws PlayerSoftDeletedException {
-        Player player = getPlayer(uniqueId);
+    public Player getOrCreatePlayer(@NonNull Object sidedObject) throws PlayerSoftDeletedException {
+        return getOrCreatePlayer(sidedPlayerFactory.generateSidedPlayer(sidedObject));
+    }
+
+    @Override
+    public Player getOrCreatePlayer(@NonNull SidedPlayer sidedObject) throws PlayerSoftDeletedException {
+        Player player = getPlayer(sidedObject.getUniqueId(), true);
 
         if (player != null) {
             return player;
         }
 
-        if (name == null) {
-            throw new IllegalArgumentException("'name' cannot be null");
-        }
-
         try {
-            return createPlayer(uniqueId, name);
+            return createPlayer(sidedObject.getUniqueId(), sidedObject.getName());
         } catch (EntityExistsException e) {
-            throw new PlayerSoftDeletedException(uniqueId);
+            throw new PlayerSoftDeletedException(sidedObject.getUniqueId());
         }
-    }
-
-    @Override
-    public Player getOrCreatePlayer(@NonNull SidedPlayer sidedPlayer) throws PlayerSoftDeletedException {
-        CloudPlayer player = (CloudPlayer) getOrCreatePlayer(sidedPlayer.getUniqueId(), sidedPlayer.getName());
-
-        if (player != null) {
-            player.setSidedPlayer(sidedPlayer);
-        }
-
-        return player;
     }
 
     @Override
     public void logoutPlayer(@NonNull Player player) {
         cloud.getPersistence().save(player);
         cloud.getPersistence().removeFromContext(player);
-    }
-
-    @Override
-    public void logoutPlayer(@NonNull SidedPlayer player) {
-        logoutPlayer(player.getUniqueId());
     }
 
     @Override
@@ -94,6 +97,7 @@ public class CloudPlayerManager implements PlayerManager {
         player.setRank(defaultRank);
 
         cloud.getPersistence().save(player);
+        player.setSidedPlayer(sidedPlayerFactory.generateSidedPlayer(uniqueId));
 
         return player;
     }

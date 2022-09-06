@@ -18,8 +18,8 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.22'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
 
-    implementation 'org.hibernate:hibernate-core:5.6.10.Final'
-    implementation 'org.hibernate:hibernate-entitymanager:5.6.10.Final'
+    implementation 'org.hibernate:hibernate-core:5.6.11.Final'
+    implementation 'org.hibernate:hibernate-entitymanager:5.6.11.Final'
 
     implementation 'redis.clients:jedis:4.2.3'
 
@@ -27,11 +27,13 @@ dependencies {
 
     implementation 'io.kubernetes:client-java-extended:16.0.0'
 
-    implementation('com.fasterxml.jackson.core:jackson-annotations:2.13.3')
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.3'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
+    implementation('com.fasterxml.jackson.core:jackson-annotations:2.13.4')
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.4'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
 
     implementation 'com.maxmind.geoip2:geoip2:3.0.1'
+
+    implementation 'com.google.inject:guice:5.1.0'
 }
 
 test {

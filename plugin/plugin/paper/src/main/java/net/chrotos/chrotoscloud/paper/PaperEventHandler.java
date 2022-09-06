@@ -26,6 +26,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -44,7 +45,7 @@ public class PaperEventHandler implements Listener {
             try {
                 databaseTransaction.suppressCommit();
 
-                net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getOrCreatePlayer(new PaperSidedPlayer(player));
+                net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getOrCreatePlayer(player);
 
                 Ban ban = getBan(cloudPlayer);
                 if (ban != null) {
@@ -76,7 +77,7 @@ public class PaperEventHandler implements Listener {
         Cloud.getInstance().getPersistence().runInTransaction(transaction -> {
             transaction.suppressCommit();
 
-            net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getOrCreatePlayer(new PaperSidedPlayer(event.getPlayer()));
+            net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getOrCreatePlayer(event.getPlayer());
 
             Ban ban = getBan(cloudPlayer);
             if (ban != null) {
@@ -102,15 +103,14 @@ public class PaperEventHandler implements Listener {
             Cloud.getInstance().getPersistence().runInTransaction(transaction -> {
                 transaction.suppressCommit();
 
-                net.chrotos.chrotoscloud.player.Player player = cloud.getPlayerManager().getOrCreatePlayer(event.getPlayerProfile().getId(),
-                        event.getPlayerProfile().getName());
+                net.chrotos.chrotoscloud.player.Player player = cloud.getPlayerManager().getPlayer(event.getPlayerProfile().getId());
+                if (player == null) {
+                    return;
+                }
 
                 event.setWhitelisted(event.isWhitelisted() || event.isOp() || player.hasPermission("minecraft.command.op")
                         || player.hasPermission("cloud.server.join." + cloud.getGameMode())); // TODO remove op?
             });
-        } catch (PlayerSoftDeletedException e) {
-            event.setWhitelisted(false);
-            event.kickMessage(Component.translatable("cloud.player.deleted", NamedTextColor.RED));
         } catch (Exception e) {
             e.printStackTrace();
             event.setWhitelisted(false);
@@ -185,7 +185,7 @@ public class PaperEventHandler implements Listener {
     }
 
     private void loadScoreboardTags(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull Player player) {
-        GameState state = cloudPlayer.getStates(cloud.getGameMode()).stream()
+        GameState state = cloudPlayer.getStates().stream()
                 .filter(gameState -> gameState != null && gameState.getName().equals("cloud:tags"))
                 .findFirst().orElse(null);
 
@@ -197,7 +197,12 @@ public class PaperEventHandler implements Listener {
     }
 
     private void loadInventory(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull Player player) throws InvalidConfigurationException {
-        PlayerInventory inventory = cloudPlayer.getInventory(cloud.getGameMode());
+        Iterator<PlayerInventory> it = cloudPlayer.getInventories().iterator();
+        if (!it.hasNext()) {
+            return;
+        }
+
+        PlayerInventory inventory = it.next();
 
         if (inventory != null) {
             YamlConfiguration inventoryContent = new YamlConfiguration();

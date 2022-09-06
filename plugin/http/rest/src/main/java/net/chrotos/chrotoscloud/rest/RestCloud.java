@@ -1,5 +1,8 @@
 package net.chrotos.chrotoscloud.rest;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import lombok.Getter;
 import lombok.NonNull;
 import net.chrotos.chrotoscloud.CoreCloud;
 import net.chrotos.chrotoscloud.games.GameManager;
@@ -9,7 +12,11 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class RestCloud extends CoreCloud {
+    @Getter
+    private Injector serviceInjector;
+
     public RestCloud() {
+        this.serviceInjector = Guice.createInjector(new RestModule(this));
         setCloudConfig(new RestConfig());
     }
 
