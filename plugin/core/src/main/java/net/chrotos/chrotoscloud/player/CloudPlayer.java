@@ -38,10 +38,6 @@ import java.util.*;
 @SQLDelete(sql = "UPDATE players SET deleted_at=now() WHERE unique_id = ?")
 @Where(clause = "deleted_at IS NULL")
 @SelectBeforeUpdate
-@NamedEntityGraph(name = "graph.Player.join",
-        attributeNodes = {@NamedAttributeNode("uniqueId"), @NamedAttributeNode("name"), @NamedAttributeNode("bans"),
-                @NamedAttributeNode("permissions"), @NamedAttributeNode("rank"), @NamedAttributeNode("stats"),
-                @NamedAttributeNode("states"), @NamedAttributeNode("inventories")})
 public class CloudPlayer extends CloudPermissible implements Player, SoftDeletable {
     @Id
     @Column(updatable = false, nullable = false)
