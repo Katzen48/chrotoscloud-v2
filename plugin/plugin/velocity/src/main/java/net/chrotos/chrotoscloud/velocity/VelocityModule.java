@@ -21,6 +21,7 @@ public class VelocityModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(Cloud.class).toInstance(cloud);
+        bind(VelocityCloud.class).toInstance(cloud);
         bind(SidedPlayerFactory.class).toInstance(new VelocitySidedPlayerFactory(cloud));
 
         bind(PersistenceAdapter.class).toProvider(cloud::getPersistence);

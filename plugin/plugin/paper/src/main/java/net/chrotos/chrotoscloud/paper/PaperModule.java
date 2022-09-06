@@ -15,11 +15,12 @@ import net.chrotos.chrotoscloud.player.SidedPlayerFactory;
 
 @AllArgsConstructor
 public class PaperModule extends AbstractModule {
-    private final Cloud cloud;
+    private final PaperCloud cloud;
 
     @Override
     protected void configure() {
         bind(Cloud.class).toInstance(cloud);
+        bind(PaperCloud.class).toInstance(cloud);
         bind(SidedPlayerFactory.class).to(PaperSidedPlayerFactory.class);
 
         bind(PersistenceAdapter.class).toProvider(cloud::getPersistence);

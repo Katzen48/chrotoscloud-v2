@@ -25,11 +25,7 @@ public class PaperCloud extends CoreCloud {
     private Injector serviceInjector;
 
     public PaperCloud() throws IOException {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(getServiceClassLoader());
         this.serviceInjector = Guice.createInjector(new PaperModule(this));
-        Thread.currentThread().setContextClassLoader(loader);
-
         setCloudConfig(new PaperConfig());
         gameManager = getServiceInjector().getInstance(PaperGameManager.class);
         inventorySavingEnabled = Bukkit.getServer().spigot().getSpigotConfig().getBoolean("players.disable-saving");
