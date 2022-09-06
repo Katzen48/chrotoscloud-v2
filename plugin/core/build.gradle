@@ -32,6 +32,8 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
 
     implementation 'com.maxmind.geoip2:geoip2:3.0.1'
+
+    implementation 'com.google.inject:guice:5.1.0'
 }
 
 test {

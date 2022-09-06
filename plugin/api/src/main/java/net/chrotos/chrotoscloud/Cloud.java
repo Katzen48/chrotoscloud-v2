@@ -10,6 +10,7 @@ import net.chrotos.chrotoscloud.messaging.pubsub.PubSubAdapter;
 import net.chrotos.chrotoscloud.messaging.queue.QueueAdapter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 import net.chrotos.chrotoscloud.player.PlayerManager;
+import net.chrotos.chrotoscloud.service.ServiceContainer;
 import net.kyori.adventure.translation.TranslationRegistry;
 
 import java.io.File;
@@ -17,7 +18,7 @@ import java.util.Iterator;
 import java.util.ServiceLoader;
 
 @Getter
-public abstract class Cloud {
+public abstract class Cloud implements ServiceContainer {
     private static Cloud instance;
     @Setter
     private static ClassLoader serviceClassLoader;

@@ -1,5 +1,7 @@
 package net.chrotos.chrotoscloud.paper;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -19,10 +21,13 @@ public class PaperCloud extends CoreCloud {
     private final boolean inventorySavingEnabled;
     @Setter
     private CloudPlugin plugin;
+    @NonNull
+    private Injector serviceInjector;
 
     public PaperCloud() throws IOException {
+        this.serviceInjector = Guice.createInjector(new PaperModule(this));
         setCloudConfig(new PaperConfig());
-        gameManager = new PaperGameManager(this);
+        gameManager = getServiceInjector().getInstance(PaperGameManager.class);
         inventorySavingEnabled = Bukkit.getServer().spigot().getSpigotConfig().getBoolean("players.disable-saving");
     }
 

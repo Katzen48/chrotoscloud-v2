@@ -15,9 +15,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Root;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
@@ -116,6 +114,10 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
             query = query.setMaxResults(filter.getPageSize());
         }
 
+        if (filter.getNamedGraph() != null) {
+            query = query.setHint("javax.persistence.fetchgraph", session.getEntityGraph(filter.getNamedGraph()));
+        }
+
         return query;
     }
 
@@ -183,7 +185,12 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
         E entity = null;
         if (filter.getPrimaryKeyValue() != null) {
-            entity = session.find(clazz, filter.getPrimaryKeyValue());
+            Map<String, Object> hints = new HashMap<>();
+            if (filter.getNamedGraph() != null) {
+                hints.put("javax.persistence.fetchgraph", session.getEntityGraph(filter.getNamedGraph()));
+            }
+
+            entity = session.find(clazz, filter.getPrimaryKeyValue(), hints);
         } else {
             try {
                 TypedQuery<E> query = getFilteredQuery(session, clazz, filter).setMaxResults(1);

@@ -25,19 +25,16 @@ public abstract class CoreCloud extends Cloud {
     private static boolean initialized;
     @Getter
     @NonNull
-    private final CloudPlayerManager playerManager;
+    private CloudPlayerManager playerManager;
     @Getter
     @NonNull
-    private final ChatManager chatManager;
+    private ChatManager chatManager;
     @Getter
     private final DatabaseReader geoIp;
     @Getter
     private TranslationRegistry translationRegistry;
 
     protected CoreCloud() {
-        this.playerManager = new CloudPlayerManager(this);
-        this.chatManager = new CoreChatManager();
-
         DatabaseReader geoIp = null;
         try {
             geoIp = new DatabaseReader.Builder(new File("/usr/local/share/GeoIP/GeoLite2-City.mmdb")).build();
@@ -67,8 +64,11 @@ public abstract class CoreCloud extends Cloud {
 
         loadServices();
 
+        this.playerManager = getServiceInjector().getInstance(CloudPlayerManager.class);
+        this.chatManager = getServiceInjector().getInstance(CoreChatManager.class);
+
         if (shouldLoadQueue()) {
-            RabbitQueueAdapter queueAdapter = new RabbitQueueAdapter();
+            RabbitQueueAdapter queueAdapter = getServiceInjector().getInstance(RabbitQueueAdapter.class);
             this.queue = queueAdapter;
             queueAdapter.configure(getCloudConfig());
         }
@@ -91,12 +91,13 @@ public abstract class CoreCloud extends Cloud {
 
         RedisCacheAdapter redisAdapter = null;
         if (shouldLoadCache()) {
-            redisAdapter = new RedisCacheAdapter();
+            redisAdapter = getServiceInjector().getInstance(RedisCacheAdapter.class);
             this.cache = redisAdapter;
             this.cache.configure(getCloudConfig());
         }
 
         if (shouldLoadPubSub()) {
+            assert redisAdapter != null;
             this.pubSub = redisAdapter.getPubSub();
         }
 

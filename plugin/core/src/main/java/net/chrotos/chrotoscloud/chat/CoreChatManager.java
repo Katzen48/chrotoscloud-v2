@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class CoreChatManager implements ChatManager {
     private final List<ChatPrefix> prefixes = new ArrayList<>();
     private final LoadingCache<Player, Component> prefixCache = CacheBuilder.newBuilder()
-                                                                .expireAfterWrite(Duration.ofSeconds(60))
+                                                                .expireAfterAccess(Duration.ofSeconds(300))
                                                                 .build(CacheLoader.from(this::getFormattedPrefix));
 
     @Override

@@ -1,5 +1,6 @@
 package net.chrotos.chrotoscloud.paper.games;
 
+import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = {@Inject})
 public class PaperGameManager implements GameManager, AutoCloseable {
     private final PaperCloud cloud;
     @Getter
