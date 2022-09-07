@@ -1,30 +1,30 @@
-kind: Deployment
+kind: StatefulSet
 apiVersion: apps/v1
 metadata:
-  name: chrotoscloud-http-rest
+  name: chrotoscloud-worker
   namespace: core
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: chrotoscloud-http-rest
+      app: chrotoscloud-worker
   template:
     metadata:
       labels:
-        app: chrotoscloud-http-rest
+        app: chrotoscloud-worker
     spec:
       volumes:
         - name: workdir
           emptyDir: {}
       initContainers:
-        - name: api-download
-          image: katzen48/chrotoscloud-v2:api-init-container
+        - name: worker-download
+          image: katzen48/chrotoscloud-v2:worker-init-container
           volumeMounts:
             - name: workdir
               mountPath: /workdir
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
       containers:
-        - name: api-server
+        - name: worker
           image: openjdk:17-jdk
           command:
             - java
@@ -33,7 +33,7 @@ spec:
             - '-Xmx1G'
             - '-jar'
             - server.jar
-          workingDir: /opt/api
+          workingDir: /opt/worker
           env:
             - name: DB_STRING
               valueFrom:
@@ -53,7 +53,7 @@ spec:
             - name: CACHE_HOST
               value: redis
             - name: CACHE_PORT
-              value: "6379"
+              value: '6379'
             - name: CACHE_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -72,11 +72,7 @@ spec:
             - name: QUEUE_HOST
               value: rabbitmq.core
             - name: QUEUE_PORT
-              value: "5672"
-          ports:
-            - name: http
-              containerPort: 8080
-              protocol: TCP
+              value: '5672'
           resources:
             limits:
               memory: 2G
@@ -84,56 +80,13 @@ spec:
               memory: 1G
           volumeMounts:
             - name: workdir
-              mountPath: /opt/api
-          livenessProbe:
-            tcpSocket:
-              port: 8080
-            initialDelaySeconds: 60
-            timeoutSeconds: 1
-            periodSeconds: 5
-            successThreshold: 1
-            failureThreshold: 3
-          readinessProbe:
-            tcpSocket:
-              port: 8080
-            initialDelaySeconds: 10
-            timeoutSeconds: 1
-            periodSeconds: 2
-            successThreshold: 1
-            failureThreshold: 10
+              mountPath: /opt/worker
           imagePullPolicy: IfNotPresent
       restartPolicy: Always
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: chrotoscloud-http-rest
-  namespace: core
-spec:
-  ports:
-    - name: http
-      protocol: TCP
-      port: 80
-      targetPort: http
-  selector:
-    app: chrotoscloud-http-rest
----
-kind: Ingress
-apiVersion: networking.k8s.io/v1
-metadata:
-  name: chrotoscloud-http-rest
-  namespace: core
-  labels:
-    name: chrotoscloud-http-rest
-spec:
-  rules:
-    - host: chrotoscloud.chrotos.net
-      http:
-        paths:
-          - path: /api
-            pathType: Prefix
-            backend:
-              service:
-                name: chrotoscloud-http-rest
-                port:
-                  name: http
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
