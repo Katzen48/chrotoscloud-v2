@@ -6,6 +6,7 @@ import lombok.Setter;
 import net.chrotos.chrotoscloud.cache.CacheAdapter;
 import net.chrotos.chrotoscloud.chat.ChatManager;
 import net.chrotos.chrotoscloud.games.GameManager;
+import net.chrotos.chrotoscloud.jobs.JobManager;
 import net.chrotos.chrotoscloud.messaging.pubsub.PubSubAdapter;
 import net.chrotos.chrotoscloud.messaging.queue.QueueAdapter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
@@ -81,6 +82,7 @@ public abstract class Cloud implements ServiceContainer {
     public abstract GameManager getGameManager();
     public abstract File getTranslationDir();
     public abstract Scheduler getScheduler();
+    public abstract JobManager getJobManager();
 
     public String getGameMode() {
         return getCloudConfig().getGameMode();

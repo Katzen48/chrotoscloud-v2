@@ -54,7 +54,7 @@ const downloadWorlds = require('./worldDownloader.js');
     const VERSION = (SOFTWARE === 'paper') ? gameMode.body.spec.version : process.env.SERVER_SOFTWARE_VERSION;
     const CLOUD_VERSION = (SOFTWARE === 'paper') ? gameMode.body.spec.cloudVersion : process.env.CLOUD_VERSION;
 
-    if (SOFTWARE !== 'api') {
+    if (SOFTWARE !== 'api' && SOFTWARE !== 'worker') {
         console.log('Fetching newest Build of', SOFTWARE, 'of version', VERSION); // Maybe remove and include in image?
 
         let versionResponse = await fetch(`${VERSIONS_URL}/${VERSION}`)
@@ -100,12 +100,27 @@ const downloadWorlds = require('./worldDownloader.js');
             console.error('Could not download worlds: ' + e);
             process.exit(1);
         }
-    } else {
+    } else if (SOFTWARE === 'api') {
         // Download ChrotosCloud-V2 implementation
         try {
             console.log('Resolving newest build of ChrotosCloud-API');
             let cloudUrl = await resolveMaven(CLOUD_BASE_URL, 'net.chrotos.chrotoscloud',
                 'http-rest', CLOUD_VERSION); // TODO accept other implementations
+            cloudUrl += '.jar';
+
+            console.log('Found newest build url:', cloudUrl);
+
+            await download(cloudUrl, PATH + '/server.jar');
+        } catch (e) {
+            console.error('Could not download chrotoscloud: ' + e);
+            process.exit(1);
+        }
+    } else if (SOFTWARE === 'worker') {
+        // Download ChrotosCloud-V2 implementation
+        try {
+            console.log('Resolving newest build of ChrotosCloud-Worker');
+            let cloudUrl = await resolveMaven(CLOUD_BASE_URL, 'net.chrotos.chrotoscloud',
+                'worker', CLOUD_VERSION);
             cloudUrl += '.jar';
 
             console.log('Found newest build url:', cloudUrl);

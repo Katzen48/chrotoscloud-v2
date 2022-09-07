@@ -11,14 +11,17 @@ import net.chrotos.chrotoscloud.messaging.pubsub.PubSubAdapter;
 import net.chrotos.chrotoscloud.messaging.queue.QueueAdapter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 import net.chrotos.chrotoscloud.player.PlayerManager;
+import net.chrotos.chrotoscloud.player.SidedPlayerFactory;
 
 @AllArgsConstructor
 public class RestModule extends AbstractModule {
-    private Cloud cloud;
+    private RestCloud cloud;
 
     @Override
     protected void configure() {
         bind(Cloud.class).toInstance(cloud);
+        bind(RestCloud.class).toInstance(cloud);
+        bind(SidedPlayerFactory.class).to(RestSidedPlayerFactory.class);
 
         bind(PersistenceAdapter.class).toProvider(cloud::getPersistence);
         bind(QueueAdapter.class).toProvider(cloud::getQueue);

@@ -1,29 +1,29 @@
-package net.chrotos.chrotoscloud.rest;
+package net.chrotos.chrotoscloud.worker;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import lombok.Getter;
 import lombok.NonNull;
 import net.chrotos.chrotoscloud.CoreCloud;
+import net.chrotos.chrotoscloud.cache.Lock;
 import net.chrotos.chrotoscloud.games.GameManager;
 import net.chrotos.chrotoscloud.tasks.Scheduler;
 
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.Duration;
 
-public class RestCloud extends CoreCloud {
+public class WorkerCloud extends CoreCloud {
     @Getter
     private final Injector serviceInjector;
+    @Getter
+    private final WorkerScheduler scheduler;
 
-    public RestCloud() {
-        this.serviceInjector = Guice.createInjector(new RestModule(this));
-        setCloudConfig(new RestConfig());
-    }
-
-    @Override
-    public void initialize() {
-        super.initialize();
+    public WorkerCloud() {
+        this.serviceInjector = Guice.createInjector(new WorkerModule(this));
+        this.scheduler = getServiceInjector().getInstance(WorkerScheduler.class);
+        setCloudConfig(new WorkerConfig());
     }
 
     @Override
@@ -43,25 +43,5 @@ public class RestCloud extends CoreCloud {
     @Override
     public File getTranslationDir() {
         return null;
-    }
-
-    @Override
-    public Scheduler getScheduler() {
-        return null;
-    }
-
-    @Override
-    protected boolean shouldLoadPubSub() {
-        return false;
-    }
-
-    @Override
-    protected boolean shouldLoadQueue() {
-        return false;
-    }
-
-    @Override
-    protected boolean shouldLoadCache() {
-        return false;
     }
 }

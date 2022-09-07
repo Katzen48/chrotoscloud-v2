@@ -1,9 +1,11 @@
 package net.chrotos.chrotoscloud.economy;
 
+import net.chrotos.chrotoscloud.Model;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public interface Transaction {
+public interface Transaction extends Model {
     String getTransactionCode();
     AccountType getAccountType();
     UUID getAccountId();

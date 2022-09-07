@@ -1,6 +1,8 @@
 package net.chrotos.chrotoscloud.permissions;
 
-public interface Permission {
+import net.chrotos.chrotoscloud.Model;
+
+public interface Permission extends Model {
     String getName();
     boolean getValue();
 }

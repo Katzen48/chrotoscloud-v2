@@ -1,6 +1,7 @@
 package net.chrotos.chrotoscloud.player;
 
 import lombok.NonNull;
+import net.chrotos.chrotoscloud.Model;
 import net.chrotos.chrotoscloud.economy.AccountHolder;
 import net.chrotos.chrotoscloud.games.states.StateHolder;
 import net.chrotos.chrotoscloud.games.stats.StatsHolder;
@@ -13,7 +14,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.UUID;
 
-public interface Player extends AccountHolder, Banable, InventoryHolder, Kickable, Permissible, StatsHolder, StateHolder {
+public interface Player extends AccountHolder, Banable, InventoryHolder, Kickable, Permissible, StatsHolder, StateHolder, Model {
     SidedPlayer getSidedPlayer();
     @NonNull
     String getName();

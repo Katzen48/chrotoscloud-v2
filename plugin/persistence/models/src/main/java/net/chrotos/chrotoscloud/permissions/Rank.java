@@ -1,11 +1,12 @@
 package net.chrotos.chrotoscloud.permissions;
 
 import lombok.NonNull;
+import net.chrotos.chrotoscloud.Model;
 import net.chrotos.chrotoscloud.player.Player;
 
 import java.util.Set;
 
-public interface Rank extends Permissible {
+public interface Rank extends Permissible, Model {
     Rank getParent();
     void setParent(Rank rank);
     @NonNull

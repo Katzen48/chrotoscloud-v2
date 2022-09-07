@@ -1,9 +1,9 @@
-package net.chrotos.chrotoscloud.rest;
+package net.chrotos.chrotoscloud.worker;
 
 import net.chrotos.chrotoscloud.CloudConfig;
 import net.kyori.adventure.text.TextComponent;
 
-public class RestConfig implements CloudConfig {
+public class WorkerConfig implements CloudConfig {
     @Override
     public String getPersistenceConnectionString() {
         return System.getenv("DB_STRING");

@@ -6,6 +6,7 @@ import lombok.NonNull;
 import net.chrotos.chrotoscloud.cache.RedisCacheAdapter;
 import net.chrotos.chrotoscloud.chat.ChatManager;
 import net.chrotos.chrotoscloud.chat.CoreChatManager;
+import net.chrotos.chrotoscloud.jobs.CloudJobManager;
 import net.chrotos.chrotoscloud.messaging.queue.RabbitQueueAdapter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 import net.chrotos.chrotoscloud.player.CloudPlayerManager;
@@ -33,6 +34,8 @@ public abstract class CoreCloud extends Cloud {
     private final DatabaseReader geoIp;
     @Getter
     private TranslationRegistry translationRegistry;
+    @Getter
+    private CloudJobManager jobManager;
 
     protected CoreCloud() {
         DatabaseReader geoIp = null;
@@ -71,6 +74,8 @@ public abstract class CoreCloud extends Cloud {
             RabbitQueueAdapter queueAdapter = getServiceInjector().getInstance(RabbitQueueAdapter.class);
             this.queue = queueAdapter;
             queueAdapter.configure(getCloudConfig());
+
+
         }
 
         loaded = true;
@@ -94,6 +99,9 @@ public abstract class CoreCloud extends Cloud {
             redisAdapter = getServiceInjector().getInstance(RedisCacheAdapter.class);
             this.cache = redisAdapter;
             this.cache.configure(getCloudConfig());
+
+            this.jobManager = getServiceInjector().getInstance(CloudJobManager.class);
+            getJobManager().initialize();
         }
 
         if (shouldLoadPubSub()) {

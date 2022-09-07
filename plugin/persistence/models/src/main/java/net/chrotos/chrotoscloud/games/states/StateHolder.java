@@ -1,12 +1,13 @@
 package net.chrotos.chrotoscloud.games.states;
 
 import lombok.NonNull;
+import net.chrotos.chrotoscloud.Model;
 
 import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
-public interface StateHolder {
+public interface StateHolder extends Model {
     @NonNull
     UUID getUniqueId();
     @NonNull

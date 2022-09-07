@@ -1,11 +1,12 @@
 package net.chrotos.chrotoscloud.games.stats;
 
 import lombok.NonNull;
+import net.chrotos.chrotoscloud.Model;
 import net.chrotos.chrotoscloud.player.Player;
 
 import java.util.UUID;
 
-public interface GameStatistic {
+public interface GameStatistic extends Model {
     @NonNull
     UUID getUniqueId();
     @NonNull
