@@ -36,6 +36,7 @@ public class CloudPlugin {
         this.cloud.setProxyServer(proxyServer);
         this.cloud.setLogger(logger);
         this.cloud.setDataDir(dataDir);
+        this.cloud.setPlugin(this);
     }
 
     @Subscribe(async = false)
@@ -68,6 +69,7 @@ public class CloudPlugin {
 
     @Subscribe(async = false)
     public void onProxyShutdown(ProxyShutdownEvent event) {
+        cloud.getScheduler().close();
         synchronizer.destruct();
     }
 }

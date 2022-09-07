@@ -15,6 +15,11 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.IdentifiableType;
+import javax.persistence.metamodel.ManagedType;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
@@ -303,6 +308,32 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     public void merge(Object object) {
         Session session = getSession();
         runInTransaction((databaseTransaction) -> session.saveOrUpdate(object));
+    }
+
+    @Override
+    public Object getPrimaryKey(Object object) {
+        IdentifiableType<?> type = (IdentifiableType<?>) sessionFactory.getMetamodel().managedType(object.getClass());
+        Member idMember = type.getId(type.getIdType().getJavaType()).getJavaMember();
+
+        try {
+            if (idMember instanceof Field field) {
+                field.setAccessible(true);
+                return field.get(object);
+            } else if (idMember instanceof Method method) {
+                method.setAccessible(true);
+                return method.invoke(object);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Override
+    public Class<?> getPrimaryKeyType(Class<?> clazz) {
+        IdentifiableType<?> type = (IdentifiableType<?>) sessionFactory.getMetamodel().managedType(clazz);
+        return type.getIdType().getJavaType();
     }
 
     private Session getSession() {

@@ -46,6 +46,7 @@ public class CloudPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         Bukkit.getOnlinePlayers().forEach(eventHandler::onPlayerLeave);
+        cloud.getScheduler().close();
     }
 
     private void tryUnregisterCommands() {

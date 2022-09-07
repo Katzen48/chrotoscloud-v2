@@ -22,4 +22,6 @@ public interface PersistenceAdapter {
     void refresh(Object object);
     @Deprecated
     void merge(Object object);
+    Object getPrimaryKey(Object object);
+    Class<?> getPrimaryKeyType(Class<?> clazz);
 }

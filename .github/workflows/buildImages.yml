@@ -53,6 +53,16 @@ jobs:
           push: true
           platforms: linux/amd64
           tags: ${{ env.BASE_IMAGE }}:api-init-container
+          
+      - name: workerInitContainer
+        uses: docker/build-push-action@v3.1.1
+        with:
+          context: images/workerInitContainer
+          no-cache: true
+          pull: true
+          push: true
+          platforms: linux/amd64
+          tags: ${{ env.BASE_IMAGE }}:worker-init-container
 
       - name: paperInitContainer
         uses: docker/build-push-action@v3.1.1

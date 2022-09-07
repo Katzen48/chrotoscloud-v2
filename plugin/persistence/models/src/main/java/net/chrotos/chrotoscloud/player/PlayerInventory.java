@@ -1,10 +1,11 @@
 package net.chrotos.chrotoscloud.player;
 
 import lombok.NonNull;
+import net.chrotos.chrotoscloud.Model;
 
 import java.util.UUID;
 
-public interface PlayerInventory {
+public interface PlayerInventory extends Model {
     @NonNull
     UUID getUniqueId();
     @NonNull

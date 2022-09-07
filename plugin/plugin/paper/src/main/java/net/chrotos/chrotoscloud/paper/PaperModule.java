@@ -7,6 +7,7 @@ import net.chrotos.chrotoscloud.CloudConfig;
 import net.chrotos.chrotoscloud.cache.CacheAdapter;
 import net.chrotos.chrotoscloud.chat.ChatManager;
 import net.chrotos.chrotoscloud.games.GameManager;
+import net.chrotos.chrotoscloud.jobs.JobManager;
 import net.chrotos.chrotoscloud.messaging.pubsub.PubSubAdapter;
 import net.chrotos.chrotoscloud.messaging.queue.QueueAdapter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
@@ -31,5 +32,6 @@ public class PaperModule extends AbstractModule {
         bind(ChatManager.class).toProvider(cloud::getChatManager);
         bind(PlayerManager.class).toProvider(cloud::getPlayerManager);
         bind(PubSubAdapter.class).toProvider(cloud::getPubSub);
+        bind(JobManager.class).toProvider(cloud::getJobManager);
     }
 }

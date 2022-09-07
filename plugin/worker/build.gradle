@@ -1,0 +1,57 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.1'
+    id 'application'
+}
+
+mainClassName = 'net.chrotos.chrotoscloud.worker.Main'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://papermc.io/repo/repository/maven-public/"
+    }
+}
+
+dependencies {
+    implementation project(':api')
+    implementation project(':persistence:models')
+    implementation project(':core')
+    implementation project(':persistence:mysql')
+
+    compileOnly 'io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT'
+
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    testCompileOnly 'org.projectlombok:lombok:1.18.22'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+
+    implementation "net.kyori:adventure-api:4.11.0"
+    implementation "net.kyori:adventure-text-serializer-legacy:4.11.0"
+
+    implementation 'org.quartz-scheduler:quartz:2.3.2'
+
+    implementation 'com.google.inject:guice:5.1.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) { publication ->
+            artifactId = 'worker'
+            from shadow.component(publication)
+        }
+    }
+}
+
+shadowJar {
+    classifier = null
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "$mainClassName"
+    }
+}

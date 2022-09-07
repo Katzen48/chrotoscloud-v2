@@ -22,10 +22,12 @@ public class PaperCloud extends CoreCloud {
     @Setter
     private CloudPlugin plugin;
     @NonNull
-    private Injector serviceInjector;
+    private final Injector serviceInjector;
+    private final PaperScheduler scheduler;
 
     public PaperCloud() throws IOException {
         this.serviceInjector = Guice.createInjector(new PaperModule(this));
+        this.scheduler = getServiceInjector().getInstance(PaperScheduler.class);
         setCloudConfig(new PaperConfig());
         gameManager = getServiceInjector().getInstance(PaperGameManager.class);
         inventorySavingEnabled = Bukkit.getServer().spigot().getSpigotConfig().getBoolean("players.disable-saving");
@@ -40,6 +42,8 @@ public class PaperCloud extends CoreCloud {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        scheduler.initialize();
     }
 
     @Override

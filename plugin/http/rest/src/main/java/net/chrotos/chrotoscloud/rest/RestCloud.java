@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.chrotos.chrotoscloud.CoreCloud;
 import net.chrotos.chrotoscloud.games.GameManager;
+import net.chrotos.chrotoscloud.tasks.Scheduler;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -13,7 +14,7 @@ import java.net.UnknownHostException;
 
 public class RestCloud extends CoreCloud {
     @Getter
-    private Injector serviceInjector;
+    private final Injector serviceInjector;
 
     public RestCloud() {
         this.serviceInjector = Guice.createInjector(new RestModule(this));
@@ -41,6 +42,11 @@ public class RestCloud extends CoreCloud {
 
     @Override
     public File getTranslationDir() {
+        return null;
+    }
+
+    @Override
+    public Scheduler getScheduler() {
         return null;
     }
 
