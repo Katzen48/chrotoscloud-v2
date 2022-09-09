@@ -62,7 +62,8 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @JsonIgnore
     private Set<Account> accounts = new HashSet<>();
 
-    @OneToMany(mappedBy = "player", targetEntity = CloudBan.class, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "player", targetEntity = CloudBan.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REFRESH, CascadeType.DETACH}, orphanRemoval = true)
     @Filter(name = "uniqueId")
     @Filter(name = "active")
     @NonNull
