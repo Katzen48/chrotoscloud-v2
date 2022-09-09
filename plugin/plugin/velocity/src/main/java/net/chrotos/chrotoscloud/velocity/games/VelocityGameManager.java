@@ -1,5 +1,6 @@
 package net.chrotos.chrotoscloud.velocity.games;
 
+import com.google.inject.Inject;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import io.kubernetes.client.openapi.ApiClient;
@@ -38,6 +39,7 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
     private Registration<GameServerPingRequest, Void> ping;
     private Registration<PlayerTeleportToServerRequest, Void> teleport;
 
+    @Inject
     public VelocityGameManager(VelocityCloud cloud) {
         this.cloud = cloud;
 
