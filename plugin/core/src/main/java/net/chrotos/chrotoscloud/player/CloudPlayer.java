@@ -35,7 +35,7 @@ import java.util.*;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @DynamicUpdate
-@SQLDelete(sql = "UPDATE players SET deleted_at=now() WHERE unique_id = ?")
+@SQLDelete(sql = "UPDATE players SET deleted_at=now() WHERE unique_id = ? AND updated_at = ?", check = ResultCheckStyle.COUNT)
 @Where(clause = "deleted_at IS NULL")
 @SelectBeforeUpdate
 public class CloudPlayer extends CloudPermissible implements Player, SoftDeletable {

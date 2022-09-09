@@ -18,7 +18,7 @@ import java.util.*;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @DynamicUpdate
-@SQLDelete(sql = "UPDATE ranks SET deleted_at=now() WHERE unique_id = ?")
+@SQLDelete(sql = "UPDATE ranks SET deleted_at=now() WHERE unique_id = ? AND updated_at = ?")
 @Immutable
 @Where(clause = "deleted_at IS NUlL")
 @Cacheable
