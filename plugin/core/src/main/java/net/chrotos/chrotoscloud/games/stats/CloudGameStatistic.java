@@ -20,7 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @DynamicUpdate
 @SelectBeforeUpdate
-@SQLDelete(sql = "UPDATE game_stats SET deleted_at=now() WHERE unique_id = ?")
+@SQLDelete(sql = "UPDATE game_stats SET deleted_at=now() WHERE unique_id = ? AND updated_at = ?")
 @Where(clause = "deleted_at IS NUlL")
 @Filter(name = "gameMode")
 public class CloudGameStatistic implements GameStatistic, SoftDeletable {

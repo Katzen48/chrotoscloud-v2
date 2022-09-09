@@ -23,7 +23,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @DynamicUpdate
-@SQLDelete(sql = "UPDATE game_states SET deleted_at=now() WHERE unique_id = ?")
+@SQLDelete(sql = "UPDATE game_states SET deleted_at=now() WHERE unique_id = ? AND updated_at = ?")
 @Where(clause = "deleted_at IS NUlL")
 @SelectBeforeUpdate
 @Filter(name = "gameMode")

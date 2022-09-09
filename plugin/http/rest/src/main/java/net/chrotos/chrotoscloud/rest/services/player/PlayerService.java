@@ -45,6 +45,14 @@ public class PlayerService extends PlayerFetchingService {
         return new PagedResponse<>(getPlayers(filter), first, pageSize);
     }
 
+    @Authenticate
+    @DELETE
+    @Path("{uuid}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public void deletePlayer(@PathParam("uuid") UUID uuid) {
+        Cloud.getInstance().getPersistence().delete(getPlayer(uuid));
+    }
+
     private List<Player> getPlayers(DataSelectFilter filter) {
         return new ArrayList<>(Cloud.getInstance().getPersistence().getAll(CloudPlayer.class, filter));
     }

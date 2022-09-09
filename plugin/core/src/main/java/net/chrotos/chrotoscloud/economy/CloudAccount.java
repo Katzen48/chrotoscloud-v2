@@ -17,7 +17,7 @@ import java.util.*;
 @Data
 @NoArgsConstructor
 @DynamicUpdate
-@SQLDelete(sql = "UPDATE accounts SET deleted_at=now() WHERE unique_id = ?")
+@SQLDelete(sql = "UPDATE accounts SET deleted_at=now() WHERE unique_id = ? AND updated_at = ?")
 @Where(clause = "deleted_at IS NUlL")
 @SelectBeforeUpdate
 @Filter(name = "accountType")
