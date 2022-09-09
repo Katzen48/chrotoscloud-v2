@@ -57,7 +57,7 @@ public class RestCloud extends CoreCloud {
 
     @Override
     protected boolean shouldLoadQueue() {
-        return false;
+        return true;
     }
 
     @Override

@@ -50,7 +50,10 @@ public class PlayerService extends PlayerFetchingService {
     @Path("{uuid}")
     @Produces(MediaType.TEXT_PLAIN)
     public void deletePlayer(@PathParam("uuid") UUID uuid) {
-        Cloud.getInstance().getPersistence().delete(getPlayer(uuid));
+        Player player = getPlayer(uuid);
+
+        player.kick();
+        Cloud.getInstance().getPersistence().delete(player);
     }
 
     private List<Player> getPlayers(DataSelectFilter filter) {
