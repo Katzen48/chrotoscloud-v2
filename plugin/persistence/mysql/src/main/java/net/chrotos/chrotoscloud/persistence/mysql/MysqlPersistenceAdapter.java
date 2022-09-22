@@ -53,6 +53,10 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
                     .setProperty("hibernate.connection.username", config.getPersistenceUser())
                     .setProperty("hibernate.connection.password", config.getPersistencePassword());
 
+            if (!config.isCachingPersistedEntities()) {
+                dbConfig.setProperty("hibernate.cache.use_second_level_cache", "false");
+            }
+
             dbConfig.setPhysicalNamingStrategy(new CamelCaseToUnderscoresNamingStrategy());
 
             sessionFactory = dbConfig.buildSessionFactory();

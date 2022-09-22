@@ -20,6 +20,11 @@ public class WorkerConfig implements CloudConfig {
     }
 
     @Override
+    public boolean isCachingPersistedEntities() {
+        return false;
+    }
+
+    @Override
     public String getCacheHost() {
         return System.getenv("CACHE_HOST");
     }
