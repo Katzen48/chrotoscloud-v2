@@ -7,7 +7,7 @@
         <property name="hibernate.connection.release_mode">after_transaction</property>
 
         <!-- Debugging and performance monitoring -->
-        <property name="hibernate.generate_statistics" value="true" />
+        <property name="hibernate.generate_statistics">true</property>
 
         <property name="hibernate.c3p0.min_size">5</property>
         <property name="hibernate.c3p0.acquire_increment">5</property>
