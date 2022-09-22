@@ -37,6 +37,7 @@ public class CloudRank extends CloudPermissible implements Rank, SoftDeletable {
     @JoinColumn(name = "permissible_unique_id")
     @Where(clause = "permissible_type='rank'")
     @JsonIgnore
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<Permission> permissions = new HashSet<>();
 
     @OneToMany(targetEntity = CloudPlayer.class, cascade = CascadeType.ALL, mappedBy = "rank")
