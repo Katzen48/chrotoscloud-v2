@@ -8,6 +8,7 @@
 
         <property name="hibernate.cache.use_second_level_cache">true</property>
         <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.internal.EhcacheRegionFactory</property>
+        <property name="net.sf.ehcache.configurationResourceName">net/chrotos/chrotoscloud/persistence/mysql/ehcache.xml</property>
 
         <!-- Debugging and performance monitoring -->
         <!--

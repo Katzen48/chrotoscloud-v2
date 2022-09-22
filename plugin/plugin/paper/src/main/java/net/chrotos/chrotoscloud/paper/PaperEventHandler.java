@@ -72,23 +72,28 @@ public class PaperEventHandler implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        Cloud.getInstance().getPersistence().runInTransaction(transaction -> {
-            transaction.suppressCommit();
+        try {
+            Cloud.getInstance().getPersistence().runInTransaction(transaction -> {
+                transaction.suppressCommit();
 
-            net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getOrCreatePlayer(event.getPlayer());
+                net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getOrCreatePlayer(event.getPlayer());
 
-            Ban ban = getBan(cloudPlayer);
-            if (ban != null) {
-                cloudPlayer.kick(ban.getBanMessage(cloudPlayer.getLocale(), cloudPlayer.getTimeZone()));
-                return;
-            }
+                Ban ban = getBan(cloudPlayer);
+                if (ban != null) {
+                    cloudPlayer.kick(ban.getBanMessage(cloudPlayer.getLocale(), cloudPlayer.getTimeZone()));
+                    return;
+                }
 
-            if (cloud.getCloudConfig().getResourcePackUrl() != null) {
-                cloudPlayer.setResourcePack(cloud.getCloudConfig().getResourcePackUrl(),
-                        cloud.getCloudConfig().getResourcePackHash(), cloud.getCloudConfig().getResourcePackRequired(),
-                        cloud.getCloudConfig().getResourcePackPrompt());
-            }
-        });
+                if (cloud.getCloudConfig().getResourcePackUrl() != null) {
+                    cloudPlayer.setResourcePack(cloud.getCloudConfig().getResourcePackUrl(),
+                            cloud.getCloudConfig().getResourcePackHash(), cloud.getCloudConfig().getResourcePackRequired(),
+                            cloud.getCloudConfig().getResourcePackPrompt());
+                }
+            });
+        } catch (Exception e) {
+            Cloud.getInstance().getPlayerManager().logoutPlayer(event.getPlayer().getUniqueId());
+            throw e;
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

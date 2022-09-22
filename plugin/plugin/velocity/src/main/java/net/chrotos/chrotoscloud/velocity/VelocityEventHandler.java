@@ -80,6 +80,7 @@ public class VelocityEventHandler {
             player.disconnect(Component.translatable("cloud.player.deleted", NamedTextColor.RED));
         } catch (Exception e) {
             player.disconnect(Component.translatable("cloud.error", NamedTextColor.RED));
+            Cloud.getInstance().getPlayerManager().logoutPlayer(player.getUniqueId());
         }
     }
 

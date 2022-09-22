@@ -38,6 +38,8 @@ import java.util.*;
 @SQLDelete(sql = "UPDATE players SET deleted_at=now() WHERE unique_id = ? AND updated_at = ?", check = ResultCheckStyle.COUNT)
 @Where(clause = "deleted_at IS NULL")
 @SelectBeforeUpdate
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CloudPlayer extends CloudPermissible implements Player, SoftDeletable {
     @Id
     @Column(updatable = false, nullable = false)
@@ -74,18 +76,22 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @JoinColumn(name = "permissible_unique_id")
     @Where(clause = "permissible_type='player'")
     @NonNull
+    @Immutable
     @JsonIgnore
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
     private Set<Permission> permissions = new HashSet<>();
 
     @Setter
     @ManyToOne(targetEntity = CloudRank.class)
     @JoinColumn(name = "rank_unique_id")
+    @Immutable
     private Rank rank;
 
     @OneToMany(mappedBy = "player", targetEntity = CloudGameStatistic.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @Filter(name = "gameMode")
     @NonNull
     @JsonIgnore
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<GameStatistic> stats = new HashSet<>();
 
     @OneToMany(mappedBy = "player", targetEntity = CloudGameState.class, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -93,18 +99,22 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @Filter(name = "name")
     @NonNull
     @JsonIgnore
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<GameState> states = new HashSet<>();
 
     @OneToMany(mappedBy = "player", targetEntity = CloudPlayerInventory.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @Filter(name = "gameMode")
     @NonNull
     @JsonIgnore
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<PlayerInventory> inventories = new HashSet<>();
 
     @CreationTimestamp
+    @Immutable
     private Calendar createdAt;
     @Temporal(TemporalType.TIMESTAMP)
     @Version
+    @Immutable
     private Calendar updatedAt;
     @Temporal(TemporalType.TIMESTAMP)
     @JsonIgnore
