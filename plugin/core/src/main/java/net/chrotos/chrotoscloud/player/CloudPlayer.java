@@ -83,8 +83,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
 
     @Setter
     @ManyToOne(targetEntity = CloudRank.class)
-    @JoinColumn(name = "rank_unique_id")
-    @Immutable
+    @JoinColumn(name = "rank_unique_id", updatable = false)
     private Rank rank;
 
     @OneToMany(mappedBy = "player", targetEntity = CloudGameStatistic.class, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -110,11 +109,9 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     private Set<PlayerInventory> inventories = new HashSet<>();
 
     @CreationTimestamp
-    @Immutable
     private Calendar createdAt;
     @Temporal(TemporalType.TIMESTAMP)
     @Version
-    @Immutable
     private Calendar updatedAt;
     @Temporal(TemporalType.TIMESTAMP)
     @JsonIgnore
