@@ -6,6 +6,9 @@
         <property name="hbm2ddl.auto">validate</property>
         <property name="hibernate.connection.release_mode">after_transaction</property>
 
+        <!-- Debugging and performance monitoring -->
+        <property name="hibernate.generate_statistics" value="true" />
+
         <property name="hibernate.c3p0.min_size">5</property>
         <property name="hibernate.c3p0.acquire_increment">5</property>
         <property name="hibernate.c3p0.timeout">300</property>
