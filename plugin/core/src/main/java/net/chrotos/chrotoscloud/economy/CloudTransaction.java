@@ -15,7 +15,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @DynamicUpdate
-@Immutable
 @SelectBeforeUpdate
 public class CloudTransaction implements Transaction {
     @Id
