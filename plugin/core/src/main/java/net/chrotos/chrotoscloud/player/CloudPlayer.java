@@ -76,7 +76,6 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @JoinColumn(name = "permissible_unique_id")
     @Where(clause = "permissible_type='player'")
     @NonNull
-    @Immutable
     @JsonIgnore
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
     private Set<Permission> permissions = new HashSet<>();
