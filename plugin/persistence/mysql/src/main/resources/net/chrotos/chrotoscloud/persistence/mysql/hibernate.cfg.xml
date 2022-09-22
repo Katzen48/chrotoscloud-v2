@@ -7,7 +7,7 @@
         <property name="hibernate.connection.release_mode">after_transaction</property>
 
         <property name="hibernate.cache.use_second_level_cache">true</property>
-        <property name="hibernate.cache.region.factory_class">"org.hibernate.cache.ehcache.EhCacheRegionFactory"</property>
+        <property name="hibernate.cache.region.factory_class">ehcache</property>
 
         <!-- Debugging and performance monitoring -->
         <!--
