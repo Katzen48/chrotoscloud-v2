@@ -22,7 +22,7 @@ dependencies {
     }
     implementation 'com.vladmihalcea:hibernate-types-55:2.19.2'
 
-    implementation 'org.ehcache:ehcache:3.10.1'
+    implementation 'net.sf.ehcache:ehcache:2.10.9.2'
 }
 
 test {
