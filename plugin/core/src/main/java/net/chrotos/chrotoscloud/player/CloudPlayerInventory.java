@@ -19,6 +19,8 @@ import java.util.UUID;
 @Where(clause = "deleted_at IS NUlL")
 @SelectBeforeUpdate
 @Filter(name = "gameMode")
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CloudPlayerInventory implements PlayerInventory {
     @Id
     @Column(updatable = false, nullable = false)
