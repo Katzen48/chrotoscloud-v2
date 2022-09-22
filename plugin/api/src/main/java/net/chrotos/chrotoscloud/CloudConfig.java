@@ -6,6 +6,9 @@ public interface CloudConfig {
     String getPersistenceConnectionString();
     String getPersistenceUser();
     String getPersistencePassword();
+    default boolean isCachingPersistedEntities() {
+        return true;
+    }
 
     String getCacheHost();
     int getCachePort();
