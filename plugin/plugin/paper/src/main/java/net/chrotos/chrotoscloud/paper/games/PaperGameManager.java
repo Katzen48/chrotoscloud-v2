@@ -214,12 +214,14 @@ public class PaperGameManager implements GameManager, AutoCloseable {
 
             String reason = event.getReason();
 
-            if (reason == null) {
-                player.kick();
-            } else {
-                Component message = LegacyComponentSerializer.builder().build().deserialize(reason);
-                player.kick(message);
-            }
+            Bukkit.getScheduler().runTask(cloud.getPlugin(), () -> {
+                if (reason == null) {
+                    player.kick();
+                } else {
+                    Component message = LegacyComponentSerializer.builder().build().deserialize(reason);
+                    player.kick(message);
+                }
+            });
         }), "games.server.kick");
     }
 
