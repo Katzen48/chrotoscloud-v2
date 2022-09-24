@@ -164,12 +164,19 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
         cloud.getLogger().debug("Getting pods for gamemode {}", gameMode);
         try {
             ArrayList<String> pods = new ArrayList<>();
-            V1PodList list = coreV1Api.listNamespacedPod("servers", null, false, null,
-                    null, "net.chrotos.chrotoscloud.gameserver/gamemode=" + gameMode, null, null,
-                    null, null, null);
+            String namespaces = System.getenv("CHROTOSCLOUD_NAMESPACES");
+            if (namespaces == null || namespaces.isBlank()) {
+                namespaces = "servers";
+            }
 
-            for (V1Pod pod : list.getItems()) {
-                pods.add(pod.getMetadata().getName());
+            for (String namespace : namespaces.split(",")) {
+                V1PodList list = coreV1Api.listNamespacedPod(namespace, null, false, null,
+                        null, "net.chrotos.chrotoscloud.gameserver/gamemode=" + gameMode, null, null,
+                        null, null, null);
+
+                for (V1Pod pod : list.getItems()) {
+                    pods.add(pod.getMetadata().getName());
+                }
             }
 
             return pods;
@@ -180,15 +187,25 @@ public class VelocityGameManager implements GameManager, AutoCloseable {
 
     protected String getPodGameMode(@NonNull String podName) {
         try {
-            V1PodList list = coreV1Api.listNamespacedPod("servers", null, false, null,
-                    "metadata.name=" + podName, null, null, null,
-                    null, null, null);
-
-            if (list.getItems().isEmpty()) {
-                return null;
+            ArrayList<String> pods = new ArrayList<>();
+            String namespaces = System.getenv("CHROTOSCLOUD_NAMESPACES");
+            if (namespaces == null || namespaces.isBlank()) {
+                namespaces = "servers";
             }
 
-            return list.getItems().get(0).getMetadata().getLabels().get("net.chrotos.chrotoscloud.gameserver/gamemode");
+            for (String namespace : namespaces.split(",")) {
+                V1PodList list = coreV1Api.listNamespacedPod(namespace, null, false, null,
+                        "metadata.name=" + podName, null, null, null,
+                        null, null, null);
+
+                if (!list.getItems().isEmpty() && list.getItems().get(0).getMetadata() != null
+                        && list.getItems().get(0).getMetadata().getLabels() != null) {
+
+                    return list.getItems().get(0).getMetadata().getLabels().get("net.chrotos.chrotoscloud.gameserver/gamemode");
+                }
+            }
+
+            return null;
         } catch (ApiException e) {
             throw new RuntimeException(e);
         }
