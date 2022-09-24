@@ -25,21 +25,36 @@ public class CloudGameModeManager implements GameModeManager {
 
     @Override
     public List<? extends GameMode> getGameModes() {
-        KubernetesApiResponse<CloudGameModeList> response = api.list("servers"); // TODO switch to env variable
+        String namespaces = System.getenv("CHROTOSCLOUD_NAMESPACES");
+        if (namespaces == null || namespaces.isBlank()) {
+            namespaces = "servers";
+        }
+        List<CloudGameMode> gameModes = new ArrayList<>();
 
-        if (response.isSuccess()) {
-            return response.getObject().getItems();
+        for (String namespace : namespaces.split(",")) {
+            KubernetesApiResponse<CloudGameModeList> response = api.list(namespace);
+
+            if (response.isSuccess()) {
+                gameModes.addAll(response.getObject().getItems());
+            }
         }
 
-        return new ArrayList<>();
+        return gameModes;
     }
 
     @Override
     public GameMode getByName(@NonNull String name) {
-        KubernetesApiResponse<CloudGameMode> response = api.get("servers", name); // TODO switch to env variable
+        String namespaces = System.getenv("CHROTOSCLOUD_NAMESPACES");
+        if (namespaces == null || namespaces.isBlank()) {
+            namespaces = "servers";
+        }
 
-        if (response.isSuccess()) {
-            return response.getObject();
+        for (String namespace : namespaces.split(",")) {
+            KubernetesApiResponse<CloudGameMode> response = api.get(namespace, name);
+
+            if (response.isSuccess()) {
+                return response.getObject();
+            }
         }
 
         return null;
