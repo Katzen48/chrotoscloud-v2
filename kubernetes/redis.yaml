@@ -13,6 +13,19 @@ spec:
     targetPort: 6379
     name: redis
 ---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: redis-claim
+  namespace: core
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: local-volumes
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -24,6 +37,10 @@ spec:
       app: redis
   serviceName: redis
   replicas: 1
+  volumes:
+  - name: redis-claim
+    persistentVolumeClaim:
+      claimName: redis-claim
   template:
     metadata:
       labels:
@@ -34,6 +51,9 @@ spec:
         image: redislabs/rejson:latest
         command: ["redis-server", "--loadmodule", "/usr/lib/redis/modules/rejson.so", "--loadmodule", "/usr/lib/redis/modules/redisearch.so", "--requirepass"]
         args: ["$(REDIS_PASSWORD)"]
+        volumeMounts:
+          - name: redis-claim
+            mountPath: /data
         ports:
         - containerPort: 6379
           name: redis

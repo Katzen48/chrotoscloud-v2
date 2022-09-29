@@ -54,6 +54,8 @@ spec:
         volumeMounts:
         - name: artifactory-volume
           mountPath: /var/opt/jfrog/artifactory
+        securityContext:
+          fsGroup: 0
       - name: "remove-lost-found"
         image: "alpine:latest"
         command:
@@ -63,6 +65,8 @@ spec:
         volumeMounts:
         - name: artifactory-volume
           mountPath: /var/opt/jfrog/artifactory
+        securityContext:
+          fsGroup: 0
       containers:
       - name: artifactory
         image: releases-docker.jfrog.io/jfrog/artifactory-oss:latest
