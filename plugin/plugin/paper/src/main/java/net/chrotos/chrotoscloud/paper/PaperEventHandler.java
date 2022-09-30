@@ -69,7 +69,10 @@ public class PaperEventHandler implements Listener {
 
                     if (cloudPlayer.hasPermission("minecraft.command.op") || cloudPlayer.hasPermission("cloud.server.join." + cloud.getGameMode())) {
                         event.allow();
+                        return;
                     }
+
+                    event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, Component.translatable("cloud.player.not_whitelisted"));
                 } catch (PlayerSoftDeletedException e) {
                     event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, Component.translatable("cloud.player.deleted", NamedTextColor.RED));
                     cloud.getPlayerManager().logoutPlayer(event.getUniqueId());
