@@ -62,6 +62,27 @@ spec:
               - key: filebeat.yml
                 path: filebeat.yml
             defaultMode: 420
+        - name: server-properties
+          configMap:
+            name: server-properties
+            items:
+              - key: server.properties
+                path: server.properties
+            defaultMode: 666
+        - name: spigot-config
+          configMap:
+            name: spigot-config
+            items:
+              - key: spigot.yml
+                path: spigot.yml
+            defaultMode: 666
+        - name: bukkit-config
+          configMap:
+            name: bukkit-config
+            items:
+              - key: bukkit.yml
+                path: bukkit.yml
+            defaultMode: 666
         - name: podinfo
           downwardAPI:
             items:
@@ -69,6 +90,25 @@ spec:
                 fieldRef:
                   fieldPath: metadata.labels
       initContainers:
+        - name: copy-configs
+          command:
+            - /bin/sh
+            - '-c'
+          volumeMounts:
+            - name: workdir
+              mountPath: /opt/paper
+            - name: server-properties
+              mountPath: /opt/defaults/server.properties
+              subPath: server.properties
+            - name: spigot-config
+              mountPath: /opt/defaults/spigot.yml
+              subPath: spigot.yml
+            - name: bukkit-config
+              mountPath: /opt/defaults/bukkit.yml
+              subPath: bukkit.yml
+          image: 'alpine:latest'
+          args:
+            - cp -R /opt/defaults/* /opt/paper/
         - name: paper-download
           image: katzen48/chrotoscloud-v2:paper-init-container
           volumeMounts:

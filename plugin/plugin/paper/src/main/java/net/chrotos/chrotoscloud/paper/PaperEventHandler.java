@@ -14,18 +14,16 @@ import net.chrotos.chrotoscloud.paper.permissions.PermissibleInjector;
 import net.chrotos.chrotoscloud.player.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerResourcePackStatusEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -36,62 +34,94 @@ public class PaperEventHandler implements Listener {
     private final PaperChatRenderer renderer = new PaperChatRenderer();
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerLogin(PlayerLoginEvent event) {
-        Player player = event.getPlayer();
+    public void onPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
+        if (!Bukkit.hasWhitelist()) {
+            return;
+        }
 
-        cloud.getPersistence().runInTransaction(databaseTransaction -> {
-            try {
+        UUID uniqueId = event.getUniqueId();
+        UUID offlineUuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + event.getName()).getBytes(StandardCharsets.UTF_8));
+        if (uniqueId.equals(offlineUuid)) {
+            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, Component.translatable("cloud.server.offline_mode"));
+            return;
+        }
+
+        try {
+            event.getPlayerProfile().complete(true);
+
+            cloud.getPersistence().runInTransaction(databaseTransaction -> {
                 databaseTransaction.suppressCommit();
 
-                net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getOrCreatePlayer(player);
+                try {
+                    net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getPlayer(event.getUniqueId());
 
-                Ban ban = getBan(cloudPlayer);
-                if (ban != null) {
-                    event.disallow(PlayerLoginEvent.Result.KICK_BANNED, ban.getBanMessage(player.locale()));
+                    if (cloudPlayer == null) {
+                        return;
+                    }
 
-                    return;
+                    boolean isWhitelisted = Bukkit.getWhitelistedPlayers().stream()
+                            .anyMatch(offlinePlayer -> offlinePlayer.getUniqueId().equals(event.getUniqueId()));
+
+                    if (isWhitelisted) {
+                        event.allow();
+                        return;
+                    }
+
+                    if (cloudPlayer.hasPermission("minecraft.command.op") || cloudPlayer.hasPermission("cloud.server.join." + cloud.getGameMode())) {
+                        event.allow();
+                    }
+                } catch (PlayerSoftDeletedException e) {
+                    event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, Component.translatable("cloud.player.deleted", NamedTextColor.RED));
+                    cloud.getPlayerManager().logoutPlayer(event.getUniqueId());
                 }
-
-                PermissibleInjector.inject(player, cloudPlayer);
-                player.setOp(player.hasPermission("minecraft.command.op"));
-
-                if (cloud.isInventorySavingEnabled()) {
-                    loadInventory(cloudPlayer, player);
-                }
-
-                loadScoreboardTags(cloudPlayer, player);
-            } catch (PlayerSoftDeletedException e) {
-                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.translatable("cloud.player.deleted", NamedTextColor.RED));
-            } catch (Exception e) {
-                e.printStackTrace();
-                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.translatable("cloud.error", NamedTextColor.RED));
-                cloud.getPlayerManager().logoutPlayer(event.getPlayer().getUniqueId());
-            }
-        });
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Component.translatable("cloud.error", NamedTextColor.RED));
+            cloud.getPlayerManager().logoutPlayer(event.getUniqueId());
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+
         try {
             Cloud.getInstance().getPersistence().runInTransaction(transaction -> {
                 transaction.suppressCommit();
 
-                net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getOrCreatePlayer(event.getPlayer());
+                try {
+                    net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getOrCreatePlayer(event.getPlayer());
 
-                Ban ban = getBan(cloudPlayer);
-                if (ban != null) {
-                    cloudPlayer.kick(ban.getBanMessage(cloudPlayer.getLocale(), cloudPlayer.getTimeZone()));
-                    return;
-                }
+                    Ban ban = getBan(cloudPlayer);
+                    if (ban != null) {
+                        cloudPlayer.kick(ban.getBanMessage(cloudPlayer.getLocale(), cloudPlayer.getTimeZone()));
+                        return;
+                    }
 
-                if (cloud.getCloudConfig().getResourcePackUrl() != null) {
-                    cloudPlayer.setResourcePack(cloud.getCloudConfig().getResourcePackUrl(),
-                            cloud.getCloudConfig().getResourcePackHash(), cloud.getCloudConfig().getResourcePackRequired(),
-                            cloud.getCloudConfig().getResourcePackPrompt());
+                    if (cloud.getCloudConfig().getResourcePackUrl() != null) {
+                        cloudPlayer.setResourcePack(cloud.getCloudConfig().getResourcePackUrl(),
+                                cloud.getCloudConfig().getResourcePackHash(), cloud.getCloudConfig().getResourcePackRequired(),
+                                cloud.getCloudConfig().getResourcePackPrompt());
+                    }
+
+                    PermissibleInjector.inject(player, cloudPlayer);
+                    player.setOp(player.hasPermission("minecraft.command.op"));
+
+                    if (cloud.isInventorySavingEnabled()) {
+                        loadInventory(player);
+                    }
+
+                    loadScoreboardTags(player);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             });
         } catch (Exception e) {
             Cloud.getInstance().getPlayerManager().logoutPlayer(event.getPlayer().getUniqueId());
+            player.kick(Component.translatable("cloud.error", NamedTextColor.RED));
+            cloud.getPlayerManager().logoutPlayer(player.getUniqueId());
             throw e;
         }
     }
@@ -102,24 +132,7 @@ public class PaperEventHandler implements Listener {
             return;
         }
 
-        try {
-            Cloud.getInstance().getPersistence().runInTransaction(transaction -> {
-                transaction.suppressCommit();
-
-                net.chrotos.chrotoscloud.player.Player player = cloud.getPlayerManager().getPlayer(event.getPlayerProfile().getId());
-                if (player == null) {
-                    return;
-                }
-
-                event.setWhitelisted(event.isWhitelisted() || event.isOp() || player.hasPermission("minecraft.command.op")
-                        || player.hasPermission("cloud.server.join." + cloud.getGameMode())); // TODO remove op?
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-            event.setWhitelisted(false);
-            event.kickMessage(Component.translatable("cloud.error", NamedTextColor.RED));
-            cloud.getPlayerManager().logoutPlayer(event.getPlayerProfile().getId());
-        }
+        event.setWhitelisted(true);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -187,35 +200,56 @@ public class PaperEventHandler implements Listener {
         cloud.getPersistence().save(cloudPlayer);
     }
 
-    private void loadScoreboardTags(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull Player player) {
-        GameState state = cloudPlayer.getStates(cloud.getGameMode()).stream()
-                .filter(gameState -> gameState != null && gameState.getName().equals("cloud:tags"))
-                .findFirst().orElse(null);
+    private void loadScoreboardTags(@NonNull Player player) {
+        cloud.getScheduler().runTaskAsync(() -> cloud.getPersistence().runInTransaction((databaseTransaction) -> {
+            databaseTransaction.suppressCommit();
 
-        if (state != null) {
-            JsonArray jsonArray = gson.fromJson(state.getState(), JsonArray.class);
+            net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getPlayer(player.getUniqueId());
+            GameState state = cloudPlayer.getStates(cloud.getGameMode()).stream().parallel()
+                    .filter(gameState -> gameState != null && gameState.getName().equals("cloud:tags"))
+                    .findFirst().orElse(null);
 
-            jsonArray.forEach(jsonElement -> player.addScoreboardTag(jsonElement.getAsString()));
-        }
+            cloud.getScheduler().runTask(() -> {
+                if (state != null) {
+                    JsonArray jsonArray = gson.fromJson(state.getState(), JsonArray.class);
+
+                    jsonArray.forEach(jsonElement -> player.addScoreboardTag(jsonElement.getAsString()));
+                }
+            });
+        }));
     }
 
-    private void loadInventory(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull Player player) throws InvalidConfigurationException {
-        PlayerInventory inventory = cloudPlayer.getInventory(cloud.getGameMode());
+    private void loadInventory(@NonNull Player player) {
+        player.sendActionBar(Component.translatable("cloud.player.inventory.loading"));
 
-        if (inventory != null) {
-            YamlConfiguration inventoryContent = new YamlConfiguration();
-            inventoryContent.loadFromString(inventory.getContent());
+        cloud.getScheduler().runTaskAsync(() -> cloud.getPersistence().runInTransaction((databaseTransaction) -> {
+            databaseTransaction.suppressCommit();
 
-            ItemStack[] contents = new ItemStack[player.getInventory().getSize()];
-            for (int i = 0; i < contents.length; i++) {
-                String key = String.valueOf(i);
-                if (inventoryContent.contains(key)) {
-                    contents[i] = inventoryContent.getItemStack(key);
+            net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getPlayer(player.getUniqueId());
+            PlayerInventory inventory = cloudPlayer.getInventory(cloud.getGameMode());
+
+            try {
+                if (inventory != null) {
+                    YamlConfiguration inventoryContent = new YamlConfiguration();
+                    inventoryContent.loadFromString(inventory.getContent());
+
+                    ItemStack[] contents = new ItemStack[player.getInventory().getSize()];
+                    for (int i = 0; i < contents.length; i++) {
+                        String key = String.valueOf(i);
+                        if (inventoryContent.contains(key)) {
+                            contents[i] = inventoryContent.getItemStack(key);
+                        }
+                    }
+
+                    cloud.getScheduler().runTask(() -> {
+                        player.getInventory().setContents(contents);
+                        player.sendActionBar(Component.empty());
+                    });
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            player.getInventory().setContents(contents);
-        }
+        }));
     }
 
     private void saveInventory(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull Player player) {
