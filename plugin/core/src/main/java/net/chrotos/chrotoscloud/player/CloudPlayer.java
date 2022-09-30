@@ -178,12 +178,6 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     }
 
     @Override
-    @JsonIgnore
-    public String getResourcePackHash() {
-        return sidedPlayer.getResourcePackHash();
-    }
-
-    @Override
     public void setResourcePack(@NonNull String url, @NonNull String hash) {
         sidedPlayer.setResourcePack(url, hash);
     }
@@ -196,12 +190,6 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
     @Override
     public void setResourcePack(@NonNull String url, @NonNull String hash, boolean required, @NonNull TextComponent prompt) {
         sidedPlayer.setResourcePack(url, hash, required, prompt);
-    }
-
-    @Override
-    @JsonIgnore
-    public boolean hasResourcePackApplied(@NonNull String hash) {
-        return sidedPlayer.hasResourcePackApplied(hash);
     }
 
     @Override

@@ -148,16 +148,6 @@ public class PaperEventHandler implements Listener {
         event.renderer(renderer);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerResourcePack(PlayerResourcePackStatusEvent event) {
-        net.chrotos.chrotoscloud.player.Player player = cloud.getPlayerManager().getPlayer(event.getPlayer().getUniqueId());
-        if (player.getSidedPlayer() == null) {
-            return;
-        }
-
-        ((PaperSidedPlayer)player.getSidedPlayer()).onResourcePackStatus(event);
-    }
-
     protected void onPlayerLeave(@NonNull Player player) {
         AtomicReference<net.chrotos.chrotoscloud.player.Player> cloudPlayer = new AtomicReference<>();
 
