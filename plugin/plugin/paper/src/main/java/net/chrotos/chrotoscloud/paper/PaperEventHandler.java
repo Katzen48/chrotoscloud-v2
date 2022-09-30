@@ -25,7 +25,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
 @RequiredArgsConstructor
 public class PaperEventHandler implements Listener {
@@ -156,38 +155,33 @@ public class PaperEventHandler implements Listener {
     }
 
     protected void onPlayerLeave(@NonNull Player player) {
-        AtomicReference<net.chrotos.chrotoscloud.player.Player> cloudPlayer = new AtomicReference<>();
+        String inventory = cloud.isInventorySavingEnabled() ? getInventoryFromPlayer(player) : null;
+        String tags = getTagsFromPlayer(player);
 
-        cloud.getPersistence().runInTransaction(databaseTransaction -> {
+        cloud.getScheduler().runTaskAsync(() -> cloud.getPersistence().runInTransaction(databaseTransaction -> {
+            net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getPlayer(player.getUniqueId());
+            if (cloudPlayer == null) {
+                return;
+            }
+
             try {
-                cloudPlayer.set(cloud.getPlayerManager().getPlayer(player.getUniqueId()));
-                if (cloudPlayer.get() == null) {
-                    return;
+                if (inventory != null) {
+                    saveInventory(cloudPlayer, inventory);
                 }
 
-                if (cloud.isInventorySavingEnabled()) {
-                    saveInventory(cloudPlayer.get(), player);
-                }
-
-                saveScoreboardTags(cloudPlayer.get(), player);
+                saveScoreboardTags(cloudPlayer, tags);
             } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                cloud.getPlayerManager().logoutPlayer(cloudPlayer);
             }
-        });
-
-        if (cloudPlayer.get() != null) {
-            cloud.getPlayerManager().logoutPlayer(cloudPlayer.get());
-        }
+        }));
     }
 
-    private void saveScoreboardTags(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull Player player) {
+    private void saveScoreboardTags(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull String json) {
         GameState state = cloudPlayer.getStates(cloud.getGameMode()).stream()
                 .filter(gameState -> gameState != null && gameState.getName().equals("cloud:tags"))
                 .findFirst().orElse(null);
-
-        JsonArray jsonArray = new JsonArray();
-        player.getScoreboardTags().forEach(jsonArray::add);
-        String json = gson.toJson(jsonArray);
 
         if (state == null) {
             GameState gameState = new CloudGameState(UUID.randomUUID(), "cloud:tags", cloud.getGameMode(),
@@ -236,19 +230,30 @@ public class PaperEventHandler implements Listener {
         }
     }
 
-    private void saveInventory(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull Player player) {
-        PlayerInventory inventory = cloudPlayer.getInventory(cloud.getGameMode());
+    private String getTagsFromPlayer(@NonNull Player player) {
+        JsonArray jsonArray = new JsonArray();
+        player.getScoreboardTags().forEach(jsonArray::add);
 
+       return gson.toJson(jsonArray);
+    }
+
+    private String getInventoryFromPlayer(@NonNull Player player) {
         YamlConfiguration inventoryContent = new YamlConfiguration();
         for (int i = 0; i < player.getInventory().getSize(); i++) {
             inventoryContent.set(String.valueOf(i), player.getInventory().getItem(i));
         }
 
+        return inventoryContent.saveToString();
+    }
+
+    private void saveInventory(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, String inventoryContent) {
+        PlayerInventory inventory = cloudPlayer.getInventory(cloud.getGameMode());
+
         if (inventory == null) {
-            inventory = new CloudPlayerInventory(UUID.randomUUID(), cloud.getGameMode(), cloudPlayer, inventoryContent.saveToString());
+            inventory = new CloudPlayerInventory(UUID.randomUUID(), cloud.getGameMode(), cloudPlayer, inventoryContent);
             cloudPlayer.getInventories().add(inventory);
         } else {
-            inventory.setContent(inventoryContent.saveToString());
+            inventory.setContent(inventoryContent);
         }
 
         Cloud.getInstance().getPersistence().save(cloudPlayer);
