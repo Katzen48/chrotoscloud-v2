@@ -15,7 +15,6 @@ import net.chrotos.chrotoscloud.player.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -51,8 +50,14 @@ public class PaperEventHandler implements Listener {
             event.getPlayerProfile().complete(true);
 
             cloud.getPersistence().runInTransaction(databaseTransaction -> {
+                databaseTransaction.suppressCommit();
+
                 try {
-                    net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getOrCreatePlayer(event.getUniqueId());
+                    net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getPlayer(event.getUniqueId());
+
+                    if (cloudPlayer == null) {
+                        return;
+                    }
 
                     boolean isWhitelisted = Bukkit.getWhitelistedPlayers().stream()
                             .anyMatch(offlinePlayer -> offlinePlayer.getUniqueId().equals(event.getUniqueId()));
@@ -104,10 +109,10 @@ public class PaperEventHandler implements Listener {
                     player.setOp(player.hasPermission("minecraft.command.op"));
 
                     if (cloud.isInventorySavingEnabled()) {
-                        loadInventory(cloudPlayer, player);
+                        loadInventory(player);
                     }
 
-                    loadScoreboardTags(cloudPlayer, player);
+                    loadScoreboardTags(player);
                 } catch (Exception e) {
                     e.printStackTrace();
                     throw new RuntimeException(e);
@@ -195,8 +200,11 @@ public class PaperEventHandler implements Listener {
         cloud.getPersistence().save(cloudPlayer);
     }
 
-    private void loadScoreboardTags(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull Player player) {
-        cloud.getScheduler().runTaskAsync(() -> {
+    private void loadScoreboardTags(@NonNull Player player) {
+        cloud.getScheduler().runTaskAsync(() -> cloud.getPersistence().runInTransaction((databaseTransaction) -> {
+            databaseTransaction.suppressCommit();
+
+            net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getPlayer(player.getUniqueId());
             GameState state = cloudPlayer.getStates(cloud.getGameMode()).stream().parallel()
                     .filter(gameState -> gameState != null && gameState.getName().equals("cloud:tags"))
                     .findFirst().orElse(null);
@@ -208,16 +216,19 @@ public class PaperEventHandler implements Listener {
                     jsonArray.forEach(jsonElement -> player.addScoreboardTag(jsonElement.getAsString()));
                 }
             });
-        });
+        }));
     }
 
-    private void loadInventory(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull Player player) {
+    private void loadInventory(@NonNull Player player) {
         player.sendActionBar(Component.translatable("cloud.player.inventory.loading"));
 
-        cloud.getScheduler().runTaskAsync(() -> {
-            try {
-                PlayerInventory inventory = cloudPlayer.getInventory(cloud.getGameMode());
+        cloud.getScheduler().runTaskAsync(() -> cloud.getPersistence().runInTransaction((databaseTransaction) -> {
+            databaseTransaction.suppressCommit();
 
+            net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getPlayer(player.getUniqueId());
+            PlayerInventory inventory = cloudPlayer.getInventory(cloud.getGameMode());
+
+            try {
                 if (inventory != null) {
                     YamlConfiguration inventoryContent = new YamlConfiguration();
                     inventoryContent.loadFromString(inventory.getContent());
@@ -236,9 +247,9 @@ public class PaperEventHandler implements Listener {
                     });
                 }
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
-        });
+        }));
     }
 
     private void saveInventory(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull Player player) {
