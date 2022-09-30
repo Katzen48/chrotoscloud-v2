@@ -1,8 +1,6 @@
 package net.chrotos.chrotoscloud.paper.permissions;
 
 import lombok.NonNull;
-import net.chrotos.chrotoscloud.paper.PaperCloud;
-import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissibleBase;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.permissions.ServerOperator;

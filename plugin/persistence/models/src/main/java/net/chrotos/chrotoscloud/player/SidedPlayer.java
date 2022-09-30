@@ -12,12 +12,8 @@ public interface SidedPlayer extends Kickable {
     UUID getUniqueId();
     String getName();
     Locale getLocale();
-    String getResourcePackHash();
     void setResourcePack(@NonNull String url, @NonNull String hash);
     void setResourcePack(@NonNull String url, @NonNull String hash, boolean required);
     void setResourcePack(@NonNull String url, @NonNull String hash, boolean required, TextComponent prompt);
     InetAddress getIPAddress();
-    default boolean hasResourcePackApplied(@NonNull String hash) {
-        return getResourcePackHash() != null && getResourcePackHash().equalsIgnoreCase(hash);
-    }
 }

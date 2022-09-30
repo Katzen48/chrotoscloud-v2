@@ -38,12 +38,6 @@ public class VelocitySidedPlayer implements SidedPlayer {
     }
 
     @Override
-    public String getResourcePackHash() {
-        return sidedObject.getAppliedResourcePack() != null ?
-                HexFormat.of().formatHex(sidedObject.getAppliedResourcePack().getHash()) : null;
-    }
-
-    @Override
     public void setResourcePack(@NonNull String url, @NonNull String hash) {
         setResourcePack(url, hash, false);
     }

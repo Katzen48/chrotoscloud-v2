@@ -18,9 +18,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PaperSidedPlayer implements SidedPlayer {
     private final Player sidedObject;
-    private String resourcePackHash;
-    @Setter
-    private String sentResourcePackHash;
 
     @Override
     public UUID getUniqueId() {
@@ -50,7 +47,6 @@ public class PaperSidedPlayer implements SidedPlayer {
     @Override
     public void setResourcePack(@NonNull String url, @NonNull String hash, boolean required, TextComponent prompt) {
         sidedObject.setResourcePack(url, hash, required, prompt != null && !prompt.content().equals("") ? prompt : null);
-        sentResourcePackHash = hash;
     }
 
     @Override
@@ -60,12 +56,6 @@ public class PaperSidedPlayer implements SidedPlayer {
         }
 
         return sidedObject.getAddress().getAddress();
-    }
-
-    public void onResourcePackStatus(PlayerResourcePackStatusEvent event) {
-        if (event.getStatus() == PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED) {
-            resourcePackHash = sentResourcePackHash;
-        }
     }
 
     @Override

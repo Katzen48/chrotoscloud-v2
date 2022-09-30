@@ -10,6 +10,7 @@ import net.chrotos.chrotoscloud.permissions.Rank;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 
+import java.net.InetAddress;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -24,12 +25,11 @@ public interface Player extends AccountHolder, Banable, InventoryHolder, Kickabl
     void setRank(Rank rank);
     @NonNull
     Component getPrefixes();
-    String getResourcePackHash();
     void setResourcePack(@NonNull String url, @NonNull String hash);
     void setResourcePack(@NonNull String url, @NonNull String hash, boolean required);
     void setResourcePack(@NonNull String url, @NonNull String hash, boolean required, @NonNull TextComponent prompt);
-    boolean hasResourcePackApplied(@NonNull String hash);
     TimeZone getTimeZone();
     TimeZone getTimeZone(Locale locale);
     Locale getLocale();
+    InetAddress getIPAddress();
 }
