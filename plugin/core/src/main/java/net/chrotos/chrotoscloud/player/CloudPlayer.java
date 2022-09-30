@@ -26,6 +26,7 @@ import org.hibernate.annotations.*;
 import javax.persistence.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import java.net.InetAddress;
 import java.time.ZoneId;
 import java.time.zone.ZoneRulesException;
 import java.util.*;
@@ -56,6 +57,10 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
 
     @JsonIgnore
     private transient CityResponse cityResponse;
+
+    @Setter
+    @JsonIgnore
+    private transient InetAddress ipAddress;
 
     @OneToMany(mappedBy = "owner", targetEntity = CloudAccount.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @Filter(name = "accountType")
@@ -200,7 +205,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
 
     @Override
     public TimeZone getTimeZone(Locale locale) {
-        CityResponse city = getCityResponse();
+        CityResponse city = getCity();
 
         String timeZoneString = city != null ? city.getLocation().getTimeZone() : getTimeZoneString(locale);
         ZoneId zoneId;
@@ -232,12 +237,10 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
 
     @Override
     public Locale getLocale() {
-        if (getSidedPlayer() == null) {
-            return Locale.US;
-        }
-
-        if (getSidedPlayer().getLocale() != null) {
-            return getSidedPlayer().getLocale();
+        if (getSidedPlayer() != null) {
+            if (getSidedPlayer().getLocale() != null) {
+                return getSidedPlayer().getLocale();
+            }
         }
 
         Locale foundLocale = null;
@@ -268,6 +271,19 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
         }
 
         return foundLocale;
+    }
+
+    @Override
+    public InetAddress getIPAddress() {
+        if (ipAddress != null) {
+            return ipAddress;
+        }
+
+        if (getSidedPlayer() != null && getSidedPlayer().getIPAddress() != null) {
+            return getSidedPlayer().getIPAddress();
+        }
+
+        return null;
     }
 
     @JsonIgnore
@@ -346,7 +362,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
             return cityResponse;
         }
 
-        if (getSidedPlayer() == null || getSidedPlayer().getIPAddress() == null) {
+        if (getIPAddress() == null) {
             return null;
         }
 
@@ -356,7 +372,7 @@ public class CloudPlayer extends CloudPermissible implements Player, SoftDeletab
         }
 
         try {
-            return (cityResponse = geoIp.city(getSidedPlayer().getIPAddress()));
+            return (cityResponse = geoIp.city(getIPAddress()));
         } catch (Exception e) {
             e.printStackTrace();
             return null;

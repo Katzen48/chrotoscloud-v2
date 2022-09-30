@@ -56,6 +56,15 @@ public class PaperEventHandler implements Listener {
                     net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getPlayer(event.getUniqueId());
 
                     if (cloudPlayer == null) {
+                        event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, Component.translatable("cloud.player.not_whitelisted"));
+                        return;
+                    }
+                    ((CloudPlayer)cloudPlayer).setIpAddress(event.getAddress());
+
+                    Ban ban = cloudPlayer.getActiveBan();
+                    if (ban != null) {
+                        event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, ban.getBanMessage(cloudPlayer.getLocale(), cloudPlayer.getTimeZone()));
+                        cloud.getPlayerManager().logoutPlayer(event.getUniqueId());
                         return;
                     }
 
@@ -73,6 +82,7 @@ public class PaperEventHandler implements Listener {
                     }
 
                     event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, Component.translatable("cloud.player.not_whitelisted"));
+                    cloud.getPlayerManager().logoutPlayer(event.getUniqueId());
                 } catch (PlayerSoftDeletedException e) {
                     event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, Component.translatable("cloud.player.deleted", NamedTextColor.RED));
                     cloud.getPlayerManager().logoutPlayer(event.getUniqueId());
@@ -89,44 +99,41 @@ public class PaperEventHandler implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        try {
-            Cloud.getInstance().getPersistence().runInTransaction(transaction -> {
-                transaction.suppressCommit();
-
+            cloud.getScheduler().runTaskAsync(() -> {
                 try {
-                    net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getOrCreatePlayer(event.getPlayer());
+                    Cloud.getInstance().getPersistence().runInTransaction(transaction -> {
+                        transaction.suppressCommit();
 
-                    Ban ban = getBan(cloudPlayer);
-                    if (ban != null) {
-                        cloudPlayer.kick(ban.getBanMessage(cloudPlayer.getLocale(), cloudPlayer.getTimeZone()));
-                        return;
-                    }
+                        try {
+                            net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getOrCreatePlayer(event.getPlayer());
 
-                    if (cloud.getCloudConfig().getResourcePackUrl() != null) {
-                        cloudPlayer.setResourcePack(cloud.getCloudConfig().getResourcePackUrl(),
-                                cloud.getCloudConfig().getResourcePackHash(), cloud.getCloudConfig().getResourcePackRequired(),
-                                cloud.getCloudConfig().getResourcePackPrompt());
-                    }
+                            if (cloud.getCloudConfig().getResourcePackUrl() != null) {
+                                cloud.getScheduler().runTask(() -> {
+                                    cloudPlayer.setResourcePack(cloud.getCloudConfig().getResourcePackUrl(),
+                                            cloud.getCloudConfig().getResourcePackHash(), cloud.getCloudConfig().getResourcePackRequired(),
+                                            cloud.getCloudConfig().getResourcePackPrompt());
+                                });
+                            }
 
-                    PermissibleInjector.inject(player, cloudPlayer);
-                    player.setOp(player.hasPermission("minecraft.command.op"));
+                            PermissibleInjector.inject(player, cloudPlayer);
+                            cloud.getScheduler().runTask(() -> player.setOp(player.hasPermission("minecraft.command.op")));
 
-                    if (cloud.isInventorySavingEnabled()) {
-                        loadInventory(player);
-                    }
+                            if (cloud.isInventorySavingEnabled()) {
+                                loadInventory(cloudPlayer, player);
+                            }
 
-                    loadScoreboardTags(player);
+                            loadScoreboardTags(cloudPlayer, player);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            throw new RuntimeException(e);
+                        }
+                    });
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new RuntimeException(e);
+                    player.kick(Component.translatable("cloud.error", NamedTextColor.RED));
+                    cloud.getPlayerManager().logoutPlayer(player.getUniqueId());
+                    throw e;
                 }
             });
-        } catch (Exception e) {
-            Cloud.getInstance().getPlayerManager().logoutPlayer(event.getPlayer().getUniqueId());
-            player.kick(Component.translatable("cloud.error", NamedTextColor.RED));
-            cloud.getPlayerManager().logoutPlayer(player.getUniqueId());
-            throw e;
-        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -193,56 +200,40 @@ public class PaperEventHandler implements Listener {
         cloud.getPersistence().save(cloudPlayer);
     }
 
-    private void loadScoreboardTags(@NonNull Player player) {
-        cloud.getScheduler().runTaskAsync(() -> cloud.getPersistence().runInTransaction((databaseTransaction) -> {
-            databaseTransaction.suppressCommit();
+    private void loadScoreboardTags(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull Player player) {
+        GameState state = cloudPlayer.getStates(cloud.getGameMode()).stream().parallel()
+                .filter(gameState -> gameState != null && gameState.getName().equals("cloud:tags"))
+                .findFirst().orElse(null);
 
-            net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getPlayer(player.getUniqueId());
-            GameState state = cloudPlayer.getStates(cloud.getGameMode()).stream().parallel()
-                    .filter(gameState -> gameState != null && gameState.getName().equals("cloud:tags"))
-                    .findFirst().orElse(null);
+        cloud.getScheduler().runTask(() -> {
+            if (state != null) {
+                JsonArray jsonArray = gson.fromJson(state.getState(), JsonArray.class);
 
-            cloud.getScheduler().runTask(() -> {
-                if (state != null) {
-                    JsonArray jsonArray = gson.fromJson(state.getState(), JsonArray.class);
-
-                    jsonArray.forEach(jsonElement -> player.addScoreboardTag(jsonElement.getAsString()));
-                }
-            });
-        }));
+                jsonArray.forEach(jsonElement -> player.addScoreboardTag(jsonElement.getAsString()));
+            }
+        });
     }
 
-    private void loadInventory(@NonNull Player player) {
-        player.sendActionBar(Component.translatable("cloud.player.inventory.loading"));
+    private void loadInventory(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull Player player) {
+        PlayerInventory inventory = cloudPlayer.getInventory(cloud.getGameMode());
+        try {
+            if (inventory != null) {
+                YamlConfiguration inventoryContent = new YamlConfiguration();
+                inventoryContent.loadFromString(inventory.getContent());
 
-        cloud.getScheduler().runTaskAsync(() -> cloud.getPersistence().runInTransaction((databaseTransaction) -> {
-            databaseTransaction.suppressCommit();
-
-            net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getPlayer(player.getUniqueId());
-            PlayerInventory inventory = cloudPlayer.getInventory(cloud.getGameMode());
-
-            try {
-                if (inventory != null) {
-                    YamlConfiguration inventoryContent = new YamlConfiguration();
-                    inventoryContent.loadFromString(inventory.getContent());
-
-                    ItemStack[] contents = new ItemStack[player.getInventory().getSize()];
-                    for (int i = 0; i < contents.length; i++) {
-                        String key = String.valueOf(i);
-                        if (inventoryContent.contains(key)) {
-                            contents[i] = inventoryContent.getItemStack(key);
-                        }
+                ItemStack[] contents = new ItemStack[player.getInventory().getSize()];
+                for (int i = 0; i < contents.length; i++) {
+                    String key = String.valueOf(i);
+                    if (inventoryContent.contains(key)) {
+                        contents[i] = inventoryContent.getItemStack(key);
                     }
-
-                    cloud.getScheduler().runTask(() -> {
-                        player.getInventory().setContents(contents);
-                        player.sendActionBar(Component.empty());
-                    });
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+
+                cloud.getScheduler().runTask(() -> player.getInventory().setContents(contents));
             }
-        }));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void saveInventory(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull Player player) {
@@ -261,17 +252,5 @@ public class PaperEventHandler implements Listener {
         }
 
         Cloud.getInstance().getPersistence().save(cloudPlayer);
-    }
-
-    private Ban getBan(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer) {
-        AtomicReference<Ban> ban = new AtomicReference<>();
-
-        Cloud.getInstance().getPersistence().runInTransaction(transaction -> {
-            transaction.suppressCommit();
-
-            ban.set(cloudPlayer.getActiveBan());
-        });
-
-        return ban.get();
     }
 }

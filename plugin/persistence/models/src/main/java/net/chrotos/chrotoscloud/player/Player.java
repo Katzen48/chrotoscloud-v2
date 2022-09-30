@@ -10,6 +10,7 @@ import net.chrotos.chrotoscloud.permissions.Rank;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 
+import java.net.InetAddress;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -30,4 +31,5 @@ public interface Player extends AccountHolder, Banable, InventoryHolder, Kickabl
     TimeZone getTimeZone();
     TimeZone getTimeZone(Locale locale);
     Locale getLocale();
+    InetAddress getIPAddress();
 }
