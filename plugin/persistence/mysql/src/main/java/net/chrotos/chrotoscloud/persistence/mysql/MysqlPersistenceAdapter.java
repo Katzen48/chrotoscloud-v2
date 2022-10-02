@@ -303,6 +303,9 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
             }
         } catch (Exception e) {
             transaction.rollback();
+            if (!insideTransaction) {
+                session.close();
+            }
 
             throw e;
         } finally {

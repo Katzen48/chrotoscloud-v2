@@ -155,8 +155,8 @@ public class PaperEventHandler implements Listener {
     }
 
     protected void onPlayerLeave(@NonNull Player player) {
-        String inventory = cloud.isInventorySavingEnabled() ? getInventoryFromPlayer(player) : null;
-        String tags = getTagsFromPlayer(player);
+        final String inventory = cloud.isInventorySavingEnabled() ? getInventoryFromPlayer(player) : null;
+        final String tags = getTagsFromPlayer(player);
 
         cloud.getScheduler().runTaskAsync(() -> cloud.getPersistence().runInTransaction(databaseTransaction -> {
             net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getPlayer(player.getUniqueId());
@@ -173,6 +173,7 @@ public class PaperEventHandler implements Listener {
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
+                databaseTransaction.commit();
                 cloud.getPlayerManager().logoutPlayer(cloudPlayer);
             }
         }));

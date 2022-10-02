@@ -299,6 +299,16 @@
         <persistence strategy="localTempSwap"/>
     </cache>
 
+    <cache name="net.chrotos.chrotoscloud.player.CloudPlayer"
+           maxElementsInMemory="10000"
+           eternal="false"
+           timeToIdleSeconds="300"
+           timeToLiveSeconds="300"
+           maxElementsOnDisk="10000000"
+           diskExpiryThreadIntervalSeconds="120"
+           memoryStoreEvictionPolicy="LRU">
+        <persistence strategy="localTempSwap"/>
+    </cache>
     <cache name="net.chrotos.chrotoscloud.player.CloudPlayer.permissions"
            maxElementsInMemory="10000"
            eternal="true"
