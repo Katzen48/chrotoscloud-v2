@@ -86,6 +86,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
         if (!insideTransation) {
             session.getTransaction().commit();
+            session.close();
         }
 
         return list;
@@ -156,6 +157,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
         if (!insideTransation) {
             session.getTransaction().commit();
+            session.close();
         }
 
         return list;
@@ -208,6 +210,7 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
 
         if (!insideTransaction) {
             session.getTransaction().commit();
+            session.close();
         }
 
         return entity;
@@ -248,6 +251,10 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
             if (sessionFactory.getCache().contains(object.getClass(), identifier)) {
                 sessionFactory.getCache().evict(object.getClass(), identifier);
             }
+        }
+
+        if (!session.getTransaction().isActive()) {
+            session.close();
         }
     }
 
@@ -298,6 +305,10 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
             transaction.rollback();
 
             throw e;
+        } finally {
+            if (!insideTransaction) {
+                session.close();
+            }
         }
     }
 
