@@ -59,6 +59,26 @@ public class MockConfig implements CloudConfig {
     }
 
     @Override
+    public String getResourcePackUrl() {
+        return null;
+    }
+
+    @Override
+    public String getResourcePackHash() {
+        return null;
+    }
+
+    @Override
+    public boolean getResourcePackRequired() {
+        return false;
+    }
+
+    @Override
+    public net.kyori.adventure.text.TextComponent getResourcePackPrompt() {
+        return null;
+    }
+
+    @Override
     public boolean shouldRunMigrations() {
         return true;
     }

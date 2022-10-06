@@ -4,7 +4,11 @@ repositories {
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.1'
+    testCompileOnly 'org.projectlombok:lombok:1.18.24'
+    testImplementation 'com.google.inject:guice:5.1.0'
+    testCompileOnly "net.kyori:adventure-api:4.11.0"
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.1'
+
     implementation project(':api')
     implementation project(':persistence:models')
     implementation project(':core')

@@ -15,7 +15,7 @@ public class RestServer {
     private final HttpServer httpServer;
 
     public RestServer() {
-        httpServer = GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), new RestApplication());
+        httpServer = GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), new RestApplication(), false);
         ServiceLocatorUtilities.createAndPopulateServiceLocator();
     }
 

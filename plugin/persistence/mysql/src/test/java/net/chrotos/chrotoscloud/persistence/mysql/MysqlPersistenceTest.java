@@ -64,8 +64,8 @@ public class MysqlPersistenceTest {
         cloud.getPersistence().save(player);
 
         cloud.getPersistence().runInTransaction((databaseTransaction) -> {
-            Account account = new CloudAccount(player, AccountType.BANK);
-            player.getAccounts().add(account);
+            CloudAccount account = new CloudAccount(player, AccountType.BANK);
+            cloud.getPersistence().save(account);
 
             assertFalse(player.getAccounts().isEmpty());
             assertFalse(cloud.getPersistence().getAll(CloudAccount.class).isEmpty());
