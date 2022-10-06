@@ -7,6 +7,7 @@ import jakarta.ws.rs.ApplicationPath;
 import net.chrotos.chrotoscloud.rest.middleware.AuthenticationMiddleware;
 import net.chrotos.chrotoscloud.rest.middleware.CORSFilter;
 import net.chrotos.chrotoscloud.rest.middleware.DynamicCache;
+import net.chrotos.chrotoscloud.rest.middleware.LoggingMiddleware;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import java.text.SimpleDateFormat;
@@ -17,6 +18,7 @@ public class RestApplication extends ResourceConfig {
         packages("net.chrotos.chrotoscloud.rest.services");
 
         register(getJacksonProvider());
+        register(new LoggingMiddleware());
         register(new CORSFilter());
         register(new AuthenticationMiddleware());
         register(new DynamicCache());
