@@ -146,7 +146,11 @@ public class PaperEventHandler implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
-        onPlayerLeave(event.getPlayer());
+        if (!cloud.getPlugin().isEnabled()) {
+            return;
+        }
+
+        onPlayerLeave(event.getPlayer(), false);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -154,11 +158,19 @@ public class PaperEventHandler implements Listener {
         event.renderer(renderer);
     }
 
-    protected void onPlayerLeave(@NonNull Player player) {
+    protected void onPlayerLeave(@NonNull Player player, boolean serverStopping) {
         final String inventory = cloud.isInventorySavingEnabled() ? getInventoryFromPlayer(player) : null;
         final String tags = getTagsFromPlayer(player);
 
-        cloud.getScheduler().runTaskAsync(() -> cloud.getPersistence().runInTransaction(databaseTransaction -> {
+        if (!serverStopping) {
+            cloud.getScheduler().runTaskAsync(() -> savePlayer(player, tags, inventory));
+        } else {
+            cloud.getPlugin().getExecutorService().submit(() -> savePlayer(player, tags, inventory));
+        }
+    }
+
+    private void savePlayer(@NonNull Player player, @NonNull String tags, String inventory) {
+        cloud.getPersistence().runInTransaction(databaseTransaction -> {
             net.chrotos.chrotoscloud.player.Player cloudPlayer = cloud.getPlayerManager().getPlayer(player.getUniqueId());
             if (cloudPlayer == null) {
                 return;
@@ -172,11 +184,11 @@ public class PaperEventHandler implements Listener {
                 saveScoreboardTags(cloudPlayer, tags);
             } catch (Exception e) {
                 e.printStackTrace();
-            } finally {
-                databaseTransaction.commit();
-                cloud.getPlayerManager().logoutPlayer(cloudPlayer);
             }
-        }));
+
+            databaseTransaction.commit();
+            cloud.getPlayerManager().logoutPlayer(cloudPlayer);
+        });
     }
 
     private void saveScoreboardTags(@NonNull net.chrotos.chrotoscloud.player.Player cloudPlayer, @NonNull String json) {
