@@ -30,6 +30,7 @@ public class PaperLeastPlayersQueueManager implements QueueManager {
     public CompletableFuture<? extends GameServer> getServer(@NonNull Player player) {
         return gameManager.getGameServers(getGameMode()).thenApply(gameServers ->
                 gameServers.stream().filter(server -> server.getMaxPlayers() == 0 || server.getPlayerCount() < server.getMaxPlayers() - 2)
-                        .min(Comparator.comparing(GameServer::getPlayerCount)).orElse(null));
+                        .min(Comparator.comparingInt(GameServer::getPlayerCount)
+                                .thenComparing(GameServer::getName)).orElse(null));
     }
 }
