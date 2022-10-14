@@ -1,5 +1,6 @@
 package net.chrotos.chrotoscloud.paper;
 
+import lombok.Getter;
 import net.chrotos.chrotoscloud.Cloud;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -12,6 +13,9 @@ import org.bukkit.plugin.java.annotation.plugin.author.Author;
 
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Plugin(name = "ChrotosCloud", version = "3.0-SNAPSHOT")
 @Author("Katzen48")
@@ -20,6 +24,8 @@ import java.util.Map;
 public class CloudPlugin extends JavaPlugin {
     private final PaperCloud cloud;
     private PaperEventHandler eventHandler;
+    @Getter
+    private final ExecutorService executorService = Executors.newWorkStealingPool(5);
 
     public CloudPlugin() {
         Cloud.setServiceClassLoader(getClassLoader());
@@ -45,7 +51,8 @@ public class CloudPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        Bukkit.getOnlinePlayers().forEach(eventHandler::onPlayerLeave);
+        Bukkit.getOnlinePlayers().forEach(player -> eventHandler.onPlayerLeave(player, true));
+        executorService.shutdown();
         cloud.getScheduler().close();
     }
 
