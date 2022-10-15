@@ -150,7 +150,7 @@ public class PaperEventHandler implements Listener {
             return;
         }
 
-        onPlayerLeave(event.getPlayer(), false);
+        onPlayerLeave(event.getPlayer(), Bukkit.isStopping());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
