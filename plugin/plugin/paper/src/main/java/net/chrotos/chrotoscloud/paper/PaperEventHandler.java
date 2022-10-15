@@ -162,7 +162,7 @@ public class PaperEventHandler implements Listener {
         final String inventory = cloud.isInventorySavingEnabled() ? getInventoryFromPlayer(player) : null;
         final String tags = getTagsFromPlayer(player);
 
-        if (!serverStopping) {
+        if (!serverStopping || cloud.getPlugin().getExecutorService().isShutdown()) {
             cloud.getScheduler().runTaskAsync(() -> savePlayer(player, tags, inventory));
         } else {
             cloud.getPlugin().getExecutorService().submit(() -> savePlayer(player, tags, inventory));
