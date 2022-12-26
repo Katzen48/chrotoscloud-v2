@@ -24,7 +24,7 @@ dependencies {
     implementation('org.hibernate:hibernate-ehcache:5.6.14.Final') {
         exclude group: 'net.sf.ehcache', module: 'ehcache'
     }
-    implementation 'com.vladmihalcea:hibernate-types-55:2.21.0'
+    implementation 'com.vladmihalcea:hibernate-types-55:2.21.1'
 
     implementation 'net.sf.ehcache:ehcache:2.10.9.2'
 }
