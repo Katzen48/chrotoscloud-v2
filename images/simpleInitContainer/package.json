@@ -9,7 +9,7 @@
     "follow-redirects": "^1.15.2",
     "js-yaml": "^4.1.0",
     "node-stream-zip": "^1.15.0",
-    "openid-client": "^5.3.4",
+    "openid-client": "^5.4.0",
     "properties-reader": "^2.2.0"
   }
 }
