@@ -10,7 +10,7 @@ dependencies {
     implementation project(':api')
     implementation project(':persistence:models')
 
-    compileOnly "net.kyori:adventure-api:4.12.0"
+    compileOnly "net.kyori:adventure-api:4.13.1"
     compileOnly "net.kyori:adventure-text-serializer-legacy:4.12.0"
 
     compileOnly 'org.projectlombok:lombok:1.18.26'
