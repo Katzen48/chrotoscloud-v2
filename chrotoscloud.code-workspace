@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "images",
+			"name": "Docker Images"
+		},
+		{
+			"path": "kubernetes",
+			"name": "Kubernetes Definitions"
+		},
+		{
+			"path": "mixins",
+			"name": "Paper Mixins"
+		},
+		{
+			"path": "plugin",
+			"name": "Plugins"
+		}
+	],
+	"settings": {
+		"java.compile.nullAnalysis.mode": "automatic"
+	}
+}

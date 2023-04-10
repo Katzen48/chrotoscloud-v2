@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "enbrain.vscode-spongepowered-mixin",
+        "redhat.java",
+        "visualstudioexptteam.vscodeintellicode",
+        "vscjava.vscode-java-dependency",
+        "vscjava.vscode-gradle",
+        "youmaycallmev.vscode-java-saber",
+        "naco-siren.gradle-language"
+    ]
+}

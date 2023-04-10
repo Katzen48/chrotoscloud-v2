@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "redhat.java",
+        "visualstudioexptteam.vscodeintellicode",
+        "vscjava.vscode-java-dependency",
+        "vscjava.vscode-gradle",
+        "shengchen.vscode-checkstyle",
+        "youmaycallmev.vscode-java-saber",
+        "naco-siren.gradle-language"
+    ]
+}
