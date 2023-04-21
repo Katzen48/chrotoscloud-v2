@@ -1,4 +1,4 @@
-FROM node:19-bullseye
+FROM node:20-bullseye
 
 RUN apt-get update && apt-get upgrade -y --with-new-pkgs && apt-get install -y ca-certificates gettext-base unar
 
