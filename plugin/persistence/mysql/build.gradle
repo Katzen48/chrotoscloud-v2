@@ -3,7 +3,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
     testCompileOnly 'org.projectlombok:lombok:1.18.26'
     testImplementation 'com.google.inject:guice:5.1.0'
     testCompileOnly "net.kyori:adventure-api:4.13.1"
