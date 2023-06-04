@@ -29,7 +29,7 @@ dependencies {
 
     implementation('com.fasterxml.jackson.core:jackson-annotations:2.15.2')
     implementation 'com.fasterxml.jackson.core:jackson-core:2.15.1'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
 
     implementation 'com.maxmind.geoip2:geoip2:3.0.2'
 
