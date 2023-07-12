@@ -17,31 +17,21 @@ import java.util.logging.Logger;
 public class PaperCloud extends CoreCloud {
     @Setter
     private Logger logger;
-    private final PaperGameManager gameManager;
     private final boolean inventorySavingEnabled;
     @Setter
     private CloudPlugin plugin;
-    @NonNull
-    private final Injector serviceInjector;
     private final PaperScheduler scheduler;
 
     public PaperCloud() throws IOException {
-        this.serviceInjector = Guice.createInjector(new PaperModule(this));
         this.scheduler = getServiceInjector().getInstance(PaperScheduler.class);
         setCloudConfig(new PaperConfig());
-        gameManager = getServiceInjector().getInstance(PaperGameManager.class);
+        // TODO move to game manager
         inventorySavingEnabled = Bukkit.getServer().spigot().getSpigotConfig().getBoolean("players.disable-saving");
     }
 
     @Override
     public void initialize() {
         super.initialize();
-
-        try {
-            gameManager.initialize();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
         scheduler.initialize();
     }

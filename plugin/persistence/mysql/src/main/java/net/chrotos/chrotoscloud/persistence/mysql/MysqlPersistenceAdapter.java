@@ -16,7 +16,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.IdentifiableType;
-import javax.persistence.metamodel.ManagedType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -34,38 +33,31 @@ public class MysqlPersistenceAdapter implements PersistenceAdapter {
     }
 
     @Override
-    public boolean configure(CloudConfig config) {
-        try {
-            if (config.shouldRunMigrations()) {
-                Flyway flyway = Flyway.configure().dataSource(  config.getPersistenceConnectionString(),
-                                                                config.getPersistenceUser(),
-                                                                config.getPersistencePassword())
-                                                    .table("migrations")
-                                                    .load();
+    public void configure(CloudConfig config) {
+        if (config.shouldRunMigrations()) {
+            Flyway flyway = Flyway.configure().dataSource(  config.getPersistenceConnectionString(),
+                                                            config.getPersistenceUser(),
+                                                            config.getPersistencePassword())
+                                                .table("migrations")
+                                                .load();
 
-                // TODO add logging
-                flyway.migrate();
-            }
-
-            Configuration dbConfig = new Configuration()
-                    .configure("/net/chrotos/chrotoscloud/persistence/mysql/hibernate.cfg.xml")
-                    .setProperty("hibernate.connection.url", config.getPersistenceConnectionString())
-                    .setProperty("hibernate.connection.username", config.getPersistenceUser())
-                    .setProperty("hibernate.connection.password", config.getPersistencePassword());
-
-            if (!config.isCachingPersistedEntities()) {
-                dbConfig.setProperty("hibernate.cache.use_second_level_cache", "false");
-            }
-
-            dbConfig.setPhysicalNamingStrategy(new CamelCaseToUnderscoresNamingStrategy());
-
-            sessionFactory = dbConfig.buildSessionFactory();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            // TODO add logging
+            flyway.migrate();
         }
 
-        return true;
+        Configuration dbConfig = new Configuration()
+                .configure("/net/chrotos/chrotoscloud/persistence/mysql/hibernate.cfg.xml")
+                .setProperty("hibernate.connection.url", config.getPersistenceConnectionString())
+                .setProperty("hibernate.connection.username", config.getPersistenceUser())
+                .setProperty("hibernate.connection.password", config.getPersistencePassword());
+
+        if (!config.isCachingPersistedEntities()) {
+            dbConfig.setProperty("hibernate.cache.use_second_level_cache", "false");
+        }
+
+        dbConfig.setPhysicalNamingStrategy(new CamelCaseToUnderscoresNamingStrategy());
+
+        sessionFactory = dbConfig.buildSessionFactory();
     }
 
     @Override

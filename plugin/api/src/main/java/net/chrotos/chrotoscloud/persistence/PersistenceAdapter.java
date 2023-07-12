@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 
 public interface PersistenceAdapter {
     boolean isConnected();
-    boolean configure(CloudConfig config);
+    void configure(CloudConfig config);
     <E> List<E> getAll(Class<E> clazz);
     <E> List<E> getAll(Class<E> clazz, DataSelectFilter filter);
     <E> List<E> getFiltered(Class<E> clazz, String predefinedFilter, Map<String, Object> parameters);

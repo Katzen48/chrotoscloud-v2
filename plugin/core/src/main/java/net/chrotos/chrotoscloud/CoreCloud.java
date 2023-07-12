@@ -1,5 +1,7 @@
 package net.chrotos.chrotoscloud;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.maxmind.geoip2.DatabaseReader;
 import lombok.Getter;
 import lombok.NonNull;
@@ -10,6 +12,7 @@ import net.chrotos.chrotoscloud.jobs.CloudJobManager;
 import net.chrotos.chrotoscloud.messaging.queue.RabbitQueueAdapter;
 import net.chrotos.chrotoscloud.persistence.PersistenceAdapter;
 import net.chrotos.chrotoscloud.player.CloudPlayerManager;
+import net.chrotos.chrotoscloud.service.ServiceProvider;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.TranslationRegistry;
@@ -25,19 +28,17 @@ public abstract class CoreCloud extends Cloud {
     private static boolean loaded;
     private static boolean initialized;
     @Getter
-    @NonNull
-    private CloudPlayerManager playerManager;
-    @Getter
-    @NonNull
-    private ChatManager chatManager;
-    @Getter
     private final DatabaseReader geoIp;
     @Getter
     private TranslationRegistry translationRegistry;
     @Getter
     private CloudJobManager jobManager;
+    @Getter
+    private final Injector serviceInjector;
+    private final Iterable<ServiceProvider> serviceProviders;
 
     protected CoreCloud() {
+        // TODO refactor to service provider
         DatabaseReader geoIp = null;
         try {
             geoIp = new DatabaseReader.Builder(new File("/usr/local/share/GeoIP/GeoLite2-City.mmdb")).build();
@@ -48,6 +49,9 @@ public abstract class CoreCloud extends Cloud {
             e.printStackTrace();
         }
         this.geoIp = geoIp;
+
+        serviceProviders = ServiceLoader.load(ServiceProvider.class);
+        serviceInjector = Guice.createInjector(serviceProviders);
     }
 
     @Override
@@ -65,18 +69,8 @@ public abstract class CoreCloud extends Cloud {
             return;
         }
 
-        loadServices();
-
-        this.playerManager = getServiceInjector().getInstance(CloudPlayerManager.class);
-        this.chatManager = getServiceInjector().getInstance(CoreChatManager.class);
-
-        if (shouldLoadQueue()) {
-            RabbitQueueAdapter queueAdapter = getServiceInjector().getInstance(RabbitQueueAdapter.class);
-            this.queue = queueAdapter;
-            queueAdapter.configure(getCloudConfig());
-
-
-        }
+        // Load all service providers
+        serviceProviders.forEach(serviceProvider -> serviceProvider.load(this));
 
         loaded = true;
     }
@@ -94,6 +88,9 @@ public abstract class CoreCloud extends Cloud {
 
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
+        // Initialize all service providers
+        serviceProviders.forEach(serviceProvider -> serviceProvider.initialize(this));
+
         RedisCacheAdapter redisAdapter = null;
         if (shouldLoadCache()) {
             redisAdapter = getServiceInjector().getInstance(RedisCacheAdapter.class);
@@ -110,40 +107,15 @@ public abstract class CoreCloud extends Cloud {
         }
 
         Thread.currentThread().setContextClassLoader(getServiceClassLoader());
-        this.persistence.configure(getCloudConfig());
-
-        if (shouldLoadQueue()) {
-            queue.initialize();
-        }
 
         Thread.currentThread().setContextClassLoader(loader);
 
         initializeTranslations();
 
         initialized = true;
-    }
 
-    private void loadServices() {
-        this.persistence = loadService(PersistenceAdapter.class);
-    }
-
-    private <E> E loadService(Class<E> clazz) {
-        ServiceLoader<E> serviceLoader = ServiceLoader.load(clazz, getServiceClassLoader());
-
-        Iterator<E> iterator = serviceLoader.iterator();
-
-        if (!iterator.hasNext()) {
-            throw new IllegalStateException(clazz.getSimpleName() + " has no implementation!");
-        }
-
-        E service = iterator.next();
-
-        if (iterator.hasNext()) {
-            throw new IllegalStateException("Multiple Implementations found for " + clazz.getSimpleName() + "! Cannot" +
-                                            "decide, which to use");
-        }
-
-        return service;
+        // Boot all service providers
+        serviceProviders.forEach(serviceProvider -> serviceProvider.boot(this));
     }
 
     private void initializeTranslations() {
@@ -203,10 +175,6 @@ public abstract class CoreCloud extends Cloud {
         });
 
         GlobalTranslator.translator().addSource(translationRegistry);
-    }
-
-    protected boolean shouldLoadQueue() {
-        return true;
     }
 
     protected boolean shouldLoadPubSub() {

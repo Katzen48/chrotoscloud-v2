@@ -38,7 +38,7 @@ public class VelocityEventHandler {
 
         CompletableFuture.supplyAsync(() -> {
             CloudGameServer previousServer = event.getPreviousServer().isPresent() ?
-                    plugin.cloud.getGameManager().getGameServer(event.getPreviousServer().get().getServerInfo().getName()).join() : null;
+                    (CloudGameServer) plugin.cloud.getGameManager().getGameServer(event.getPreviousServer().get().getServerInfo().getName()).join() : null;
 
             plugin.cloud.getQueue().publish("games.server.connect:" + event.getPlayer().getCurrentServer().get()
                             .getServerInfo().getName(),
