@@ -21,7 +21,7 @@ public class RabbitQueueAdapter implements QueueAdapter, AutoCloseable {
     private Connection connection;
     private final ThreadLocal<Channel> publishOnlyChannel = new ThreadLocal<>();
 
-    public void configure(CloudConfig config) {
+    public void configure(@NonNull CloudConfig config) {
         gson = new GsonBuilder().create();
 
         factory = new ConnectionFactory();

@@ -29,6 +29,8 @@ public class MysqlPersistenceTest {
 
         cloud.load();
         assertTrue(cloud.isLoaded());
+        cloud.initialize();
+        assertTrue(cloud.isInitialized());
 
         assertNotNull(cloud.getPersistence());
         assertTrue(cloud.getPersistence() instanceof MysqlPersistenceAdapter);
@@ -39,6 +41,8 @@ public class MysqlPersistenceTest {
     public void testPlayerPersistence() {
         Cloud cloud = Cloud.getInstance();
 
+        cloud.load();
+        assertTrue(cloud.isLoaded());
         cloud.initialize();
         assertTrue(cloud.isInitialized());
 
@@ -55,6 +59,8 @@ public class MysqlPersistenceTest {
     public void testAccountPersistence() {
         Cloud cloud = Cloud.getInstance();
 
+        cloud.load();
+        assertTrue(cloud.isLoaded());
         cloud.initialize();
         assertTrue(cloud.isInitialized());
 
@@ -77,6 +83,8 @@ public class MysqlPersistenceTest {
     public void testPermissionPersistenceAndCheck() {
         Cloud cloud = Cloud.getInstance();
 
+        cloud.load();
+        assertTrue(cloud.isLoaded());
         cloud.initialize();
         assertTrue(cloud.isInitialized());
 
@@ -126,6 +134,8 @@ public class MysqlPersistenceTest {
     public void testGameStats() {
         Cloud cloud = Cloud.getInstance();
 
+        cloud.load();
+        assertTrue(cloud.isLoaded());
         cloud.initialize();
         assertTrue(cloud.isInitialized());
 

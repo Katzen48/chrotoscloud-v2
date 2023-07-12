@@ -5,23 +5,17 @@ import com.google.inject.Injector;
 import lombok.Getter;
 import lombok.NonNull;
 import net.chrotos.chrotoscloud.CoreCloud;
-import net.chrotos.chrotoscloud.cache.Lock;
 import net.chrotos.chrotoscloud.games.GameManager;
-import net.chrotos.chrotoscloud.tasks.Scheduler;
 
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.time.Duration;
 
 public class WorkerCloud extends CoreCloud {
-    @Getter
-    private final Injector serviceInjector;
     @Getter
     private final WorkerScheduler scheduler;
 
     public WorkerCloud() {
-        this.serviceInjector = Guice.createInjector(new WorkerModule(this));
         this.scheduler = getServiceInjector().getInstance(WorkerScheduler.class);
         setCloudConfig(new WorkerConfig());
     }
@@ -33,11 +27,6 @@ public class WorkerCloud extends CoreCloud {
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public @NonNull GameManager getGameManager() {
-        return null;
     }
 
     @Override

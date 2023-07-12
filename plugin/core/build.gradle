@@ -34,6 +34,8 @@ dependencies {
     implementation 'com.maxmind.geoip2:geoip2:3.0.2'
 
     implementation 'com.google.inject:guice:5.1.0'
+    compileOnly 'com.google.auto.service:auto-service:1.1.1'
+    annotationProcessor 'com.google.auto.service:auto-service:1.1.1'
 }
 
 test {

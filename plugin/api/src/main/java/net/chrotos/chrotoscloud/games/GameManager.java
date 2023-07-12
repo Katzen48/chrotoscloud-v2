@@ -4,10 +4,12 @@ import lombok.NonNull;
 import net.chrotos.chrotoscloud.games.gamemode.GameModeManager;
 import net.chrotos.chrotoscloud.player.Player;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface GameManager {
+    void initialize() throws IOException;
     GameModeManager getGameModeManager();
     CompletableFuture<? extends GameServer> getGameServer(@NonNull String name);
     CompletableFuture<List<? extends GameServer>> getGameServers();

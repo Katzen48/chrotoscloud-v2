@@ -41,6 +41,8 @@ dependencies {
     implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
 
     implementation 'com.google.inject:guice:5.1.0'
+    compileOnly 'com.google.auto.service:auto-service:1.1.1'
+    annotationProcessor 'com.google.auto.service:auto-service:1.1.1'
 }
 
 test {

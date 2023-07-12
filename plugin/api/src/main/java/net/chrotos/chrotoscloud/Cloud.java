@@ -25,15 +25,14 @@ public abstract class Cloud implements ServiceContainer {
     @Setter
     private static ClassLoader serviceClassLoader;
     protected CloudConfig cloudConfig;
-    protected PersistenceAdapter persistence;
     protected CacheAdapter cache;
     protected PubSubAdapter pubSub;
-    protected QueueAdapter queue;
     protected TranslationRegistry translationRegistry;
 
     @NonNull
     public static Cloud getInstance() {
         if (Cloud.instance == null) {
+            // TODO refactor to service provider
             ServiceLoader<Cloud> serviceLoader = ServiceLoader.load(Cloud.class, getServiceClassLoader());
 
             Iterator<Cloud> iterator = serviceLoader.iterator();
@@ -73,16 +72,32 @@ public abstract class Cloud implements ServiceContainer {
 
     // Getter
     @NonNull
-    public abstract PlayerManager getPlayerManager();
+    public final PlayerManager getPlayerManager() {
+        return getServiceInjector().getInstance(PlayerManager.class);
+    }
+
     @NonNull
-    public abstract ChatManager getChatManager();
+    public final ChatManager getChatManager() {
+        return getServiceInjector().getInstance(ChatManager.class);
+    }
+
+    public final QueueAdapter getQueue() {
+        return getServiceInjector().getInstance(QueueAdapter.class);
+    }
+
     @NonNull
     public abstract String getHostname();
-    @NonNull
-    public abstract GameManager getGameManager();
+
+    public final GameManager getGameManager() {
+        return getServiceInjector().getInstance(GameManager.class);
+    }
     public abstract File getTranslationDir();
     public abstract Scheduler getScheduler();
     public abstract JobManager getJobManager();
+
+    public PersistenceAdapter getPersistence() {
+        return getServiceInjector().getInstance(PersistenceAdapter.class);
+    }
 
     public String getGameMode() {
         return getCloudConfig().getGameMode();
