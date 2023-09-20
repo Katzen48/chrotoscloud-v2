@@ -6,7 +6,7 @@
     "@kubernetes/client-node": "^0.18.1",
     "cross-fetch": "^4.0.0",
     "fast-xml-parser": "^4.2.7",
-    "follow-redirects": "^1.15.2",
+    "follow-redirects": "^1.15.3",
     "js-yaml": "^4.1.0",
     "node-stream-zip": "^1.15.0",
     "openid-client": "^5.4.3",
