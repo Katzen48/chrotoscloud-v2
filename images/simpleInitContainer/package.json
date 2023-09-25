@@ -5,7 +5,7 @@
   "dependencies": {
     "@kubernetes/client-node": "^0.18.1",
     "cross-fetch": "^4.0.0",
-    "fast-xml-parser": "^4.2.7",
+    "fast-xml-parser": "^4.3.1",
     "follow-redirects": "^1.15.2",
     "js-yaml": "^4.1.0",
     "node-stream-zip": "^1.15.0",
