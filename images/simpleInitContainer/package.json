@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "main.js",
   "dependencies": {
-    "@kubernetes/client-node": "^0.18.1",
+    "@kubernetes/client-node": "^0.20.0",
     "cross-fetch": "^4.0.0",
     "fast-xml-parser": "^4.2.7",
     "follow-redirects": "^1.15.2",
