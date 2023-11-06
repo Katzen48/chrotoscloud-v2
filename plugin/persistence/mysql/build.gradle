@@ -7,7 +7,7 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.28'
     testImplementation 'com.google.inject:guice:5.1.0'
     testCompileOnly "net.kyori:adventure-api:4.14.0"
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
 
     implementation project(':api')
     implementation project(':persistence:models')
